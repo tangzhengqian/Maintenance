@@ -1,20 +1,27 @@
-package com.tzq.maintenance;
+package com.tzq.maintenance.ui;
 
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
-public class MainAct extends AppCompatActivity {
+import com.tzq.common.utils.LogUtil;
+import com.tzq.maintenance.R;
+import com.tzq.maintenance.core.HttpTask;
+
+public class MainAct extends BaseAct {
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_act);
+    int getlayoutId() {
+        return R.layout.main_act;
+    }
+
+    @Override
+    void onCreate() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -31,7 +38,15 @@ public class MainAct extends AppCompatActivity {
                         }).show();
             }
         });
+        new HttpTask("http://www.baidu.com").addCompleteCallBack(new HttpTask.CompleteCallBack() {
+            @Override
+            public void onComplete(boolean isSuccess, Object data, String msg) {
+                LogUtil.i(isSuccess + "  " + data.toString());
+                Toast.makeText(mAct, "grgtdh", Toast.LENGTH_SHORT).show();
+            }
+        }).start();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
