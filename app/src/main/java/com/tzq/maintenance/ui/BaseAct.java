@@ -18,9 +18,9 @@ public abstract class BaseAct extends AppCompatActivity{
         setContentView(getlayoutId());
         mAct=this;
         ButterKnife.bind(this);
-        onCreate();
+        onCreated(savedInstanceState);
     }
     abstract int getlayoutId();
-    abstract void onCreate();
+    abstract void onCreated(Bundle savedInstanceState);
 
 }

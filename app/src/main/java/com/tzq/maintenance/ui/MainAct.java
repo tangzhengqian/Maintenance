@@ -1,5 +1,6 @@
 package com.tzq.maintenance.ui;
 
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
@@ -21,7 +22,7 @@ public class MainAct extends BaseAct {
     }
 
     @Override
-    void onCreate() {
+    void onCreated(Bundle savedInstanceState) {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -38,7 +39,7 @@ public class MainAct extends BaseAct {
                         }).show();
             }
         });
-        new HttpTask("http://www.baidu.com").addCompleteCallBack(new HttpTask.CompleteCallBack() {
+        new HttpTask("http://php.weather.sina.com.cn/xml.php?city=%B1%B1%BE%A9&password=DJOYnieT8234jlsK&day=0").addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(boolean isSuccess, Object data, String msg) {
                 LogUtil.i(isSuccess + "  " + data.toString());
@@ -47,26 +48,18 @@ public class MainAct extends BaseAct {
         }).start();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main_act, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 }
