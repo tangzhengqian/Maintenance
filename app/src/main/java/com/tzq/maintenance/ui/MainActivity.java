@@ -13,12 +13,12 @@ import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.core.HttpTask;
 
-public class MainAct extends BaseAct {
+public class MainActivity extends BaseActivity {
 
 
     @Override
     int getlayoutId() {
-        return R.layout.main_act;
+        return R.layout.activity_main;
     }
 
     @Override
