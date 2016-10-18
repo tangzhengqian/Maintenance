@@ -3,26 +3,23 @@ package com.tzq.maintenance.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.TextView;
 
-import com.tzq.common.utils.AppUtil;
 import com.tzq.maintenance.R;
 
-import butterknife.BindView;
 
 public class SplashActivity extends BaseActivity {
-    @BindView(R.id.showTv)
-    TextView mShowTv;
+    private TextView showTv;
 
     @Override
-    int getlayoutId() {
-        return R.layout.activity_splash;
-    }
-
-    @Override
-    void onCreated(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+        showTv = (TextView) findViewById(R.id.showTv);
         try {
-            mShowTv.setText("施工养护系统\t" + AppUtil.getPackageInfo(mAct, mAct.getPackageName()).versionName);
+            showTv.setText("施工养护系统\t" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -34,5 +31,10 @@ public class SplashActivity extends BaseActivity {
                 finish();
             }
         }, 1500);
+    }
+
+    @Override
+    public void onClick(View view) {
+
     }
 }

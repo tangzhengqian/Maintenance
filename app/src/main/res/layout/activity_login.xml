@@ -13,7 +13,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:orientation="vertical">
 
         <LinearLayout
@@ -37,17 +36,9 @@
             <EditText style="@style/item.value"
                 android:inputType="textPassword"/>
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
-            <TextView
-                style="@style/item.label"
-                android:text="公司编号" />
-
-            <EditText style="@style/item.value"/>
-        </LinearLayout>
         <Button
+            android:id="@+id/login_bt"
             style="@style/button"
             android:text="登录"/>
     </LinearLayout>

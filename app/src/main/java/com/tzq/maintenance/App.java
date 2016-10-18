@@ -2,7 +2,8 @@ package com.tzq.maintenance;
 
 import android.app.Application;
 
-import com.tzq.maintenance.core.DBManager;
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.Configuration;
 
 /**
  * Created by Administrator on 2016/8/29.
@@ -19,6 +20,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        DBManager.init(this);
+        Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("my.db").setDatabaseVersion(1).create();
+        ActiveAndroid.initialize(dbConfiguration);
     }
 }
