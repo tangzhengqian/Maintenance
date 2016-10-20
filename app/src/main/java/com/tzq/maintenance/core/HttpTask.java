@@ -1,9 +1,11 @@
 package com.tzq.maintenance.core;
 
+import android.app.Activity;
 import android.os.Looper;
 
 import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,6 +30,7 @@ public class HttpTask {
     private OkHttpClient mOkHttpClient;
     private List<CompleteCallBack> mCompleteCallBacks = new ArrayList<>();
     private List<ProgressCallBack> mProgressCallBacks = new ArrayList<>();
+    private Activity mActivity;
 
     public HttpTask(String url) {
         mUrl = url;
@@ -49,6 +52,11 @@ public class HttpTask {
         return this;
     }
 
+    public HttpTask setActivity(Activity activity) {
+        mActivity = activity;
+        return this;
+    }
+
     public void start(RequestBody body) {
         LogUtil.i("start " + mUrl);
         Request r;
@@ -58,6 +66,9 @@ public class HttpTask {
             r = new Request.Builder().url(mUrl).post(body).build();
         }
         Call call = mOkHttpClient.newCall(r);
+        if (mActivity != null && mActivity instanceof Activity) {
+            ProgressDialogUtil.show(mActivity);
+        }
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -76,6 +87,9 @@ public class HttpTask {
 
     private void onComplete(Object data) {
         Looper.prepare();
+        if (mActivity != null && mActivity instanceof Activity) {
+            ProgressDialogUtil.hide(mActivity);
+        }
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(true, data, "");
         }

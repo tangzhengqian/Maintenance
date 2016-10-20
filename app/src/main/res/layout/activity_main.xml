@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="8dp"
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
@@ -15,6 +16,7 @@
         <!--android:layout_gravity="bottom|end"-->
         <!--android:layout_margin="@dimen/fab_margin"-->
         <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -22,9 +24,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+            <TextView
+                android:id="@+id/user_msg_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/block_bg"
+                android:gravity="center"
+                android:padding="8dp"/>
             <Button
                 android:id="@+id/tzd_bt"
                 style="@style/button"
+                android:layout_marginTop="16dp"
                 android:text="通知单管理"/>
         </LinearLayout>
     </ScrollView>

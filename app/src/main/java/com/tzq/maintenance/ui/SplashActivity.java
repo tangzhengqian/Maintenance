@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.widget.TextView;
 
 import com.tzq.maintenance.R;
@@ -34,7 +33,8 @@ public class SplashActivity extends BaseActivity {
     }
 
     @Override
-    public void onClick(View view) {
+    public void onViewClick(int id) {
 
     }
+
 }

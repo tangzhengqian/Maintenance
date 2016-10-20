@@ -24,6 +24,7 @@
         </activity>
         <activity android:name=".ui.LoginActivity"></activity>
         <activity android:name=".ui.MainActivity"></activity>
+        <activity android:name=".ui.TongZDListActivity"></activity>
     </application>
 
 </manifest>

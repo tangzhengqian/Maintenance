@@ -3,9 +3,7 @@ package com.tzq.maintenance.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 
-import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.R;
 
 /**
@@ -20,11 +18,10 @@ public class LoginActivity extends BaseActivity {
         setTitle(R.string.login_title);
     }
 
-    public void onClick(View view){
-        LogUtil.i("--onClick "+view.getId());
-        switch (view.getId()){
+    public void onViewClick(int id) {
+        switch (id) {
             case R.id.login_bt:
-                startActivity(new Intent(mAct,MainActivity.class));
+                startActivity(new Intent(mAct, MainActivity.class));
                 finish();
                 break;
         }
