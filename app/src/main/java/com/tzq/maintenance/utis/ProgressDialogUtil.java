@@ -3,8 +3,6 @@ package com.tzq.maintenance.utis;
 import android.app.Activity;
 import android.app.ProgressDialog;
 
-import com.tzq.common.utils.LogUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,7 +33,7 @@ public class ProgressDialogUtil {
 
         }
         pd.count++;
-        LogUtil.i("pd.count=" + pd.count);
+//        LogUtil.i("pd.count=" + pd.count);
         sProgressDialogMap.put(activity, pd);
         if (pd.progressDialog.isShowing()) {
             return;
@@ -50,7 +48,7 @@ public class ProgressDialogUtil {
             return;
         }
         pd.count--;
-        LogUtil.i("pd.count=" + pd.count);
+//        LogUtil.i("pd.count=" + pd.count);
         if (pd.count <= 0) {
             pd.progressDialog.dismiss();
         }

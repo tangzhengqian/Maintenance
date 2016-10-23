@@ -1,15 +1,12 @@
 package com.tzq.maintenance.bean;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-
 /**
- * Created by zqtang on 16/8/30.
+ * Created by Administrator on 2016/10/23.
  */
-@Table(name = "User",id = "_id")
-public class User extends Model{
-    @Column
-    public String name;
 
+public class User {
+    public int user_id;
+    public String user_name;
+    public int company_id;
+    public int maintenance_id;
 }

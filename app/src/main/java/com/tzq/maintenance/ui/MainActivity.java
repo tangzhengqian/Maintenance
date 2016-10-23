@@ -65,6 +65,7 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+
             new HttpTask("http://php.weather.sina.com.cn/xml.php?city=%B1%B1%BE%A9&password=DJOYnieT8234jlsK&day=0").setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                 @Override
                 public void onComplete(boolean isSuccess, Object data, String msg) {

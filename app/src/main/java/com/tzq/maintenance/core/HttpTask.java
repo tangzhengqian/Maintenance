@@ -3,8 +3,11 @@ package com.tzq.maintenance.core;
 import android.app.Activity;
 import android.os.Looper;
 
+import com.google.gson.Gson;
 import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.maintenance.bean.Rep;
+import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import java.io.File;
@@ -21,6 +24,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
  * Created by zqtang on 16/8/30.
@@ -34,10 +38,13 @@ public class HttpTask {
 
     public HttpTask(String url) {
         mUrl = url;
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);//包含header、body数据
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS);
+                .readTimeout(15, TimeUnit.SECONDS)
+                .addInterceptor(loggingInterceptor);
         mOkHttpClient = builder.build();
 
     }
@@ -59,49 +66,57 @@ public class HttpTask {
 
     public void start(RequestBody body) {
         LogUtil.i("start " + mUrl);
-        Request r;
+        final Request r;
         if (body == null) {
-            r = new Request.Builder().url(mUrl).get().build();
+            r = new Request.Builder().url(mUrl).addHeader("client", "Android").get().build();
         } else {
-            r = new Request.Builder().url(mUrl).post(body).build();
+            r = new Request.Builder().url(mUrl).addHeader("client", "Android").post(body).build();
         }
         Call call = mOkHttpClient.newCall(r);
-        if (mActivity != null && mActivity instanceof Activity) {
-            ProgressDialogUtil.show(mActivity);
-        }
+        showProgressDialog();
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                LogUtil.i("onFailure  " + e.getMessage());
+                hideProgressDialog();
                 onError(e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                LogUtil.i("onResponse  " + response.toString());
-                if (response.body() != null) {
-                    onComplete(response.body().string());
+                String body = response.body().string();
+                LogUtil.i("onResponse  " + body);
+                Looper.prepare();
+                hideProgressDialog();
+                Rep res = new Gson().fromJson(body, Rep.class);
+                if (res != null) {
+                    if (res.code == Rep.CODE_SUCCESS) {
+                        MyUtil.toast(res.msg);
+                        onComplete(res.data);
+                    } else {
+                        MyUtil.toast(res.msg);
+                        onError(res.msg);
+                    }
+                } else {
+                    MyUtil.toast("返回数据格式出错");
+                    onError("返回数据格式出错");
                 }
+                Looper.loop();
             }
         });
     }
 
     private void onComplete(Object data) {
-        Looper.prepare();
-        if (mActivity != null && mActivity instanceof Activity) {
-            ProgressDialogUtil.hide(mActivity);
-        }
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(true, data, "");
         }
-        Looper.loop();
+
     }
 
     private void onError(String msg) {
-        Looper.prepare();
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(false, null, msg);
         }
-        Looper.loop();
     }
 
     public void start() {
@@ -135,6 +150,18 @@ public class HttpTask {
                 }
             }
         });
+    }
+
+    private void showProgressDialog() {
+        if (mActivity != null && mActivity instanceof Activity) {
+            ProgressDialogUtil.show(mActivity);
+        }
+    }
+
+    private void hideProgressDialog() {
+        if (mActivity != null && mActivity instanceof Activity) {
+            ProgressDialogUtil.hide(mActivity);
+        }
     }
 
     public interface CompleteCallBack {
