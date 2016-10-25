@@ -10,10 +10,10 @@ import com.tzq.maintenance.App;
 
 public class MyUtil {
     public static void toast(String msg) {
-        Toast.makeText(App.my(), msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(App.getInstance(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void toast(int msgId) {
-        Toast.makeText(App.my(), msgId, Toast.LENGTH_SHORT).show();
+        Toast.makeText(App.getInstance(), msgId, Toast.LENGTH_SHORT).show();
     }
 }

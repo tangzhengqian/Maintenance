@@ -6,10 +6,13 @@ import android.support.annotation.Nullable;
 import android.widget.EditText;
 
 import com.google.gson.Gson;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.User;
+import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
+import com.tzq.maintenance.utis.SyncUtil;
 
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
@@ -53,8 +56,25 @@ public class LoginActivity extends BaseActivity {
                     public void onComplete(boolean isSuccess, Object data, String msg) {
                         if (isSuccess) {
                             User user = new Gson().fromJson(data.toString(), User.class);
-                            startActivity(new Intent(mAct, MainActivity.class));
-                            finish();
+                            App.getInstance().setUser(user);
+                            if(SyncUtil.isDataSyncCompleted()){
+                                startActivity(new Intent(mAct, MainActivity.class));
+                                finish();
+                            }else {
+                                SyncUtil.sCompleteListeners.add(new CompleteListener() {
+                                    @Override
+                                    public void onComplete(Object data) {
+                                        startActivity(new Intent(mAct, MainActivity.class));
+                                        finish();
+                                    }
+
+                                    @Override
+                                    public void onFail() {
+
+                                    }
+                                });
+                                SyncUtil.startSync();
+                            }
                         }
                     }
                 }).start(formBody);

@@ -9,4 +9,5 @@ public class User {
     public String user_name;
     public int company_id;
     public int maintenance_id;
+    public String session_id;
 }

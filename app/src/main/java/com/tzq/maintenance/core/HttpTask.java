@@ -6,6 +6,8 @@ import android.os.Looper;
 import com.google.gson.Gson;
 import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.common.utils.Util;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.bean.Rep;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
@@ -67,11 +69,15 @@ public class HttpTask {
     public void start(RequestBody body) {
         LogUtil.i("start " + mUrl);
         final Request r;
-        if (body == null) {
-            r = new Request.Builder().url(mUrl).addHeader("client", "Android").get().build();
-        } else {
-            r = new Request.Builder().url(mUrl).addHeader("client", "Android").post(body).build();
-        }
+        String sessionId = Util.avoidNull(App.getInstance().getUser().session_id);
+        Request.Builder builder = new Request.Builder();
+        builder.url(mUrl).addHeader("client", "Android").addHeader("session_id", sessionId);
+        r = builder.post(body).build();
+//        if (body == null) {
+//            r = builder.get().build();
+//        } else {
+//            r = builder.post(body).build();
+//        }
         Call call = mOkHttpClient.newCall(r);
         showProgressDialog();
         call.enqueue(new Callback() {
