@@ -12,6 +12,7 @@ import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.User;
 import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
+import com.tzq.maintenance.utis.ProgressDialogUtil;
 import com.tzq.maintenance.utis.SyncUtil;
 
 import okhttp3.FormBody;
@@ -53,28 +54,25 @@ public class LoginActivity extends BaseActivity {
                         .build();
                 new HttpTask(Config.url_login).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
-                    public void onComplete(boolean isSuccess, Object data, String msg) {
+                    public void onComplete(boolean isSuccess, String data, String msg) {
                         if (isSuccess) {
-                            User user = new Gson().fromJson(data.toString(), User.class);
+                            User user = new Gson().fromJson(data, User.class);
                             App.getInstance().setUser(user);
-                            if(SyncUtil.isDataSyncCompleted()){
-                                startActivity(new Intent(mAct, MainActivity.class));
-                                finish();
-                            }else {
-                                SyncUtil.sCompleteListeners.add(new CompleteListener() {
-                                    @Override
-                                    public void onComplete(Object data) {
-                                        startActivity(new Intent(mAct, MainActivity.class));
-                                        finish();
-                                    }
+                            ProgressDialogUtil.show(mAct);
+                            SyncUtil.sCompleteListeners.add(new CompleteListener() {
+                                @Override
+                                public void onComplete(Object data) {
+                                    ProgressDialogUtil.hide(mAct);
+                                    startActivity(new Intent(mAct, MainActivity.class));
+                                    finish();
+                                }
 
-                                    @Override
-                                    public void onFail() {
+                                @Override
+                                public void onFail() {
 
-                                    }
-                                });
-                                SyncUtil.startSync();
-                            }
+                                }
+                            });
+                            SyncUtil.startSync();
                         }
                     }
                 }).start(formBody);

@@ -7,11 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.tzq.common.utils.LogUtil;
+import com.activeandroid.query.Select;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.R;
-import com.tzq.maintenance.core.HttpTask;
+import com.tzq.maintenance.bean.Company;
+import com.tzq.maintenance.bean.Maintenance;
+import com.tzq.maintenance.bean.Role;
 
 public class MainActivity extends BaseActivity {
     TextView userMsgTv;
@@ -24,11 +26,15 @@ public class MainActivity extends BaseActivity {
         setTitle("工程管理系统");
         userMsgTv = (TextView) findViewById(R.id.user_msg_tv);
         tzdBtn = (Button) findViewById(R.id.tzd_bt);
-
-        userMsgTv.setText("用户：xxxx" +
-                "\n所属公司：xxxxxxx" +
-                "\n所属养护科：xxxxxx" +
-                "\n职位：xxxx");
+        String name = App.getInstance().getUser().user_name;
+        Company company = new Select().from(Company.class).where("id=" + App.getInstance().getUser().company_id).executeSingle();
+        Maintenance maintenance = new Select().from(Maintenance.class).where("id=" + App.getInstance().getUser().maintenance_id).executeSingle();
+//        Management management=new Select().from(Management.class).where("id="+App.getInstance().getUser().maintenance_id).executeSingle();
+        Role role = new Select().from(Role.class).where("id=" + App.getInstance().getUser().role_id).executeSingle();
+        userMsgTv.setText("用户：" + name +
+                "\n所属公司：" + company.name +
+                "\n所属养护科：" + maintenance.name +
+                "\n职位：" + role.name);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -66,13 +72,6 @@ public class MainActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
 
-            new HttpTask("http://php.weather.sina.com.cn/xml.php?city=%B1%B1%BE%A9&password=DJOYnieT8234jlsK&day=0").setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-                @Override
-                public void onComplete(boolean isSuccess, Object data, String msg) {
-                    LogUtil.i(isSuccess + "  " + data.toString());
-                    Toast.makeText(mAct, data.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }).start();
             return true;
         }
         return super.onOptionsItemSelected(item);

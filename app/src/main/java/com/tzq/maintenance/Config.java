@@ -10,7 +10,7 @@ public class Config {
     public static final String url_management_list = url_host + "/Home/Api/getManagementList";
     public static final String url_maintenance_list = url_host + "/Home/Api/getMaintenanceList";
     public static final String url_role_list = url_host + "/Home/Api/getRoleList";
-    public static final String url_company_list = url_host + "/Home/Company/sList";
+    public static final String url_company_list = url_host + "/Home/Api/getCompanyList";
 
     public static final String prefs_key_login_user="user";
 }

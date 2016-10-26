@@ -1,7 +1,5 @@
 package com.tzq.maintenance;
 
-import android.app.Application;
-
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 import com.google.gson.Gson;
@@ -17,7 +15,7 @@ import com.tzq.maintenance.core.CrashHandler;
 /**
  * database:103.214.195.78  pangxie520
  */
-public class App extends Application {
+public class App extends com.activeandroid.app.Application {
     private static App mInstance;
     private User user;
 
@@ -34,7 +32,13 @@ public class App extends Application {
         CrashHandler.getInstance().init(mInstance);
         Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("getInstance.db").setDatabaseVersion(1).create();
         ActiveAndroid.initialize(dbConfiguration);
+//        startService(new Intent(mInstance, CoreService.class));
+    }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        ActiveAndroid.dispose();
     }
 
     synchronized public User getUser() {

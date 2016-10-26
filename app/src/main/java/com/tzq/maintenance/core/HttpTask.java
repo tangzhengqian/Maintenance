@@ -3,14 +3,14 @@ package com.tzq.maintenance.core;
 import android.app.Activity;
 import android.os.Looper;
 
-import com.google.gson.Gson;
 import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
-import com.tzq.maintenance.bean.Rep;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +37,7 @@ public class HttpTask {
     private List<CompleteCallBack> mCompleteCallBacks = new ArrayList<>();
     private List<ProgressCallBack> mProgressCallBacks = new ArrayList<>();
     private Activity mActivity;
+    private boolean mIsShowMessage = true;
 
     public HttpTask(String url) {
         mUrl = url;
@@ -66,20 +67,19 @@ public class HttpTask {
         return this;
     }
 
+    public HttpTask setShowMessage(boolean b) {
+        mIsShowMessage = b;
+        return this;
+    }
+
     public void start(RequestBody body) {
         LogUtil.i("start " + mUrl);
         final Request r;
-        String sessionId = Util.avoidNull(App.getInstance().getUser().session_id);
+        String sessionId = Util.avoidNull(App.getInstance().getUser().token);
         Request.Builder builder = new Request.Builder();
-        builder.url(mUrl).addHeader("client", "Android").addHeader("session_id", sessionId);
+        builder.url(mUrl).addHeader("client", "Android").addHeader("token", sessionId);
         r = builder.post(body).build();
-//        if (body == null) {
-//            r = builder.get().build();
-//        } else {
-//            r = builder.post(body).build();
-//        }
         Call call = mOkHttpClient.newCall(r);
-        showProgressDialog();
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -94,17 +94,22 @@ public class HttpTask {
                 LogUtil.i("onResponse  " + body);
                 Looper.prepare();
                 hideProgressDialog();
-                Rep res = new Gson().fromJson(body, Rep.class);
-                if (res != null) {
-                    if (res.code == Rep.CODE_SUCCESS) {
-                        MyUtil.toast(res.msg);
-                        onComplete(res.data);
+                try {
+                    JSONObject o = new JSONObject(body);
+                    int code = o.getInt("code");
+                    String msg = o.getString("msg");
+                    String data = o.getString("data");
+                    if (code == 0) {
+                        showMessage(msg);
+                        onComplete(data);
                     } else {
-                        MyUtil.toast(res.msg);
-                        onError(res.msg);
+                        showMessage(msg);
+                        onError(msg);
                     }
-                } else {
-                    MyUtil.toast("返回数据格式出错");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LogUtil.e(e.getMessage(), e);
+                    showMessage("返回数据格式出错");
                     onError("返回数据格式出错");
                 }
                 Looper.loop();
@@ -112,7 +117,17 @@ public class HttpTask {
         });
     }
 
-    private void onComplete(Object data) {
+    public void start() {
+        start(null);
+    }
+
+    private void showMessage(String msg) {
+        if (mIsShowMessage) {
+            MyUtil.toast(msg);
+        }
+    }
+
+    private void onComplete(String data) {
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(true, data, "");
         }
@@ -125,9 +140,6 @@ public class HttpTask {
         }
     }
 
-    public void start() {
-        start(null);
-    }
 
     public void download() {
         Request request = new Request.Builder().url(mUrl).build();
@@ -171,7 +183,7 @@ public class HttpTask {
     }
 
     public interface CompleteCallBack {
-        void onComplete(boolean isSuccess, Object data, String msg);
+        void onComplete(boolean isSuccess, String data, String msg);
     }
 
     public interface ProgressCallBack {

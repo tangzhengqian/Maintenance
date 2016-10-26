@@ -29,7 +29,7 @@ public class SplashActivity extends BaseActivity {
                 startActivity(new Intent(mAct, LoginActivity.class));
                 finish();
             }
-        }, 1500);
+        }, 500);
     }
 
     @Override
