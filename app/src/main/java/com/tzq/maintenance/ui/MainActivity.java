@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -22,7 +23,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
         setTitle("工程管理系统");
         userMsgTv = (TextView) findViewById(R.id.user_msg_tv);
         tzdBtn = (Button) findViewById(R.id.tzd_bt);
@@ -53,10 +54,10 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void onViewClick(int id) {
-        switch (id) {
+    public void onViewClick(View view) {
+        switch (view.getId()) {
             case R.id.tzd_bt:
-                startActivity(new Intent(mAct, TongZDListActivity.class));
+                startActivity(new Intent(mAct, NoticeListActivity.class));
                 break;
         }
     }

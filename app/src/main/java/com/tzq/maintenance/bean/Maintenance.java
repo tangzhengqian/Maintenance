@@ -18,7 +18,7 @@ public class Maintenance extends Model {
     @Column
     public String name;
     @Column
-    public String createtime;
+    public String create_at;
     @Column
     public String desc;
 

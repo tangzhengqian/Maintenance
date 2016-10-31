@@ -80,6 +80,7 @@ public class HttpTask {
         builder.url(mUrl).addHeader("client", "Android").addHeader("token", sessionId);
         r = builder.post(body).build();
         Call call = mOkHttpClient.newCall(r);
+        showProgressDialog();
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -97,10 +98,10 @@ public class HttpTask {
                 try {
                     JSONObject o = new JSONObject(body);
                     int code = o.getInt("code");
-                    String msg = o.getString("msg");
+                    String msg = o.optString("msg");
                     String data = o.getString("data");
                     if (code == 0) {
-                        showMessage(msg);
+//                        showMessage(msg);
                         onComplete(data);
                     } else {
                         showMessage(msg);

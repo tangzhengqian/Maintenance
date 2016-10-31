@@ -2,9 +2,11 @@ package com.tzq.maintenance;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
+import com.activeandroid.query.Select;
 import com.google.gson.Gson;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.Util;
+import com.tzq.maintenance.bean.Company;
 import com.tzq.maintenance.bean.User;
 import com.tzq.maintenance.core.CrashHandler;
 
@@ -33,6 +35,8 @@ public class App extends com.activeandroid.app.Application {
         Configuration dbConfiguration = new Configuration.Builder(this).setDatabaseName("getInstance.db").setDatabaseVersion(1).create();
         ActiveAndroid.initialize(dbConfiguration);
 //        startService(new Intent(mInstance, CoreService.class));
+
+        new Select().from(Company.class).execute();
     }
 
     @Override

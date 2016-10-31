@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/notice_no_tv"
+            style="@style/notice_item_tv"
+            android:text="编号：" />
+
+        <TextView
+            android:id="@+id/notice_name_tv"
+            style="@style/notice_item_tv"
+            android:layout_below="@+id/notice_no_tv"
+            android:text="工程名称：" />
+
+        <TextView
+            android:id="@+id/notice_type_tv"
+            style="@style/notice_item_tv"
+            android:layout_below="@+id/notice_name_tv"
+            android:text="工程名称：" />
+
+        <TextView
+            android:id="@+id/notice_cost_tv"
+            style="@style/notice_item_tv"
+
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="造价：" />
+
+        <TextView
+            android:id="@+id/notice_status_tv"
+            style="@style/notice_item_tv"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/notice_cost_tv"
+            android:text="状态：" />
+
+        <TextView
+            android:id="@+id/notice_date_tv"
+            style="@style/notice_item_tv"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/notice_status_tv"
+            android:text="" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="#ddd" />
+
+</LinearLayout>

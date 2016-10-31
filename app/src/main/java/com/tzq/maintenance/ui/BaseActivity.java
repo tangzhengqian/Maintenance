@@ -14,7 +14,7 @@ import com.tzq.common.utils.LogUtil;
 /**
  * Created by zqtang on 16/8/30.
  */
-public abstract class BaseActivity extends AppCompatActivity{
+public abstract class BaseActivity extends AppCompatActivity implements View.OnClickListener{
     protected Activity mAct;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,14 +22,14 @@ public abstract class BaseActivity extends AppCompatActivity{
         mAct=this;
     }
 
-    abstract public void onViewClick(int id);
+    abstract public void onViewClick(View view);
 
     public void onClick(View view) {
         LogUtil.i("--onClick "+view.getId());
         switch (view.getId()){
 
         }
-        onViewClick(view.getId());
+        onViewClick(view);
     }
 
     @Override
