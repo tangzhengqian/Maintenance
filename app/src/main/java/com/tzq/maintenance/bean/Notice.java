@@ -1,12 +1,13 @@
 package com.tzq.maintenance.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Administrator on 2016/10/29.
  */
 
-public class Notice implements Serializable{
+public class Notice implements Serializable {
     public int id;
     public String stake_ud;//上行
     public String cate;//
@@ -16,7 +17,7 @@ public class Notice implements Serializable{
     public String start_time;//
     public int is_checked;//
     public String end_time;//
-    public String detail;//
+    public List<Detail> detail;//
     public String days;//
     public String detail_new;//
     public String project_cost;//

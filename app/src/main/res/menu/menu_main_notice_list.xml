@@ -5,11 +5,15 @@
     <item
         android:id="@+id/action_create"
         android:orderInCategory="100"
-        android:title="创建通知单"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_sort"
-        android:orderInCategory="100"
-        android:title="排序"
-        app:showAsAction="never" />
+        android:title="创建通知单"/>
+    <!--<item-->
+        <!--android:id="@+id/action_create"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="创建通知单"-->
+        <!--app:showAsAction="never" />-->
+    <!--<item-->
+        <!--android:id="@+id/action_sort"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="排序"-->
+        <!--app:showAsAction="never" />-->
 </menu>

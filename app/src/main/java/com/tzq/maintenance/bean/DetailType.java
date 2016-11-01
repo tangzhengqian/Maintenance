@@ -17,4 +17,10 @@ public class DetailType extends Model {
     public int management_id;
     @Column
     public int company_id;
+
+
+    @Override
+    public String toString() {
+        return cate_name;
+    }
 }

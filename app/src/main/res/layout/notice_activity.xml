@@ -12,7 +12,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp">
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
                 android:layout_height="match_parent" />
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -55,7 +55,7 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +68,7 @@
                 android:layout_height="match_parent" />
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
                 android:layout_weight="1" />
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -109,24 +109,41 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
         </LinearLayout>
-        <LinearLayout style="@style/notice_lay"
+
+        <LinearLayout
+            style="@style/item_lay"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="细目：" />
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="细目：" />
+
+                <ImageView
+                    android:id="@+id/add_detail_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:onClick="onClick"
+                    android:src="@mipmap/add" />
+            </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/detail_list_lay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:orientation="vertical"></LinearLayout>
+                android:orientation="vertical"
+                android:padding="8dp"></LinearLayout>
         </LinearLayout>
 
-        <LinearLayout style="@style/notice_lay">
+        <LinearLayout style="@style/item_lay">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -142,7 +159,7 @@
 
         <LinearLayout
             android:id="@+id/bofore_ic_lay"
-            style="@style/notice_lay"
+            style="@style/item_lay"
             android:layout_height="82dp"
             android:clickable="true"
             android:onClick="onClick">

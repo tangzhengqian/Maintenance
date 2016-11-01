@@ -1,24 +1,22 @@
 package com.tzq.maintenance.utis;
 
+import android.content.Context;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
+import com.tzq.maintenance.bean.Detail;
+import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NoticeType;
 import com.tzq.maintenance.bean.Structure;
-import com.tzq.maintenance.core.HttpTask;
 
 import java.util.List;
-
-import okhttp3.FormBody;
 
 /**
  * Created by Administrator on 2016/10/23.
@@ -91,6 +89,28 @@ public class MyUtil {
         return 0;
     }
 
+    public static int getDetailTypeIndex(List<DetailType> list, int id) {
+        int i = 0;
+        for (DetailType n : list) {
+            if (n.id == id) {
+                return i;
+            }
+            i++;
+        }
+        return 0;
+    }
+
+    public static int getDetailIndex(List<Detail> list, int id) {
+        int i = 0;
+        for (Detail n : list) {
+            if (n.id == id) {
+                return i;
+            }
+            i++;
+        }
+        return 0;
+    }
+
     public static void displayPic(ImageView iv, String url) {
         LogUtil.i("displayPic  " + url);
         if (!url.startsWith("http://")) {
@@ -99,6 +119,26 @@ public class MyUtil {
         Picasso.with(App.getInstance()).load(url).resize(60, 60).centerCrop().into(iv);
     }
 
+    public static DetailType getDetailType(int id) {
+        DetailType detailType = new Select().from(DetailType.class).where("id = " + id).executeSingle();
+        return detailType == null ? new DetailType() : detailType;
+    }
 
+    public static Detail getDetail(int id) {
+        Detail detail = new Select().from(Detail.class).where("id = " + id).executeSingle();
+        return detail == null ? new Detail() : detail;
+    }
+
+    public static <T> void setUpSp(Context context, Spinner sp, List<T> list) {
+        ArrayAdapter<T> adapter = new ArrayAdapter<T>(context, android.R.layout.simple_spinner_item, list);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(adapter);
+    }
+
+    public static <T> void setUpSp(Context context, Spinner sp, T[] array) {
+        ArrayAdapter<T> adapter = new ArrayAdapter<T>(context, android.R.layout.simple_spinner_item, array);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(adapter);
+    }
 
 }

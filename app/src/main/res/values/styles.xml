@@ -51,7 +51,7 @@
         <item name="android:textSize">15sp</item>
         <item name="android:layout_marginBottom">4dp</item>
     </style>
-    <style name="notice_lay">
+    <style name="item_lay">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">55dp</item>
         <item name="android:gravity">center_vertical</item>
