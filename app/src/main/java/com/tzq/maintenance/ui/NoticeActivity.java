@@ -20,6 +20,7 @@ import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.FormBody;
@@ -30,6 +31,7 @@ import okhttp3.FormBody;
 
 public class NoticeActivity extends BaseActivity {
     final int REQUEST_DETAIL = 101;
+    final int REQUEST_PHOTO = 102;
     Notice mNotice;
     Spinner mTypeSp, mStakeSp, structureSp;
     EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDateEt, mDaysEt, mCostEt;
@@ -170,6 +172,14 @@ public class NoticeActivity extends BaseActivity {
             case R.id.add_detail_iv:
                 startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("type", DetailActivity.TYPE_NOTICE_DETAIL), REQUEST_DETAIL);
                 break;
+            case R.id.brfore_pic_lay:
+                String[] beforePicUrls = mNotice.before_pic.split(",");
+                ArrayList<String> list = new ArrayList<>();
+                for (String s : beforePicUrls) {
+                    list.add(s);
+                }
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("urls", list), REQUEST_PHOTO);
+                break;
         }
     }
 
@@ -178,7 +188,7 @@ public class NoticeActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_DETAIL) {
-                Detail detail= (Detail) data.getSerializableExtra("detail");
+                Detail detail = (Detail) data.getSerializableExtra("detail");
                 addDetailView(detail);
             }
 

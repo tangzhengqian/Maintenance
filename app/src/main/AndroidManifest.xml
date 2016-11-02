@@ -30,6 +30,8 @@
         <activity android:name=".ui.NoticeListActivity"></activity>
         <activity android:name=".ui.NoticeActivity"></activity>
         <activity android:name=".ui.DetailActivity" />
+        <activity android:name=".ui.PhotoGridShowActivity" />
+        <activity android:name=".ui.PhotoViewPagerActivity" />
 
         <service android:name=".service.CoreService"/>
     </application>

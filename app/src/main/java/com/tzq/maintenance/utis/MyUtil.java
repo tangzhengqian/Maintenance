@@ -119,6 +119,14 @@ public class MyUtil {
         Picasso.with(App.getInstance()).load(url).resize(60, 60).centerCrop().into(iv);
     }
 
+    public static void displayLargePic(ImageView iv, String url) {
+        LogUtil.i("displayPic  " + url);
+        if (!url.startsWith("http://")) {
+            url = Config.url_host + url;
+        }
+        Picasso.with(App.getInstance()).load(url).into(iv);
+    }
+
     public static DetailType getDetailType(int id) {
         DetailType detailType = new Select().from(DetailType.class).where("id = " + id).executeSingle();
         return detailType == null ? new DetailType() : detailType;
