@@ -37,8 +37,7 @@
                 android:id="@+id/stake_sp"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:entries="@array/notice_stake" />
+                android:layout_weight="1"/>
 
             <EditText
                 android:id="@+id/stake_num1_et"
@@ -89,11 +88,15 @@
                 android:layout_height="wrap_content"
                 android:text="开单时间：" />
 
-            <EditText
-                android:id="@+id/date_et"
+            <TextView
+                android:id="@+id/date_tv"
                 android:layout_width="0dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:gravity="center_vertical"
+                android:clickable="true"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:hint="选择日期"/>
         </LinearLayout>
 
         <LinearLayout style="@style/item_lay">

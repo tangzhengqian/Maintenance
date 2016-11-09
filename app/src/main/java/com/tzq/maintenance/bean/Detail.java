@@ -3,6 +3,7 @@ package com.tzq.maintenance.bean;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
@@ -12,6 +13,7 @@ import java.io.Serializable;
 @Table(name = "Detail", id = "_id")
 public class Detail extends Model implements Serializable {
     @Column
+    @SerializedName(value = "id",alternate = {"detail_id"})
     public int id;
     @Column
     public String detail_name;
@@ -22,6 +24,7 @@ public class Detail extends Model implements Serializable {
     @Column
     public String detail_quantities;
     @Column
+    @SerializedName(value = "cate_id",alternate = {"detail_name_cate"})
     public int cate_id;
     @Column
     public String detail_num;
@@ -32,8 +35,6 @@ public class Detail extends Model implements Serializable {
     @Column
     public int company_id;
 
-    public int detail_name_cate;
-    public int detail_id;
     public String detail_price;
     public String detail_quantities1;
     public String detail_quantities2;

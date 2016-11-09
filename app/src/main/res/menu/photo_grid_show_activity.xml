@@ -3,7 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item
+        android:id="@+id/action_add_pic"
+        android:title="添加图片"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_delete"
         android:title="删除"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_complete"
+        android:title="完成"
+        app:showAsAction="never" />
 </menu>

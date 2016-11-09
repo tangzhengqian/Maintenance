@@ -3,6 +3,8 @@ package com.tzq.maintenance.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +17,7 @@ import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Detail;
+import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Notice;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.HttpTask;
@@ -34,7 +37,8 @@ public class NoticeActivity extends BaseActivity {
     final int REQUEST_PHOTO = 102;
     Notice mNotice;
     Spinner mTypeSp, mStakeSp, structureSp;
-    EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDateEt, mDaysEt, mCostEt;
+    EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDaysEt, mCostEt;
+    TextView mDateEt;
     ImageView mBeforeIv1, mBeforeIv2, mBeforeMoreIv;
     LinearLayout mDetailListLay;
 
@@ -53,7 +57,7 @@ public class NoticeActivity extends BaseActivity {
         mStakeNum2Et = (EditText) findViewById(R.id.stake_num2_et);
         mProjectNameEt = (EditText) findViewById(R.id.name_et);
         mDaysEt = (EditText) findViewById(R.id.days_et);
-        mDateEt = (EditText) findViewById(R.id.date_et);
+        mDateEt = (TextView) findViewById(R.id.date_tv);
         mCostEt = (EditText) findViewById(R.id.cost_et);
         mBeforeIv1 = (ImageView) findViewById(R.id.before_iv1);
         mBeforeIv2 = (ImageView) findViewById(R.id.before_iv2);
@@ -62,10 +66,28 @@ public class NoticeActivity extends BaseActivity {
 
         mNotice = (Notice) getIntent().getSerializableExtra("notice");
         MyUtil.setUpSp(mAct, mTypeSp, Config.CATES);
+        MyUtil.setUpSp(mAct, mStakeSp, Config.STAKES);
         MyUtil.setUpSp(mAct, structureSp, new Select().from(Structure.class).execute());
         update();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.notice_act, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_save:
+                createNotice();
+                break;
+            case R.id.action_edit:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void getNoticeDetail(int noticeId) {
         new HttpTask(Config.url_notice_detail).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
@@ -86,31 +108,15 @@ public class NoticeActivity extends BaseActivity {
             mNotice = new Notice();
             setTitle("新建通知单");
             mDetailListLay.removeAllViews();
-            mTypeSp.setEnabled(true);
-            mStakeSp.setEnabled(true);
-            structureSp.setEnabled(true);
-            mStakeNum1Et.setEnabled(true);
-            mStakeNum2Et.setEnabled(true);
-            mProjectNameEt.setEnabled(true);
-            mDaysEt.setEnabled(true);
-            mDateEt.setEnabled(true);
-            mCostEt.setEnabled(true);
+            setEditable(true);
+
             findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
         } else {
             setTitle("通知单详情");
-//            mTypeSp.setEnabled(false);
-//            mStakeSp.setEnabled(false);
-//            structureSp.setEnabled(false);
-//            mStakeNum1Et.setEnabled(false);
-//            mStakeNum2Et.setEnabled(false);
-//            mProjectNameEt.setEnabled(false);
-//            mDaysEt.setEnabled(false);
-//            mDateEt.setEnabled(false);
-//            mCostEt.setEnabled(false);
-//            findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
+            setEditable(true);
 
             mTypeSp.setSelection(MyUtil.getNoticeCateIndex(mNotice.cate));
-            mStakeSp.setSelection(getStakeIndex());
+            mStakeSp.setSelection(MyUtil.getNoticeStakeIndex(mNotice.stake_ud));
             structureSp.setSelection(MyUtil.getStructureIndex(mNotice.structure_id));
             mStakeNum1Et.setText(mNotice.stake_num1);
             mStakeNum2Et.setText(mNotice.stake_num2);
@@ -135,50 +141,133 @@ public class NoticeActivity extends BaseActivity {
         }
     }
 
+    private void setEditable(boolean b) {
+        mTypeSp.setEnabled(b);
+        mStakeSp.setEnabled(b);
+        structureSp.setEnabled(b);
+        mStakeNum1Et.setEnabled(b);
+        mStakeNum2Et.setEnabled(b);
+        mProjectNameEt.setEnabled(b);
+        mDaysEt.setEnabled(b);
+        mDateEt.setEnabled(b);
+        mCostEt.setEnabled(b);
+        if (b) {
+            findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
+        }
+
+    }
+
     private void addDetailView(final Detail detail) {
         if (detail == null) {
             return;
+        }
+        int count = mDetailListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mDetailListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            if (childDetail.id == detail.id) {
+                childDetail = detail;
+                return;
+            }
         }
         View view = View.inflate(mAct, R.layout.notice_detail_lay, null);
         view.setTag(detail);
         TextView typeTv = (TextView) view.findViewById(R.id.detail_type_tv);
         TextView nameTv = (TextView) view.findViewById(R.id.detail_name_tv);
         TextView costTv = (TextView) view.findViewById(R.id.detail_cost_tv);
-        typeTv.setText(MyUtil.getDetailType(detail.detail_name_cate).cate_name);
-        nameTv.setText(MyUtil.getDetail(detail.detail_id).detail_name);
+        typeTv.setText(MyUtil.getDetailType(detail.cate_id).cate_name);
+        nameTv.setText(MyUtil.getDetail(detail.id).detail_name);
         costTv.setText(detail.detail_all_price);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("type", DetailActivity.TYPE_NOTICE_DETAIL).putExtra("detail", detail), REQUEST_DETAIL);
+                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail), REQUEST_DETAIL);
             }
         });
         mDetailListLay.addView(view);
     }
 
-    private int getStakeIndex() {
-        String[] a = getResources().getStringArray(R.array.notice_stake);
-        for (int i = 0; i < a.length; i++) {
-            if (a[i].equals(mNotice.stake_ud)) {
-                return i;
+    private void deleteDetailView(final Detail detail) {
+        if (detail == null) {
+            return;
+        }
+        int count = mDetailListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mDetailListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            if (childDetail.id == detail.id) {
+                childDetail = detail;
+                mDetailListLay.removeView(child);
+                return;
             }
         }
-        return 0;
+    }
+
+    private void createNotice() {
+        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
+        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).id;
+        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
+        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
+        mNotice.project_name = mProjectNameEt.getText().toString();
+        mNotice.start_time = mDateEt.getText().toString();
+        mNotice.project_cost = mCostEt.getText().toString();
+        mNotice.days = mDaysEt.getText().toString();
+
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add("cate", mNotice.cate)
+                .add("stake_ud", mNotice.stake_ud + "")
+                .add("stake_num1", mNotice.stake_num1 + "")
+                .add("stake_num2", mNotice.stake_num2 + "")
+                .add("product_name", mNotice.project_name + "")
+                .add("start_time", "" + mNotice.start_time)
+//                .add("picOne","")
+//                .add("detail_new","")
+                .add("structure", "" + mNotice.project_cost)//造价project_cost
+                .add("structure_id", "" + mNotice.structure_id)//结构物
+                .add("days", "" + mNotice.days);
+        int count = mDetailListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mDetailListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
+            builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
+//            builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
+            builder.add("detail[" + i + "][detail_price]", "" + childDetail.detail_price);
+            builder.add("detail[" + i + "][detail_unit]", "" + childDetail.detail_unit);
+            builder.add("detail[" + i + "][detail_quantities1]", "" + childDetail.detail_quantities1);
+            builder.add("detail[" + i + "][detail_quantities2]", "" + childDetail.detail_quantities2);
+            builder.add("detail[" + i + "][detail_quantities3]", "" + childDetail.detail_quantities3);
+            builder.add("detail[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
+        }
+
+        new HttpTask(Config.url_notice_add).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+            @Override
+            public void onComplete(boolean isSuccess, String data, String msg) {
+
+            }
+        }).start(builder.build());
     }
 
     @Override
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.add_detail_iv:
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("type", DetailActivity.TYPE_NOTICE_DETAIL), REQUEST_DETAIL);
+                startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL);
                 break;
             case R.id.brfore_pic_lay:
-                String[] beforePicUrls = mNotice.before_pic.split(",");
                 ArrayList<String> list = new ArrayList<>();
-                for (String s : beforePicUrls) {
-                    list.add(s);
+                if (!Util.isEmpty(mNotice.before_pic)) {
+                    String[] beforePicUrls = mNotice.before_pic.split(",");
+                    for (String s : beforePicUrls) {
+                        list.add(s);
+                    }
                 }
                 startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("urls", list), REQUEST_PHOTO);
+                break;
+            case R.id.date_tv:
+                MyUtil.showDateTimeDialog(mAct, mDateEt);
                 break;
         }
     }
@@ -186,10 +275,13 @@ public class NoticeActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_DETAIL) {
+        if (requestCode == REQUEST_DETAIL) {
+            if (resultCode == RESULT_OK) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 addDetailView(detail);
+            } else if (resultCode == Config.RESULT_DELETE) {
+                Detail detail = (Detail) data.getSerializableExtra("detail");
+                deleteDetailView(detail);
             }
 
         }

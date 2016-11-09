@@ -4,14 +4,14 @@ package com.tzq.maintenance.bean;
  * Created by Administrator on 2016/10/31.
  */
 
-public class NoticeType {
+public class NormalBean {
     public String id;
     public String name;
 
-    public NoticeType() {
+    public NormalBean() {
     }
 
-    public NoticeType(String id, String name) {
+    public NormalBean(String id, String name) {
         this.id = id;
         this.name = name;
     }

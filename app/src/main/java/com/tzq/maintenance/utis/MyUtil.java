@@ -1,21 +1,36 @@
 package com.tzq.maintenance.utis;
 
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.TimePickerDialog;
 import android.content.Context;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
 import com.squareup.picasso.Picasso;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
-import com.tzq.maintenance.bean.NoticeType;
+import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Structure;
+import com.tzq.maintenance.core.MyListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,7 +73,7 @@ public class MyUtil {
     }
 
     public static String getNoticeCateStr(String id) {
-        for (NoticeType n : Config.CATES) {
+        for (NormalBean n : Config.CATES) {
             if (n.id.equals(id)) {
                 return n.name;
             }
@@ -66,9 +81,20 @@ public class MyUtil {
         return "";
     }
 
+    public static int getNoticeStakeIndex(String id) {
+        int i = 0;
+        for (NormalBean n : Config.CATES) {
+            if (n.id.equals(id)) {
+                return i;
+            }
+            i++;
+        }
+        return 0;
+    }
+
     public static int getNoticeCateIndex(String id) {
         int i = 0;
-        for (NoticeType n : Config.CATES) {
+        for (NormalBean n : Config.CATES) {
             if (n.id.equals(id)) {
                 return i;
             }
@@ -113,15 +139,15 @@ public class MyUtil {
 
     public static void displayPic(ImageView iv, String url) {
         LogUtil.i("displayPic  " + url);
-        if (!url.startsWith("http://")) {
+        if (!url.contains(":")) {
             url = Config.url_host + url;
         }
-        Picasso.with(App.getInstance()).load(url).resize(60, 60).centerCrop().into(iv);
+        Picasso.with(App.getInstance()).load(url).resize(100, 100).centerCrop().into(iv);
     }
 
     public static void displayLargePic(ImageView iv, String url) {
         LogUtil.i("displayPic  " + url);
-        if (!url.startsWith("http://")) {
+        if (!url.contains(":")) {
             url = Config.url_host + url;
         }
         Picasso.with(App.getInstance()).load(url).into(iv);
@@ -147,6 +173,100 @@ public class MyUtil {
         ArrayAdapter<T> adapter = new ArrayAdapter<T>(context, android.R.layout.simple_spinner_item, array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp.setAdapter(adapter);
+    }
+
+    public static void showDateTimeDialog(final Activity act, final View v) {
+        String value = "";
+        if (v instanceof TextView) {
+            TextView t = (TextView) v;
+            value = t.getText().toString();
+        } else if (v instanceof EditText) {
+            EditText t = (EditText) v;
+            value = t.getText().toString();
+        }
+        final String dfVaule = value;
+        final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        showDateDialog(act, dfVaule, df, new MyListener() {
+            @Override
+            public void onComplete(final Object date) {
+                showTimeDialog(act, dfVaule, df, new MyListener() {
+
+                    @Override
+                    public void onComplete(Object time) {
+                        String dateTime = date.toString() + " " + time.toString();
+                        LogUtil.i("--dateTime=" + dateTime);
+                        if (v instanceof TextView) {
+                            TextView t = (TextView) v;
+                            t.setText(dateTime);
+                        } else if (v instanceof EditText) {
+                            EditText t = (EditText) v;
+                            t.setText(dateTime);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    public static void showDateDialog(Activity act, final String dftValue, final SimpleDateFormat sdf, final MyListener l) {
+        Date date = null;
+        try {
+            Calendar cal = Calendar.getInstance();
+            if (Util.isEmpty(dftValue)) {
+                cal.setTimeInMillis(System.currentTimeMillis());
+            } else {
+                date = sdf.parse(dftValue);
+                cal.setTime(date);
+            }
+            DatePickerDialog dpd = new DatePickerDialog(act, new OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Calendar c = Calendar.getInstance();
+                    c.set(year, monthOfYear, dayOfMonth);
+                    String str = new SimpleDateFormat("yyyy-MM-dd").format(c.getTime());
+                    if (l != null) {
+                        l.onComplete(str);
+                    }
+                }
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            dpd.setCanceledOnTouchOutside(false);
+            dpd.show();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void showTimeDialog(Activity act, String dftValue, final SimpleDateFormat df, final MyListener l) {
+        Date date = null;
+        try {
+            Calendar cal = Calendar.getInstance();
+            if (Util.isEmpty(dftValue)) {
+                cal.setTimeInMillis(System.currentTimeMillis());
+            } else {
+                date = df.parse(dftValue);
+
+                cal.setTime(date);
+            }
+            TimePickerDialog tpd = new TimePickerDialog(act, new TimePickerDialog.OnTimeSetListener() {
+
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    Calendar c = Calendar.getInstance();
+                    c.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    c.set(Calendar.MINUTE, minute);
+                    String str = new SimpleDateFormat("HH:mm").format(c.getTime());
+                    if (l != null) {
+                        l.onComplete(str);
+                    }
+                }
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true);
+            tpd.setCanceledOnTouchOutside(false);
+            tpd.show();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            LogUtil.e(e.getMessage(), e);
+        }
     }
 
 }

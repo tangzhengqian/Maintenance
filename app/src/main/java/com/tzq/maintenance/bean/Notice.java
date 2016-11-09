@@ -19,7 +19,7 @@ public class Notice implements Serializable {
     public String end_time;//
     public List<Detail> detail;//
     public String days;//
-    public String detail_new;//
+    public List<DetailNew> detail_new;//
     public String project_cost;//
     public int team_id;//
     public String before_pic;//

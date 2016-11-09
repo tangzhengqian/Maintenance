@@ -14,8 +14,8 @@ import com.tzq.maintenance.bean.Maintenance;
 import com.tzq.maintenance.bean.Management;
 import com.tzq.maintenance.bean.Role;
 import com.tzq.maintenance.bean.Structure;
-import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
+import com.tzq.maintenance.core.MyListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ public class SyncUtil {
     private static final int MAX_RETRY_COUNT = 5;
     private static int sRetryCount = 0;
 
-    public static List<CompleteListener> sCompleteListeners = new ArrayList<>();
+    public static List<MyListener> sCompleteListeners = new ArrayList<>();
 
     public static void startSync() {
         sRetryCount = 0;
@@ -39,13 +39,13 @@ public class SyncUtil {
 
     private static void notifyComplete() {
         PrefsManager.getInstance().save(Config.prefs_key_sync_time, System.currentTimeMillis());
-        for (CompleteListener l : sCompleteListeners) {
+        for (MyListener l : sCompleteListeners) {
             l.onComplete(null);
         }
     }
 
     private static void notifyFail() {
-        for (CompleteListener l : sCompleteListeners) {
+        for (MyListener l : sCompleteListeners) {
             l.onFail();
         }
     }
@@ -57,7 +57,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Company.class);
+                    new Delete().from(Company.class).execute();
                     List<Company> list = new Gson().fromJson(data, new TypeToken<List<Company>>() {
                     }.getType());
                     for (Company item : list) {
@@ -86,7 +86,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Management.class);
+                    new Delete().from(Management.class).execute();
                     List<Management> list = new Gson().fromJson(data, new TypeToken<List<Management>>() {
                     }.getType());
                     for (Management item : list) {
@@ -116,7 +116,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Maintenance.class);
+                    new Delete().from(Maintenance.class).execute();
                     List<Maintenance> list = new Gson().fromJson(data, new TypeToken<List<Maintenance>>() {
                     }.getType());
                     for (Maintenance item : list) {
@@ -146,7 +146,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Role.class);
+                    new Delete().from(Role.class).execute();
                     List<Role> list = new Gson().fromJson(data, new TypeToken<List<Role>>() {
                     }.getType());
                     for (Role item : list) {
@@ -175,7 +175,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Structure.class);
+                    new Delete().from(Structure.class).execute();
                     List<Structure> list = new Gson().fromJson(data, new TypeToken<List<Structure>>() {
                     }.getType());
                     for (Structure item : list) {
@@ -204,7 +204,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(DetailType.class);
+                    new Delete().from(DetailType.class).execute();
                     List<DetailType> list = new Gson().fromJson(data, new TypeToken<List<DetailType>>() {
                     }.getType());
                     for (DetailType item : list) {
@@ -232,7 +232,7 @@ public class SyncUtil {
             public void onComplete(boolean isSuccess, String data, String msg) {
                 if (isSuccess) {
                     ActiveAndroid.beginTransaction();
-                    new Delete().from(Detail.class);
+                    new Delete().from(Detail.class).execute();
                     List<Detail> list = new Gson().fromJson(data, new TypeToken<List<Detail>>() {
                     }.getType());
                     for (Detail item : list) {

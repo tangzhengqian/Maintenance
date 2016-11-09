@@ -1,9 +1,11 @@
 package com.tzq.maintenance.ui;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +16,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.tzq.common.ui.CBaseAdapter;
+import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.utis.MyUtil;
 
@@ -25,6 +28,7 @@ import java.util.List;
  */
 
 public class PhotoGridShowActivity extends BaseActivity {
+    private final static int REQUEST_ADD_PIC = 11;
     private GridView mGridView;
     PhotoAdapter mAdapter;
     ArrayList<String> mUrls = new ArrayList<>();
@@ -67,10 +71,35 @@ public class PhotoGridShowActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == 0) {
-
+        if (item.getItemId() == R.id.action_delete) {
+            new AlertDialog.Builder(mAct).setMessage("确定要删除所选图片？").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for (int index : mSelectPostion) {
+                        mUrls.remove(index);
+                    }
+                    mAdapter.notifyDataSetChanged();
+                }
+            }).setNegativeButton("取消", null).show();
+        } else if (item.getItemId() == R.id.action_add_pic) {
+            startActivityForResult(new Intent(mAct, PhotoSelectLocalActivity.class), REQUEST_ADD_PIC);
+        } else if (item.getItemId() == R.id.action_complete) {
+            setResult(RESULT_OK, new Intent().putStringArrayListExtra("urls", mUrls));
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ADD_PIC) {
+            if (resultCode == RESULT_OK) {
+                String url = data.getStringExtra("url");
+                LogUtil.i("---url=" + url);
+                mUrls.add(url);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
     }
 
     class PhotoAdapter extends CBaseAdapter<String> {

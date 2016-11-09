@@ -11,13 +11,17 @@ import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.User;
-import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
+import com.tzq.maintenance.core.MyListener;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 import com.tzq.maintenance.utis.SyncUtil;
 
+import java.io.File;
+
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/9/5.
@@ -42,8 +46,11 @@ public class LoginActivity extends BaseActivity {
 
         phoneNumberEt = (EditText) findViewById(R.id.phone_number_et);
         passwordEt = (EditText) findViewById(R.id.password_et);
-        phoneNumberEt.setText("18780104253");
+        phoneNumberEt.setText("18780104204");
         passwordEt.setText("pangxie");
+
+        RequestBody fileBody = RequestBody.create(MediaType.parse("image/png"), new File(""));
+
     }
 
     public void onViewClick(View view) {
@@ -56,18 +63,13 @@ public class LoginActivity extends BaseActivity {
                         if (isSuccess) {
                             User user = new Gson().fromJson(data, User.class);
                             App.getInstance().setUser(user);
-                            SyncUtil.sCompleteListeners.add(new CompleteListener() {
+                            SyncUtil.sCompleteListeners.add(new MyListener() {
                                 @Override
                                 public void onComplete(Object data) {
                                     MyUtil.toast("登录成功");
                                     ProgressDialogUtil.hide(mAct);
                                     startActivity(new Intent(mAct, MainActivity.class));
                                     finish();
-                                }
-
-                                @Override
-                                public void onFail() {
-
                                 }
                             });
                             SyncUtil.startSync();
