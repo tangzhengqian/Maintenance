@@ -1,6 +1,7 @@
 package com.tzq.maintenance.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -12,20 +13,12 @@ import android.widget.ImageView;
 import com.tzq.common.bean.PhotoAibum;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.ImageUtil;
-import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
-import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
-import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/11/2.
@@ -65,23 +58,6 @@ public class PhotoSelectLocalActivity extends BaseActivity {
 
     }
 
-    private void upload(String path) {
-        LogUtil.i("----path=" + path);
-        File file = new File(path);
-        RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
-        new HttpTask(Config.url_add_pic).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-
-            }
-        }).start(new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("image", file.getName(), fileBody)
-                .build());
-        ;
-    }
-
-
     class PhotoAdapter extends CBaseAdapter<String> {
 
         public PhotoAdapter(Context c) {
@@ -110,9 +86,8 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             vh.photoIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    setResult(RESULT_OK, new Intent().putExtra("url", url));
-//                    finish();
-                    upload(path);
+                    setResult(RESULT_OK, new Intent().putExtra("path", path));
+                    finish();
                 }
             });
             return convertView;

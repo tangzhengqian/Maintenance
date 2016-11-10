@@ -25,7 +25,7 @@ import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Structure;
-import com.tzq.maintenance.core.MyListener;
+import com.tzq.maintenance.core.CompleteListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -187,10 +187,10 @@ public class MyUtil {
         final String dfVaule = value;
         final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        showDateDialog(act, dfVaule, df, new MyListener() {
+        showDateDialog(act, dfVaule, df, new CompleteListener() {
             @Override
             public void onComplete(final Object date) {
-                showTimeDialog(act, dfVaule, df, new MyListener() {
+                showTimeDialog(act, dfVaule, df, new CompleteListener() {
 
                     @Override
                     public void onComplete(Object time) {
@@ -209,7 +209,7 @@ public class MyUtil {
         });
     }
 
-    public static void showDateDialog(Activity act, final String dftValue, final SimpleDateFormat sdf, final MyListener l) {
+    public static void showDateDialog(Activity act, final String dftValue, final SimpleDateFormat sdf, final CompleteListener l) {
         Date date = null;
         try {
             Calendar cal = Calendar.getInstance();
@@ -237,7 +237,7 @@ public class MyUtil {
         }
     }
 
-    public static void showTimeDialog(Activity act, String dftValue, final SimpleDateFormat df, final MyListener l) {
+    public static void showTimeDialog(Activity act, String dftValue, final SimpleDateFormat df, final CompleteListener l) {
         Date date = null;
         try {
             Calendar cal = Calendar.getInstance();

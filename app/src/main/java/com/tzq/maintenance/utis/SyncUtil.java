@@ -12,10 +12,11 @@ import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.Maintenance;
 import com.tzq.maintenance.bean.Management;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.bean.Role;
 import com.tzq.maintenance.bean.Structure;
+import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
-import com.tzq.maintenance.core.MyListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class SyncUtil {
     private static final int MAX_RETRY_COUNT = 5;
     private static int sRetryCount = 0;
 
-    public static List<MyListener> sCompleteListeners = new ArrayList<>();
+    public static List<CompleteListener> sCompleteListeners = new ArrayList<>();
 
     public static void startSync() {
         sRetryCount = 0;
@@ -39,13 +40,13 @@ public class SyncUtil {
 
     private static void notifyComplete() {
         PrefsManager.getInstance().save(Config.prefs_key_sync_time, System.currentTimeMillis());
-        for (MyListener l : sCompleteListeners) {
+        for (CompleteListener l : sCompleteListeners) {
             l.onComplete(null);
         }
     }
 
     private static void notifyFail() {
-        for (MyListener l : sCompleteListeners) {
+        for (CompleteListener l : sCompleteListeners) {
             l.onFail();
         }
     }
@@ -54,11 +55,11 @@ public class SyncUtil {
     private static void getCompanyList() {
         new HttpTask(Config.url_company_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Company.class).execute();
-                    List<Company> list = new Gson().fromJson(data, new TypeToken<List<Company>>() {
+                    List<Company> list = new Gson().fromJson(responseData.data, new TypeToken<List<Company>>() {
                     }.getType());
                     for (Company item : list) {
                         item.save();
@@ -76,18 +77,18 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .build());
     }
 
     private static void getManagementList() {
         new HttpTask(Config.url_management_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Management.class).execute();
-                    List<Management> list = new Gson().fromJson(data, new TypeToken<List<Management>>() {
+                    List<Management> list = new Gson().fromJson(responseData.data, new TypeToken<List<Management>>() {
                     }.getType());
                     for (Management item : list) {
                         item.save();
@@ -105,7 +106,7 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
     }
@@ -113,11 +114,11 @@ public class SyncUtil {
     private static void getMaintenanceList() {
         new HttpTask(Config.url_maintenance_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Maintenance.class).execute();
-                    List<Maintenance> list = new Gson().fromJson(data, new TypeToken<List<Maintenance>>() {
+                    List<Maintenance> list = new Gson().fromJson(responseData.data, new TypeToken<List<Maintenance>>() {
                     }.getType());
                     for (Maintenance item : list) {
                         item.save();
@@ -135,7 +136,7 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
     }
@@ -143,11 +144,11 @@ public class SyncUtil {
     private static void getRoleList() {
         new HttpTask(Config.url_role_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Role.class).execute();
-                    List<Role> list = new Gson().fromJson(data, new TypeToken<List<Role>>() {
+                    List<Role> list = new Gson().fromJson(responseData.data, new TypeToken<List<Role>>() {
                     }.getType());
                     for (Role item : list) {
                         item.save();
@@ -165,18 +166,18 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .build());
     }
 
     private static void getStructureList() {
         new HttpTask(Config.url_structure_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Structure.class).execute();
-                    List<Structure> list = new Gson().fromJson(data, new TypeToken<List<Structure>>() {
+                    List<Structure> list = new Gson().fromJson(responseData.data, new TypeToken<List<Structure>>() {
                     }.getType());
                     for (Structure item : list) {
                         item.save();
@@ -194,18 +195,18 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .build());
     }
 
     private static void getDetailTypeList() {
         new HttpTask(Config.url_detail_type_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(DetailType.class).execute();
-                    List<DetailType> list = new Gson().fromJson(data, new TypeToken<List<DetailType>>() {
+                    List<DetailType> list = new Gson().fromJson(responseData.data, new TypeToken<List<DetailType>>() {
                     }.getType());
                     for (DetailType item : list) {
                         item.save();
@@ -223,17 +224,18 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .build());
     }
+
     private static void getDetailList() {
         new HttpTask(Config.url_detail_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
                     ActiveAndroid.beginTransaction();
                     new Delete().from(Detail.class).execute();
-                    List<Detail> list = new Gson().fromJson(data, new TypeToken<List<Detail>>() {
+                    List<Detail> list = new Gson().fromJson(responseData.data, new TypeToken<List<Detail>>() {
                     }.getType());
                     for (Detail item : list) {
                         item.save();
@@ -250,7 +252,7 @@ public class SyncUtil {
                     }
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .build());
     }
 }

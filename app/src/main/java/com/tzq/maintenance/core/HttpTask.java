@@ -7,6 +7,7 @@ import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 
@@ -72,54 +73,73 @@ public class HttpTask {
         return this;
     }
 
-    public void start(RequestBody body) {
-        LogUtil.i("start " + mUrl);
+    private Call getCall(RequestBody body) {
         final Request r;
         String sessionId = Util.avoidNull(App.getInstance().getUser().token);
         Request.Builder builder = new Request.Builder();
         builder.url(mUrl).addHeader("client", "Android").addHeader("token", sessionId);
         r = builder.post(body).build();
-        Call call = mOkHttpClient.newCall(r);
+        return mOkHttpClient.newCall(r);
+    }
+
+    public void enqueue(RequestBody body) {
+        LogUtil.i("enqueue " + mUrl);
+
         showProgressDialog();
-        call.enqueue(new Callback() {
+        getCall(body).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 LogUtil.i("onFailure  " + e.getMessage());
+                Looper.prepare();
                 hideProgressDialog();
-                onError(e.getMessage());
+                onComplete(new ResponseData(-1, e.getMessage()));
+                Looper.loop();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body().string();
-                LogUtil.i("onResponse  " + body);
                 Looper.prepare();
                 hideProgressDialog();
-                try {
-                    JSONObject o = new JSONObject(body);
-                    int code = o.getInt("code");
-                    String msg = o.optString("msg");
-                    String data = o.getString("data");
-                    if (code == 0) {
-//                        showMessage(msg);
-                        onComplete(data);
-                    } else {
-                        showMessage(msg);
-                        onError(msg);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LogUtil.e(e.getMessage(), e);
-                    showMessage("返回数据格式出错");
-                    onError("返回数据格式出错");
+                ResponseData responseData = getResponseData(response);
+                if (responseData.code == 0) {
+//                showMessage(msg);
+                    onComplete(responseData);
+                } else {
+                    showMessage(responseData.msg);
+                    onComplete(responseData);
                 }
                 Looper.loop();
             }
         });
     }
 
-    public void start() {
-        start(null);
+    public ResponseData execute(RequestBody body) {
+        LogUtil.i("enqueue " + mUrl);
+        try {
+            Response response = getCall(body).execute();
+            return getResponseData(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new ResponseData(-1, e.getMessage());
+        }
+    }
+
+    private ResponseData getResponseData(Response response) {
+        ResponseData responseData = new ResponseData();
+        try {
+            String body = response.body().string();
+            LogUtil.i("onResponse  " + body);
+            JSONObject o = new JSONObject(body);
+            responseData.code = o.getInt("code");
+            responseData.msg = o.optString("msg");
+            responseData.data = o.getString("data");
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseData.code = -1;
+            responseData.msg = "返回数据格式出错";
+            responseData.data = "";
+        }
+        return responseData;
     }
 
     private void showMessage(String msg) {
@@ -128,16 +148,9 @@ public class HttpTask {
         }
     }
 
-    private void onComplete(String data) {
+    private void onComplete(ResponseData responseData) {
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
-            completeCallBack.onComplete(true, data, "");
-        }
-
-    }
-
-    private void onError(String msg) {
-        for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
-            completeCallBack.onComplete(false, null, msg);
+            completeCallBack.onComplete(responseData);
         }
     }
 
@@ -184,7 +197,7 @@ public class HttpTask {
     }
 
     public interface CompleteCallBack {
-        void onComplete(boolean isSuccess, String data, String msg);
+        void onComplete(ResponseData responseData);
     }
 
     public interface ProgressCallBack {

@@ -21,6 +21,7 @@ import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Notice;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
 
@@ -114,14 +115,14 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         footerView.setText("正在加载更多数据...");
         new HttpTask(Config.url_notice_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(final boolean isSuccess, final String data, String msg) {
+            public void onComplete(final ResponseData responseData) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         int count = 0;
-                        if (isSuccess) {
+                        if (responseData.isSuccess()) {
                             try {
-                                JSONObject o = new JSONObject(data);
+                                JSONObject o = new JSONObject(responseData.data);
                                 count = o.optInt("count");
                                 List<Notice> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
                                 }.getType());
@@ -151,7 +152,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 });
 
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
 //                .add("page_size", 10 + "")
                 .build());

@@ -33,7 +33,6 @@ public class ProgressDialogUtil {
 
         }
         pd.count++;
-//        LogUtil.i("pd.count=" + pd.count);
         sProgressDialogMap.put(activity, pd);
         if (pd.progressDialog.isShowing()) {
             return;
@@ -48,7 +47,6 @@ public class ProgressDialogUtil {
             return;
         }
         pd.count--;
-//        LogUtil.i("pd.count=" + pd.count);
         if (pd.count <= 0) {
             pd.progressDialog.dismiss();
         }

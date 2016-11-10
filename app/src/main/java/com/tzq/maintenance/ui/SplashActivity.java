@@ -11,7 +11,7 @@ import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.User;
-import com.tzq.maintenance.core.MyListener;
+import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.utis.SyncUtil;
 
 
@@ -33,7 +33,7 @@ public class SplashActivity extends BaseActivity {
         User user = App.getInstance().getUser();
         if (user.user_id > 0) {
             if (syncTime == 0 || System.currentTimeMillis() - syncTime > Config.sync_delay) {
-                SyncUtil.sCompleteListeners.add(new MyListener() {
+                SyncUtil.sCompleteListeners.add(new CompleteListener() {
                     @Override
                     public void onComplete(Object data) {
                         gotoMain();

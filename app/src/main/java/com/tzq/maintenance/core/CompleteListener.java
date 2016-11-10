@@ -1,10 +1,13 @@
 package com.tzq.maintenance.core;
 
 /**
- * Created by Administrator on 2016/10/25.
+ * Created by Administrator on 2016/11/7.
  */
 
-public interface CompleteListener {
-    void onComplete(Object data);
-    void onFail();
+public abstract class CompleteListener implements BaseListener {
+
+    @Override
+    public void onFail() {
+
+    }
 }

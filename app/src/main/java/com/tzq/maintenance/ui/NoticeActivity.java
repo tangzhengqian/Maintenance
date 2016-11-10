@@ -2,6 +2,7 @@ package com.tzq.maintenance.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,14 +20,21 @@ import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Notice;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
+import com.tzq.maintenance.utis.ProgressDialogUtil;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/10/31.
@@ -41,6 +49,8 @@ public class NoticeActivity extends BaseActivity {
     TextView mDateEt;
     ImageView mBeforeIv1, mBeforeIv2, mBeforeMoreIv;
     LinearLayout mDetailListLay;
+    List<String> mBeforePicUris = new ArrayList<>();
+    ArrayList<String> mNewBeforePicUris = null;
 
 
     @Override
@@ -81,7 +91,38 @@ public class NoticeActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_save:
-                createNotice();
+                ProgressDialogUtil.show(mAct);
+                new Thread(){
+                    @Override
+                    public void run() {
+                        if (mNewBeforePicUris != null) {
+                            //del pic
+                            for (String uri : mBeforePicUris) {
+                                if (!mNewBeforePicUris.contains(uri)) {
+                                    new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
+                                    mBeforePicUris.remove(uri);
+                                }
+                            }
+                            //upload pic
+                            for (String uri : mNewBeforePicUris) {
+                                if (uri.startsWith("file://")) {
+                                    String path = uri.substring("file://".length());
+                                    File file = new File(path);
+                                    RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
+                                    ResponseData responseData = new HttpTask(Config.url_add_pic).execute(new MultipartBody.Builder()
+                                            .setType(MultipartBody.FORM)
+                                            .addFormDataPart("image", file.getName(), fileBody)
+                                            .build());
+                                    if (responseData.isSuccess()) {
+                                        mBeforePicUris.add(responseData.data);
+                                    }
+                                }
+                            }
+                        }
+                        saveNotice();
+                    }
+                }.start();
+
                 break;
             case R.id.action_edit:
                 break;
@@ -92,12 +133,12 @@ public class NoticeActivity extends BaseActivity {
     private void getNoticeDetail(int noticeId) {
         new HttpTask(Config.url_notice_detail).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
-                if (isSuccess) {
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
 
                 }
             }
-        }).start(new FormBody.Builder()
+        }).enqueue(new FormBody.Builder()
                 .add("id", noticeId + "")
                 .build());
     }
@@ -124,13 +165,20 @@ public class NoticeActivity extends BaseActivity {
             mCostEt.setText(mNotice.project_cost);
             mDateEt.setText(mNotice.created_at);
             mDaysEt.setText(mNotice.days);
-            String[] beforePicUrls = mNotice.before_pic.split(",");
-            if (beforePicUrls.length >= 1) {
-                MyUtil.displayPic(mBeforeIv1, beforePicUrls[0]);
+            if (!Util.isEmpty(mNotice.before_pic)) {
+                String[] beforePicUrls = mNotice.before_pic.split(",");
+                mBeforePicUris = Arrays.asList(beforePicUrls);
+                if (mBeforePicUris.size() >= 1) {
+                    MyUtil.displayPic(mBeforeIv1, mBeforePicUris.get(0));
+                }
+                if (mBeforePicUris.size() >= 2) {
+                    MyUtil.displayPic(mBeforeIv2, mBeforePicUris.get(1));
+                }
+            } else {
+                MyUtil.displayPic(mBeforeIv1, "");
+                MyUtil.displayPic(mBeforeIv1, "");
             }
-            if (beforePicUrls.length >= 2) {
-                MyUtil.displayPic(mBeforeIv2, beforePicUrls[2]);
-            }
+
             List<Detail> detailList = mNotice.detail;
             mDetailListLay.removeAllViews();
             if (!Util.isEmpty(detailList)) {
@@ -140,6 +188,7 @@ public class NoticeActivity extends BaseActivity {
             }
         }
     }
+
 
     private void setEditable(boolean b) {
         mTypeSp.setEnabled(b);
@@ -163,16 +212,19 @@ public class NoticeActivity extends BaseActivity {
         if (detail == null) {
             return;
         }
+        View view = null;
         int count = mDetailListLay.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = mDetailListLay.getChildAt(i);
             Detail childDetail = (Detail) child.getTag();
             if (childDetail.id == detail.id) {
-                childDetail = detail;
-                return;
+                view = child;
             }
         }
-        View view = View.inflate(mAct, R.layout.notice_detail_lay, null);
+        if (view == null) {
+            view = View.inflate(mAct, R.layout.notice_detail_lay, null);
+            mDetailListLay.addView(view);
+        }
         view.setTag(detail);
         TextView typeTv = (TextView) view.findViewById(R.id.detail_type_tv);
         TextView nameTv = (TextView) view.findViewById(R.id.detail_name_tv);
@@ -186,7 +238,7 @@ public class NoticeActivity extends BaseActivity {
                 startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail), REQUEST_DETAIL);
             }
         });
-        mDetailListLay.addView(view);
+
     }
 
     private void deleteDetailView(final Detail detail) {
@@ -205,7 +257,7 @@ public class NoticeActivity extends BaseActivity {
         }
     }
 
-    private void createNotice() {
+    private void saveNotice() {
         mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
         mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).id;
         mNotice.stake_num1 = mStakeNum1Et.getText().toString();
@@ -217,15 +269,16 @@ public class NoticeActivity extends BaseActivity {
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", mNotice.cate)
+                .add("id", mNotice.id + "")
                 .add("stake_ud", mNotice.stake_ud + "")
                 .add("stake_num1", mNotice.stake_num1 + "")
                 .add("stake_num2", mNotice.stake_num2 + "")
-                .add("product_name", mNotice.project_name + "")
+                .add("project_name", mNotice.project_name + "")
                 .add("start_time", "" + mNotice.start_time)
 //                .add("picOne","")
 //                .add("detail_new","")
-                .add("structure", "" + mNotice.project_cost)//造价project_cost
-                .add("structure_id", "" + mNotice.structure_id)//结构物
+                .add("project_cost", "" + mNotice.project_cost)
+                .add("structure_id", "" + mNotice.structure_id)
                 .add("days", "" + mNotice.days);
         int count = mDetailListLay.getChildCount();
         for (int i = 0; i < count; i++) {
@@ -233,7 +286,7 @@ public class NoticeActivity extends BaseActivity {
             Detail childDetail = (Detail) child.getTag();
             builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
             builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
-//            builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
+            builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
             builder.add("detail[" + i + "][detail_price]", "" + childDetail.detail_price);
             builder.add("detail[" + i + "][detail_unit]", "" + childDetail.detail_unit);
             builder.add("detail[" + i + "][detail_quantities1]", "" + childDetail.detail_quantities1);
@@ -242,12 +295,27 @@ public class NoticeActivity extends BaseActivity {
             builder.add("detail[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
         }
 
-        new HttpTask(Config.url_notice_add).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(boolean isSuccess, String data, String msg) {
+        if (mBeforePicUris != null) {
+            StringBuffer sb = new StringBuffer();
 
+            for (String url : mBeforePicUris) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(url);
             }
-        }).start(builder.build());
+            builder.add("before_pic", sb.toString());
+        }
+
+
+        ResponseData responseData=new HttpTask(Config.url_notice_save).execute(builder.build());
+        Looper.prepare();
+        if(responseData.isSuccess()){
+            MyUtil.toast("保存成功");
+            finish();
+        }
+        ProgressDialogUtil.hide(mAct);
+        Looper.loop();
     }
 
     @Override
@@ -264,7 +332,7 @@ public class NoticeActivity extends BaseActivity {
                         list.add(s);
                     }
                 }
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("urls", list), REQUEST_PHOTO);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", list), REQUEST_PHOTO);
                 break;
             case R.id.date_tv:
                 MyUtil.showDateTimeDialog(mAct, mDateEt);
@@ -284,6 +352,21 @@ public class NoticeActivity extends BaseActivity {
                 deleteDetailView(detail);
             }
 
+        } else if (requestCode == REQUEST_PHOTO) {
+            if (resultCode == RESULT_OK) {
+                mNewBeforePicUris = new ArrayList<>();
+                ArrayList<String> uris = data.getStringArrayListExtra("uris");
+                mNewBeforePicUris.addAll(uris);
+
+                MyUtil.displayPic(mBeforeIv1, "");
+                MyUtil.displayPic(mBeforeIv2, "");
+                if (mNewBeforePicUris.size() >= 1) {
+                    MyUtil.displayPic(mBeforeIv1, mNewBeforePicUris.get(0));
+                }
+                if (mNewBeforePicUris.size() >= 2) {
+                    MyUtil.displayPic(mBeforeIv2, mNewBeforePicUris.get(1));
+                }
+            }
         }
     }
 }

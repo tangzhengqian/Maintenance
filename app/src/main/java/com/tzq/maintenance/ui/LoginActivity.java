@@ -10,9 +10,10 @@ import com.google.gson.Gson;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.bean.User;
+import com.tzq.maintenance.core.CompleteListener;
 import com.tzq.maintenance.core.HttpTask;
-import com.tzq.maintenance.core.MyListener;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 import com.tzq.maintenance.utis.SyncUtil;
@@ -59,11 +60,11 @@ public class LoginActivity extends BaseActivity {
                 ProgressDialogUtil.show(mAct);
                 new HttpTask(Config.url_login).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
-                    public void onComplete(boolean isSuccess, String data, String msg) {
-                        if (isSuccess) {
-                            User user = new Gson().fromJson(data, User.class);
+                    public void onComplete(ResponseData responseData) {
+                        if (responseData.isSuccess()) {
+                            User user = new Gson().fromJson(responseData.data, User.class);
                             App.getInstance().setUser(user);
-                            SyncUtil.sCompleteListeners.add(new MyListener() {
+                            SyncUtil.sCompleteListeners.add(new CompleteListener() {
                                 @Override
                                 public void onComplete(Object data) {
                                     MyUtil.toast("登录成功");
@@ -75,7 +76,7 @@ public class LoginActivity extends BaseActivity {
                             SyncUtil.startSync();
                         }
                     }
-                }).start(new FormBody.Builder()
+                }).enqueue(new FormBody.Builder()
                         .add("username", phoneNumberEt.getText().toString())
                         .add("password", passwordEt.getText().toString())
                         .build());

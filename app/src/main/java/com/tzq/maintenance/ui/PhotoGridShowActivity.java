@@ -31,7 +31,7 @@ public class PhotoGridShowActivity extends BaseActivity {
     private final static int REQUEST_ADD_PIC = 11;
     private GridView mGridView;
     PhotoAdapter mAdapter;
-    ArrayList<String> mUrls = new ArrayList<>();
+    ArrayList<String> mUris = new ArrayList<>();
     List<Integer> mSelectPostion = new ArrayList<>();
 
     @Override
@@ -46,8 +46,8 @@ public class PhotoGridShowActivity extends BaseActivity {
 
         mGridView.setAdapter(mAdapter);
 
-        mUrls = getIntent().getStringArrayListExtra("urls");
-        mAdapter.setDataList(mUrls);
+        mUris = getIntent().getStringArrayListExtra("uris");
+        mAdapter.setDataList(mUris);
     }
 
     @Override
@@ -76,15 +76,17 @@ public class PhotoGridShowActivity extends BaseActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     for (int index : mSelectPostion) {
-                        mUrls.remove(index);
+                        mUris.remove(index);
                     }
-                    mAdapter.notifyDataSetChanged();
+                    mSelectPostion.clear();
+                    mAdapter.setDataList(mUris);
                 }
             }).setNegativeButton("取消", null).show();
         } else if (item.getItemId() == R.id.action_add_pic) {
             startActivityForResult(new Intent(mAct, PhotoSelectLocalActivity.class), REQUEST_ADD_PIC);
         } else if (item.getItemId() == R.id.action_complete) {
-            setResult(RESULT_OK, new Intent().putStringArrayListExtra("urls", mUrls));
+            setResult(RESULT_OK, new Intent().putStringArrayListExtra("uris", mUris));
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -94,10 +96,10 @@ public class PhotoGridShowActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ADD_PIC) {
             if (resultCode == RESULT_OK) {
-                String url = data.getStringExtra("url");
-                LogUtil.i("---url=" + url);
-                mUrls.add(url);
-                mAdapter.notifyDataSetChanged();
+                String path = data.getStringExtra("path");
+                LogUtil.i("---path=" + path);
+                mUris.add("file://"+path);
+                mAdapter.setDataList(mUris);
             }
         }
     }
@@ -123,23 +125,25 @@ public class PhotoGridShowActivity extends BaseActivity {
                 vh = (VH) convertView.getTag();
             }
 
-            String url = getItem(position);
-            MyUtil.displayPic(vh.photoIv, url);
+            String uri = getItem(position);
+            MyUtil.displayPic(vh.photoIv, uri);
             if (mSelectPostion.contains(position)) {
                 vh.photoCover.setVisibility(View.VISIBLE);
+                vh.photoCb.setChecked(false);
             } else {
                 vh.photoCover.setVisibility(View.GONE);
+                vh.photoCb.setChecked(true);
             }
             vh.photoIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(mAct, PhotoViewPagerActivity.class).putExtra("cur", position).putStringArrayListExtra("urls", mUrls));
+                    startActivity(new Intent(mAct, PhotoViewPagerActivity.class).putExtra("cur", position).putStringArrayListExtra("urls", mUris));
                 }
             });
             vh.photoCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
+                    if (isChecked&&!mSelectPostion.contains(position)) {
                         mSelectPostion.add(position);
                     } else {
                         mSelectPostion.remove(Integer.valueOf(position));

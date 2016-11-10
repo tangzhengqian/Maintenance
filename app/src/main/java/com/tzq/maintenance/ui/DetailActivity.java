@@ -67,8 +67,11 @@ public class DetailActivity extends BaseActivity {
         } else {
             mDetail = new Detail();
             mDetail.id = -1;
+            mTypeSp.setSelection(0);
             mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(mTypeSp.getSelectedItemPosition()).id).execute();
             MyUtil.setUpSp(mAct, mNameSp, mDetailList);
+//            mNameSp.setSelection(0);
+            mUnitEt.setText(((Detail) mNameSp.getSelectedItem()).detail_unit);
         }
 
         new Handler().postDelayed(new Runnable() {
@@ -100,7 +103,6 @@ public class DetailActivity extends BaseActivity {
                 if (mDetailList != null && mDetailList.size() > position) {
                     mDetail = mDetailList.get(position);
                     if (mDetail != null) {
-                        mPriceEt.setText(mDetail.detail_price);
                         mUnitEt.setText(mDetail.detail_unit);
                     }
                 }
