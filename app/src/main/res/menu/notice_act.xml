@@ -7,7 +7,15 @@
         android:orderInCategory="100"
         android:title="保存"/>
     <item
-        android:id="@+id/action_edit"
+        android:id="@+id/action_deal"
         android:orderInCategory="100"
-        android:title="修改"/>
+        android:title="删除"/>
+    <item
+        android:id="@+id/action_delete"
+        android:orderInCategory="100"
+        android:title="删除"/>
+    <!--<item-->
+        <!--android:id="@+id/action_edit"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="修改"/>-->
 </menu>

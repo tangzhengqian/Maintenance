@@ -26,7 +26,8 @@
         <activity
             android:name=".ui.LoginActivity"
             android:launchMode="singleTask"></activity>
-        <activity android:name=".ui.MainActivity"></activity>
+        <activity android:name=".ui.MainActivity"
+            android:launchMode="singleTask"></activity>
         <activity android:name=".ui.NoticeListActivity"></activity>
         <activity android:name=".ui.NoticeActivity"></activity>
         <activity android:name=".ui.DetailActivity" />

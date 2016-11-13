@@ -34,8 +34,20 @@ public class SyncUtil {
     public static List<CompleteListener> sCompleteListeners = new ArrayList<>();
 
     public static void startSync() {
-        sRetryCount = 0;
-        getCompanyList();
+        new Thread(){
+            @Override
+            public void run() {
+                getCompanyList();
+                getManagementList();
+                getMaintenanceList();
+                getRoleList();
+                getStructureList();
+                getDetailTypeList();
+                getDetailList();
+                notifyComplete();
+            }
+        }.start();
+
     }
 
     private static void notifyComplete() {
@@ -53,206 +65,172 @@ public class SyncUtil {
 
 
     private static void getCompanyList() {
-        new HttpTask(Config.url_company_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Company.class).execute();
-                    List<Company> list = new Gson().fromJson(responseData.data, new TypeToken<List<Company>>() {
-                    }.getType());
-                    for (Company item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getManagementList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getCompanyList();
-                    } else {
-                        notifyFail();
-                    }
-                }
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_company_list).setShowMessage(false).execute(new FormBody.Builder().build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Company.class).execute();
+            List<Company> list = new Gson().fromJson(responseData.data, new TypeToken<List<Company>>() {
+            }.getType());
+            for (Company item : list) {
+                item.save();
             }
-        }).enqueue(new FormBody.Builder()
-                .build());
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getCompanyList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getManagementList() {
-        new HttpTask(Config.url_management_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Management.class).execute();
-                    List<Management> list = new Gson().fromJson(responseData.data, new TypeToken<List<Management>>() {
-                    }.getType());
-                    for (Management item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getMaintenanceList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getManagementList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_management_list).setShowMessage(false).execute(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Management.class).execute();
+            List<Management> list = new Gson().fromJson(responseData.data, new TypeToken<List<Management>>() {
+            }.getType());
+            for (Management item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getManagementList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getMaintenanceList() {
-        new HttpTask(Config.url_maintenance_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Maintenance.class).execute();
-                    List<Maintenance> list = new Gson().fromJson(responseData.data, new TypeToken<List<Maintenance>>() {
-                    }.getType());
-                    for (Maintenance item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getRoleList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getMaintenanceList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_maintenance_list).setShowMessage(false).execute(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Maintenance.class).execute();
+            List<Maintenance> list = new Gson().fromJson(responseData.data, new TypeToken<List<Maintenance>>() {
+            }.getType());
+            for (Maintenance item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getMaintenanceList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getRoleList() {
-        new HttpTask(Config.url_role_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Role.class).execute();
-                    List<Role> list = new Gson().fromJson(responseData.data, new TypeToken<List<Role>>() {
-                    }.getType());
-                    for (Role item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getStructureList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getRoleList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_role_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Role.class).execute();
+            List<Role> list = new Gson().fromJson(responseData.data, new TypeToken<List<Role>>() {
+            }.getType());
+            for (Role item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getRoleList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getStructureList() {
-        new HttpTask(Config.url_structure_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Structure.class).execute();
-                    List<Structure> list = new Gson().fromJson(responseData.data, new TypeToken<List<Structure>>() {
-                    }.getType());
-                    for (Structure item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getDetailTypeList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getStructureList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_structure_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Structure.class).execute();
+            List<Structure> list = new Gson().fromJson(responseData.data, new TypeToken<List<Structure>>() {
+            }.getType());
+            for (Structure item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getStructureList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getDetailTypeList() {
-        new HttpTask(Config.url_detail_type_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(DetailType.class).execute();
-                    List<DetailType> list = new Gson().fromJson(responseData.data, new TypeToken<List<DetailType>>() {
-                    }.getType());
-                    for (DetailType item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    sRetryCount = 0;
-                    getDetailList();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getDetailTypeList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_detail_type_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(DetailType.class).execute();
+            List<DetailType> list = new Gson().fromJson(responseData.data, new TypeToken<List<DetailType>>() {
+            }.getType());
+            for (DetailType item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getDetailTypeList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 
     private static void getDetailList() {
-        new HttpTask(Config.url_detail_list).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    ActiveAndroid.beginTransaction();
-                    new Delete().from(Detail.class).execute();
-                    List<Detail> list = new Gson().fromJson(responseData.data, new TypeToken<List<Detail>>() {
-                    }.getType());
-                    for (Detail item : list) {
-                        item.save();
-                    }
-                    ActiveAndroid.setTransactionSuccessful();
-                    ActiveAndroid.endTransaction();
-                    notifyComplete();
-                } else {
-                    sRetryCount++;
-                    if (sRetryCount <= MAX_RETRY_COUNT) {
-                        getDetailList();
-                    } else {
-                        notifyFail();
-                    }
-                }
-            }
-        }).enqueue(new FormBody.Builder()
+        sRetryCount = 0;
+        ResponseData responseData = new HttpTask(Config.url_detail_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Detail.class).execute();
+            List<Detail> list = new Gson().fromJson(responseData.data, new TypeToken<List<Detail>>() {
+            }.getType());
+            for (Detail item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getDetailList();
+            } else {
+                notifyFail();
+            }
+        }
     }
 }

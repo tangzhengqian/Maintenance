@@ -58,7 +58,11 @@ public class App extends com.activeandroid.app.Application {
     }
 
     synchronized public void setUser(User user) {
-        PrefsManager.getInstance().save(Config.prefs_key_login_user, new Gson().toJson(user));
         this.user = user;
+        if(user==null){
+            PrefsManager.getInstance().save(Config.prefs_key_login_user, "");
+        }else {
+            PrefsManager.getInstance().save(Config.prefs_key_login_user, new Gson().toJson(user));
+        }
     }
 }

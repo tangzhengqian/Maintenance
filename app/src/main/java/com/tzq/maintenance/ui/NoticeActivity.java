@@ -1,9 +1,11 @@
 package com.tzq.maintenance.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,7 +52,7 @@ public class NoticeActivity extends BaseActivity {
     ImageView mBeforeIv1, mBeforeIv2, mBeforeMoreIv;
     LinearLayout mDetailListLay;
     List<String> mBeforePicUris = new ArrayList<>();
-    ArrayList<String> mNewBeforePicUris = null;
+    ArrayList<String> mNewBeforePicUris = new ArrayList<>();
 
 
     @Override
@@ -78,12 +80,13 @@ public class NoticeActivity extends BaseActivity {
         MyUtil.setUpSp(mAct, mTypeSp, Config.CATES);
         MyUtil.setUpSp(mAct, mStakeSp, Config.STAKES);
         MyUtil.setUpSp(mAct, structureSp, new Select().from(Structure.class).execute());
-        update();
+        init();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.notice_act, menu);
+        MenuItem dealMenu = menu.findItem(R.id.action_deal);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -92,30 +95,28 @@ public class NoticeActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 ProgressDialogUtil.show(mAct);
-                new Thread(){
+                new Thread() {
                     @Override
                     public void run() {
-                        if (mNewBeforePicUris != null) {
-                            //del pic
-                            for (String uri : mBeforePicUris) {
-                                if (!mNewBeforePicUris.contains(uri)) {
-                                    new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
-                                    mBeforePicUris.remove(uri);
-                                }
+                        //del pic
+                        for (String uri : mBeforePicUris) {
+                            if (!mNewBeforePicUris.contains(uri)) {
+                                new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
+                                mBeforePicUris.remove(uri);
                             }
-                            //upload pic
-                            for (String uri : mNewBeforePicUris) {
-                                if (uri.startsWith("file://")) {
-                                    String path = uri.substring("file://".length());
-                                    File file = new File(path);
-                                    RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
-                                    ResponseData responseData = new HttpTask(Config.url_add_pic).execute(new MultipartBody.Builder()
-                                            .setType(MultipartBody.FORM)
-                                            .addFormDataPart("image", file.getName(), fileBody)
-                                            .build());
-                                    if (responseData.isSuccess()) {
-                                        mBeforePicUris.add(responseData.data);
-                                    }
+                        }
+                        //upload pic
+                        for (String uri : mNewBeforePicUris) {
+                            if (uri.startsWith("file://")) {
+                                String path = uri.substring("file://".length());
+                                File file = new File(path);
+                                RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
+                                ResponseData responseData = new HttpTask(Config.url_add_pic).execute(new MultipartBody.Builder()
+                                        .setType(MultipartBody.FORM)
+                                        .addFormDataPart("image", file.getName(), fileBody)
+                                        .build());
+                                if (responseData.isSuccess()) {
+                                    mBeforePicUris.add(responseData.data);
                                 }
                             }
                         }
@@ -124,7 +125,23 @@ public class NoticeActivity extends BaseActivity {
                 }.start();
 
                 break;
-            case R.id.action_edit:
+//            case R.id.action_edit:
+//                break;
+            case R.id.action_delete:
+                new AlertDialog.Builder(mAct).setMessage("删除该通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setGet(true).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                            @Override
+                            public void onComplete(ResponseData responseData) {
+                                if (responseData.isSuccess()) {
+                                    MyUtil.toast("删除成功");
+                                    finish();
+                                }
+                            }
+                        }).enqueue(new FormBody.Builder().add("id", mNotice.id + "").build());
+                    }
+                }).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -144,7 +161,7 @@ public class NoticeActivity extends BaseActivity {
     }
 
 
-    private void update() {
+    private void init() {
         if (mNotice == null) {
             mNotice = new Notice();
             setTitle("新建通知单");
@@ -168,6 +185,7 @@ public class NoticeActivity extends BaseActivity {
             if (!Util.isEmpty(mNotice.before_pic)) {
                 String[] beforePicUrls = mNotice.before_pic.split(",");
                 mBeforePicUris = Arrays.asList(beforePicUrls);
+                mNewBeforePicUris.addAll(mBeforePicUris);
                 if (mBeforePicUris.size() >= 1) {
                     MyUtil.displayPic(mBeforeIv1, mBeforePicUris.get(0));
                 }
@@ -275,8 +293,6 @@ public class NoticeActivity extends BaseActivity {
                 .add("stake_num2", mNotice.stake_num2 + "")
                 .add("project_name", mNotice.project_name + "")
                 .add("start_time", "" + mNotice.start_time)
-//                .add("picOne","")
-//                .add("detail_new","")
                 .add("project_cost", "" + mNotice.project_cost)
                 .add("structure_id", "" + mNotice.structure_id)
                 .add("days", "" + mNotice.days);
@@ -308,9 +324,9 @@ public class NoticeActivity extends BaseActivity {
         }
 
 
-        ResponseData responseData=new HttpTask(Config.url_notice_save).execute(builder.build());
+        ResponseData responseData = new HttpTask(Config.url_notice_save).execute(builder.build());
         Looper.prepare();
-        if(responseData.isSuccess()){
+        if (responseData.isSuccess()) {
             MyUtil.toast("保存成功");
             finish();
         }
@@ -325,14 +341,7 @@ public class NoticeActivity extends BaseActivity {
                 startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL);
                 break;
             case R.id.brfore_pic_lay:
-                ArrayList<String> list = new ArrayList<>();
-                if (!Util.isEmpty(mNotice.before_pic)) {
-                    String[] beforePicUrls = mNotice.before_pic.split(",");
-                    for (String s : beforePicUrls) {
-                        list.add(s);
-                    }
-                }
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", list), REQUEST_PHOTO);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNewBeforePicUris), REQUEST_PHOTO);
                 break;
             case R.id.date_tv:
                 MyUtil.showDateTimeDialog(mAct, mDateEt);

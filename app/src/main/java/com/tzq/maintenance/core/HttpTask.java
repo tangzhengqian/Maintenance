@@ -39,6 +39,7 @@ public class HttpTask {
     private List<ProgressCallBack> mProgressCallBacks = new ArrayList<>();
     private Activity mActivity;
     private boolean mIsShowMessage = true;
+    private boolean mIsGet;
 
     public HttpTask(String url) {
         mUrl = url;
@@ -73,12 +74,22 @@ public class HttpTask {
         return this;
     }
 
+    public HttpTask setGet(boolean b) {
+        mIsGet = b;
+        return this;
+    }
+
     private Call getCall(RequestBody body) {
         final Request r;
         String sessionId = Util.avoidNull(App.getInstance().getUser().token);
         Request.Builder builder = new Request.Builder();
         builder.url(mUrl).addHeader("client", "Android").addHeader("token", sessionId);
-        r = builder.post(body).build();
+        if (mIsGet) {
+            r = builder.get().build();
+        } else {
+            r = builder.post(body).build();
+        }
+
         return mOkHttpClient.newCall(r);
     }
 
@@ -88,33 +99,29 @@ public class HttpTask {
         showProgressDialog();
         getCall(body).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(Call call, final IOException e) {
                 LogUtil.i("onFailure  " + e.getMessage());
-                Looper.prepare();
                 hideProgressDialog();
                 onComplete(new ResponseData(-1, e.getMessage()));
-                Looper.loop();
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                Looper.prepare();
+            public void onResponse(Call call, final Response response) throws IOException {
                 hideProgressDialog();
                 ResponseData responseData = getResponseData(response);
                 if (responseData.code == 0) {
-//                showMessage(msg);
                     onComplete(responseData);
                 } else {
                     showMessage(responseData.msg);
                     onComplete(responseData);
                 }
-                Looper.loop();
+
             }
         });
     }
 
     public ResponseData execute(RequestBody body) {
-        LogUtil.i("enqueue " + mUrl);
+        LogUtil.i("execute " + mUrl);
         try {
             Response response = getCall(body).execute();
             return getResponseData(response);
@@ -143,15 +150,20 @@ public class HttpTask {
     }
 
     private void showMessage(String msg) {
+        Looper.prepare();
         if (mIsShowMessage) {
             MyUtil.toast(msg);
         }
+        Looper.loop();
     }
 
-    private void onComplete(ResponseData responseData) {
+    private void onComplete(final ResponseData responseData) {
+        Looper.prepare();
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(responseData);
         }
+        Looper.loop();
+
     }
 
 

@@ -1,8 +1,10 @@
 package com.tzq.maintenance.ui;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,8 +73,15 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-
+        if (id == R.id.action_quit) {
+            new AlertDialog.Builder(mAct).setMessage("退出当前帐号？").setNegativeButton("取消",null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    App.getInstance().setUser(null);
+                    startActivity(new Intent(mAct,LoginActivity.class));
+                    finish();
+                }
+            }).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -18,11 +18,7 @@ import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 import com.tzq.maintenance.utis.SyncUtil;
 
-import java.io.File;
-
 import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/9/5.
@@ -47,10 +43,8 @@ public class LoginActivity extends BaseActivity {
 
         phoneNumberEt = (EditText) findViewById(R.id.phone_number_et);
         passwordEt = (EditText) findViewById(R.id.password_et);
-        phoneNumberEt.setText("18780104204");
+        phoneNumberEt.setText("18780104206");
         passwordEt.setText("pangxie");
-
-        RequestBody fileBody = RequestBody.create(MediaType.parse("image/png"), new File(""));
 
     }
 
@@ -67,10 +61,21 @@ public class LoginActivity extends BaseActivity {
                             SyncUtil.sCompleteListeners.add(new CompleteListener() {
                                 @Override
                                 public void onComplete(Object data) {
-                                    MyUtil.toast("登录成功");
-                                    ProgressDialogUtil.hide(mAct);
-                                    startActivity(new Intent(mAct, MainActivity.class));
-                                    finish();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    MyUtil.toast("登录成功");
+                                                    ProgressDialogUtil.hide(mAct);
+                                                    startActivity(new Intent(mAct , MainActivity.class));
+                                                    finish();
+                                                }
+                                            });
+                                        }
+                                    });
+
                                 }
                             });
                             SyncUtil.startSync();

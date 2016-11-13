@@ -98,7 +98,8 @@ public class PhotoGridShowActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 String path = data.getStringExtra("path");
                 LogUtil.i("---path=" + path);
-                mUris.add("file://"+path);
+                mUris.add("file://" + path);
+
                 mAdapter.setDataList(mUris);
             }
         }
@@ -120,7 +121,6 @@ public class PhotoGridShowActivity extends BaseActivity {
                 vh.photoCover = convertView.findViewById(R.id.photo_cover_v);
                 vh.photoCb = (CheckBox) convertView.findViewById(R.id.photo_selected_cb);
                 convertView.setTag(vh);
-
             } else {
                 vh = (VH) convertView.getTag();
             }
@@ -129,10 +129,10 @@ public class PhotoGridShowActivity extends BaseActivity {
             MyUtil.displayPic(vh.photoIv, uri);
             if (mSelectPostion.contains(position)) {
                 vh.photoCover.setVisibility(View.VISIBLE);
-                vh.photoCb.setChecked(false);
+                vh.photoCb.setChecked(true);
             } else {
                 vh.photoCover.setVisibility(View.GONE);
-                vh.photoCb.setChecked(true);
+                vh.photoCb.setChecked(false);
             }
             vh.photoIv.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -143,7 +143,7 @@ public class PhotoGridShowActivity extends BaseActivity {
             vh.photoCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked&&!mSelectPostion.contains(position)) {
+                    if (isChecked && !mSelectPostion.contains(position)) {
                         mSelectPostion.add(position);
                     } else {
                         mSelectPostion.remove(Integer.valueOf(position));

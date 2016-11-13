@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
+import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
@@ -122,22 +123,23 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                         int count = 0;
                         if (responseData.isSuccess()) {
                             try {
-                                JSONObject o = new JSONObject(responseData.data);
-                                count = o.optInt("count");
-                                List<Notice> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
-                                }.getType());
-                                mPage = p;
-                                if (!Util.isEmpty(list)) {
+                                if (Util.isEmpty(responseData.data)) {
+                                    mListData.clear();
+                                } else {
+                                    JSONObject o = new JSONObject(responseData.data);
+                                    count = o.optInt("count");
+                                    List<Notice> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
+                                    }.getType());
+                                    mPage = p;
                                     if (p == 1) {
                                         mListData.clear();
                                     }
                                     mListData.addAll(list);
-                                    mListAdapter.setDataList(mListData);
                                 }
-
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                LogUtil.e(e.getMessage(), e);
                             }
+                            mListAdapter.setDataList(mListData);
                         }
                         if (mListData.size() >= count) {
                             footerView.setText("没有更多的数据了");
@@ -186,7 +188,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             vh.noTv.setText("编号：" + item.id);
             vh.typeTv.setText("分类：" + MyUtil.getNoticeCateStr(item.cate));
             vh.costTv.setText("造价：" + item.project_cost);
-            vh.statusTv.setText("状态：" + MyUtil.getNoticeStatusStr(Integer.valueOf(item.step)));
+            vh.statusTv.setText("状态：" + MyUtil.getNoticeStepStr(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
             return convertView;
         }

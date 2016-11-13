@@ -46,8 +46,8 @@ public class MyUtil {
         Toast.makeText(App.getInstance(), msgId, Toast.LENGTH_SHORT).show();
     }
 
-    public static String getNoticeStatusStr(int status) {
-        switch (status) {
+    public static String getNoticeStepStr(int step) {
+        switch (step) {
             case 0:
                 return "新创建";
             case 10://为提交到施工管理
@@ -70,6 +70,21 @@ public class MyUtil {
                 return "不通过";
         }
         return "未知";
+    }
+
+    public static String getNoticeDealStr(int step, int createUserRole,int nowUseRole) {
+        String str=null;
+        if(step==0){
+            if(createUserRole==nowUseRole){
+                if(createUserRole==6){//施工单位巡查人员
+                    return "提交到施工管理";
+                }else {
+
+                }
+
+            }
+        }
+        return str;
     }
 
     public static String getNoticeCateStr(String id) {
@@ -138,7 +153,7 @@ public class MyUtil {
     }
 
     public static void displayPic(ImageView iv, String url) {
-        LogUtil.i("displayPic  " + url);
+//        LogUtil.i("displayPic  " + url);
         if (!url.contains(":")) {
             url = Config.url_host + url;
         }
@@ -146,7 +161,7 @@ public class MyUtil {
     }
 
     public static void displayLargePic(ImageView iv, String url) {
-        LogUtil.i("displayPic  " + url);
+//        LogUtil.i("displayPic  " + url);
         if (!url.contains(":")) {
             url = Config.url_host + url;
         }
@@ -194,7 +209,7 @@ public class MyUtil {
 
                     @Override
                     public void onComplete(Object time) {
-                        String dateTime = date.toString() + " " + time.toString();
+                        String dateTime = date.toString() + " " + time.toString() + ":00";
                         LogUtil.i("--dateTime=" + dateTime);
                         if (v instanceof TextView) {
                             TextView t = (TextView) v;
