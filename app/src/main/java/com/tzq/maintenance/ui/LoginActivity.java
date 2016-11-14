@@ -43,7 +43,7 @@ public class LoginActivity extends BaseActivity {
 
         phoneNumberEt = (EditText) findViewById(R.id.phone_number_et);
         passwordEt = (EditText) findViewById(R.id.password_et);
-        phoneNumberEt.setText("18780104206");
+        phoneNumberEt.setText("18780104203");
         passwordEt.setText("pangxie");
 
     }

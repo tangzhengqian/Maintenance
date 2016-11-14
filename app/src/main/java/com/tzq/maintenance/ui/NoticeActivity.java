@@ -16,12 +16,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Notice;
+import com.tzq.maintenance.bean.NoticeDealBean;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.HttpTask;
@@ -53,6 +56,7 @@ public class NoticeActivity extends BaseActivity {
     LinearLayout mDetailListLay;
     List<String> mBeforePicUris = new ArrayList<>();
     ArrayList<String> mNewBeforePicUris = new ArrayList<>();
+    NoticeDealBean mNoticeDealBean;
 
 
     @Override
@@ -86,7 +90,41 @@ public class NoticeActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.notice_act, menu);
-        MenuItem dealMenu = menu.findItem(R.id.action_deal);
+        MenuItem dealNextMenu = menu.findItem(R.id.action_deal_next);
+        MenuItem dealCancelMenu = menu.findItem(R.id.action_deal_cancel);
+        MenuItem deleteMenu = menu.findItem(R.id.action_delete);
+        if (mNotice.created_user_id == App.getInstance().getUser().user_id || App.getInstance().getUser().role_id == 1) {
+            deleteMenu.setVisible(true);
+        } else {
+            deleteMenu.setVisible(false);
+        }
+        if (mNotice.id <= 0) {
+            dealNextMenu.setVisible(false);
+            dealCancelMenu.setVisible(false);
+        } else {
+            mNoticeDealBean = MyUtil.getNoticeDealStr(mNotice.step, mNotice.role_id, App.getInstance().getUser().role_id);
+            if (mNoticeDealBean != null) {
+                LogUtil.i(mNoticeDealBean.toString());
+            }
+            if (mNoticeDealBean == null) {
+                dealNextMenu.setVisible(false);
+                dealCancelMenu.setVisible(false);
+            } else {
+                if (Util.isEmpty(mNoticeDealBean.nextStr)) {
+                    dealNextMenu.setVisible(false);
+                } else {
+                    dealNextMenu.setVisible(true);
+                    dealNextMenu.setTitle(mNoticeDealBean.nextStr);
+                }
+                if (Util.isEmpty(mNoticeDealBean.cancelStr)) {
+                    dealCancelMenu.setVisible(false);
+                } else {
+                    dealCancelMenu.setVisible(true);
+                    dealCancelMenu.setTitle(mNoticeDealBean.cancelStr);
+                }
+            }
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -131,7 +169,7 @@ public class NoticeActivity extends BaseActivity {
                 new AlertDialog.Builder(mAct).setMessage("删除该通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setGet(true).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                        new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                             @Override
                             public void onComplete(ResponseData responseData) {
                                 if (responseData.isSuccess()) {
@@ -139,9 +177,31 @@ public class NoticeActivity extends BaseActivity {
                                     finish();
                                 }
                             }
-                        }).enqueue(new FormBody.Builder().add("id", mNotice.id + "").build());
+                        }).enqueue();
                     }
                 }).show();
+                break;
+            case R.id.action_deal_next:
+                new HttpTask(Config.url_notice_deal + "?id=" + mNotice.id + "&act=" + mNoticeDealBean.nextAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                    @Override
+                    public void onComplete(ResponseData responseData) {
+                        if (responseData.isSuccess()) {
+                            MyUtil.toast("操作成功");
+                            finish();
+                        }
+                    }
+                }).enqueue();
+                break;
+            case R.id.action_deal_cancel:
+                new HttpTask(Config.url_notice_deal + "?id=" + mNotice.id + "&act=" + mNoticeDealBean.cancelAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                    @Override
+                    public void onComplete(ResponseData responseData) {
+                        if (responseData.isSuccess()) {
+                            MyUtil.toast("操作成功");
+                            finish();
+                        }
+                    }
+                }).enqueue();
                 break;
         }
         return super.onOptionsItemSelected(item);

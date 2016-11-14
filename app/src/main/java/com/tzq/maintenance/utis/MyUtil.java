@@ -24,6 +24,7 @@ import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NormalBean;
+import com.tzq.maintenance.bean.NoticeDealBean;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.CompleteListener;
 
@@ -50,11 +51,11 @@ public class MyUtil {
         switch (step) {
             case 0:
                 return "新创建";
-            case 10://为提交到施工管理
+            case 10:
                 return "施工审核";
-            case 20://提交到养护科管理
+            case 20:
                 return "养护科审核";
-            case 30://提交到科长
+            case 30:
                 return "科长审核";
             case 11://施工管理通过
                 return "通过";
@@ -72,19 +73,36 @@ public class MyUtil {
         return "未知";
     }
 
-    public static String getNoticeDealStr(int step, int createUserRole,int nowUseRole) {
-        String str=null;
-        if(step==0){
-            if(createUserRole==nowUseRole){
-                if(createUserRole==6){//施工单位巡查人员
-                    return "提交到施工管理";
-                }else {
-
+    public static NoticeDealBean getNoticeDealStr(int step, int createUserRoleId, int nowUseRoleId) {
+        NoticeDealBean bean = null;
+        if (step == 0) {
+            if (createUserRoleId == nowUseRoleId) {
+                if (createUserRoleId == 6) {//施工单位巡查人员
+                    return new NoticeDealBean("提交到施工管理", "for_5", null, null);
+                } else if (createUserRoleId == 5) {//施工单位管理
+                    return new NoticeDealBean("提交到养护科管理", "for_3", "不通过", "return_6");
+                } else if (createUserRoleId == 4) {//养护科巡查人员
+                    return new NoticeDealBean("提交到养护科管理", "for_3", null, null);
+                } else if (createUserRoleId == 3) {//养护科管理
+                    return new NoticeDealBean("提交到科长", "for_2", "不通过", "return_5");
+                } else if (createUserRoleId == 2) {//养护科管理
+                    return new NoticeDealBean("通过", "for_end", "不通过", "return_3");
                 }
-
+            }
+        } else if (step == 10) {
+            if (nowUseRoleId == 5) {//施工单位管理
+                return new NoticeDealBean("提交到养护科管理", "for_3", "不通过", "return_6");
+            }
+        } else if (step == 20) {
+            if (nowUseRoleId == 3) {//养护科管理
+                return new NoticeDealBean("提交到科长", "for_2", "不通过", "return_5");
+            }
+        } else if (step == 30) {
+            if (nowUseRoleId == 2) {//养护科管理
+                return new NoticeDealBean("通过", "for_end", "不通过", "return_3");
             }
         }
-        return str;
+        return bean;
     }
 
     public static String getNoticeCateStr(String id) {

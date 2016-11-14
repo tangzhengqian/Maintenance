@@ -39,7 +39,6 @@ public class HttpTask {
     private List<ProgressCallBack> mProgressCallBacks = new ArrayList<>();
     private Activity mActivity;
     private boolean mIsShowMessage = true;
-    private boolean mIsGet;
 
     public HttpTask(String url) {
         mUrl = url;
@@ -74,23 +73,22 @@ public class HttpTask {
         return this;
     }
 
-    public HttpTask setGet(boolean b) {
-        mIsGet = b;
-        return this;
-    }
-
     private Call getCall(RequestBody body) {
         final Request r;
         String sessionId = Util.avoidNull(App.getInstance().getUser().token);
         Request.Builder builder = new Request.Builder();
         builder.url(mUrl).addHeader("client", "Android").addHeader("token", sessionId);
-        if (mIsGet) {
+        if (body == null) {
             r = builder.get().build();
         } else {
             r = builder.post(body).build();
         }
 
         return mOkHttpClient.newCall(r);
+    }
+
+    public void enqueue() {
+        enqueue(null);
     }
 
     public void enqueue(RequestBody body) {
@@ -137,9 +135,9 @@ public class HttpTask {
             String body = response.body().string();
             LogUtil.i("onResponse  " + body);
             JSONObject o = new JSONObject(body);
-            responseData.code = o.getInt("code");
+            responseData.code = o.optInt("code");
             responseData.msg = o.optString("msg");
-            responseData.data = o.getString("data");
+            responseData.data = o.optString("data");
         } catch (Exception e) {
             e.printStackTrace();
             responseData.code = -1;
