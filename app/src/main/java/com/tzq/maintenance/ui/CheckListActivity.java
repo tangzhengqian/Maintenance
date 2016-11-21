@@ -21,7 +21,7 @@ import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
-import com.tzq.maintenance.bean.Notice;
+import com.tzq.maintenance.bean.Check;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
@@ -38,24 +38,24 @@ import okhttp3.FormBody;
  * Created by Administrator on 2016/10/20.
  */
 
-public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class CheckListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView mListView;
     private Adapter mListAdapter;
     private TextView footerView;
     private int mPage = 1;
     private final int page_size = 10;
-    private List<Notice> mListData = new ArrayList<>();
+    private List<Check> mListData = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.notice_list_activity);
-        setTitle("通知单列表");
+        setContentView(R.layout.check_list_activity);
+        setTitle("验收单列表");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
-        mListView = (ListView) findViewById(R.id.tongzd_list);
+        mListView = (ListView) findViewById(R.id.list_view);
         footerView = (TextView) getLayoutInflater().inflate(R.layout.list_footer_view, null);
 
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -68,8 +68,8 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Notice item = mListAdapter.getItem(position);
-                startActivity(new Intent(mAct, NoticeActivity.class).putExtra("notice", item));
+                Check item = mListAdapter.getItem(position);
+                startActivity(new Intent(mAct, CheckActivity.class).putExtra("check", item));
             }
         });
         httpGetList(1);
@@ -114,7 +114,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
 
     private void httpGetList(final int p) {
         footerView.setText("正在加载更多数据...");
-        new HttpTask(Config.url_notice_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+        new HttpTask(Config.url_check_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(final ResponseData responseData) {
                 runOnUiThread(new Runnable() {
@@ -128,7 +128,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
-                                    List<Notice> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
+                                    List<Check> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Check>>() {
                                     }.getType());
                                     mPage = p;
                                     if (p == 1) {
@@ -160,7 +160,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 .build());
     }
 
-    class Adapter extends CBaseAdapter<Notice> {
+    class Adapter extends CBaseAdapter<Check> {
 
         public Adapter(Context c) {
             super(c);
@@ -183,7 +183,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 vh = (VH) convertView.getTag();
             }
 
-            Notice item = getItem(position);
+            Check item = getItem(position);
             vh.nameTv.setText("名称：" + item.project_name);
             vh.noTv.setText("编号：" + item.id);
             vh.typeTv.setText("分类：" + MyUtil.getNoticeCateStr(item.cate));

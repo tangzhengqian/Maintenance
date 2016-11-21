@@ -34,6 +34,8 @@
         <activity android:name=".ui.PhotoGridShowActivity" />
         <activity android:name=".ui.PhotoViewPagerActivity" />
         <activity android:name=".ui.PhotoSelectLocalActivity" />
+        <activity android:name=".ui.CheckListActivity" />
+        <activity android:name=".ui.CheckActivity" />
 
         <service android:name=".service.CoreService"/>
     </application>

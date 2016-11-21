@@ -33,6 +33,7 @@ public class PhotoGridShowActivity extends BaseActivity {
     PhotoAdapter mAdapter;
     ArrayList<String> mUris = new ArrayList<>();
     List<Integer> mSelectPostion = new ArrayList<>();
+    boolean mEditable = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +48,7 @@ public class PhotoGridShowActivity extends BaseActivity {
         mGridView.setAdapter(mAdapter);
 
         mUris = getIntent().getStringArrayListExtra("uris");
+        mEditable = getIntent().getBooleanExtra("editable", true);
         mAdapter.setDataList(mUris);
     }
 
@@ -57,6 +59,9 @@ public class PhotoGridShowActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mEditable) {
+            return true;
+        }
 
         getMenuInflater().inflate(R.menu.photo_grid_show_activity, menu);
         MenuItem delete = menu.findItem(R.id.action_delete);

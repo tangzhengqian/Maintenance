@@ -32,10 +32,15 @@
                 android:gravity="center"
                 android:padding="8dp"/>
             <Button
-                android:id="@+id/tzd_bt"
+                android:id="@+id/notices_bt"
                 style="@style/button"
                 android:layout_marginTop="16dp"
                 android:text="通知单管理"/>
+            <Button
+                android:id="@+id/checks_bt"
+                style="@style/button"
+                android:layout_marginTop="16dp"
+                android:text="验收单管理"/>
         </LinearLayout>
     </ScrollView>
 

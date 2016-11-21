@@ -20,20 +20,24 @@ import com.tzq.maintenance.bean.Role;
 
 public class MainActivity extends BaseActivity {
     TextView userMsgTv;
-    Button tzdBtn;
+    Button noticesBtn, checksBtn;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        setTitle("工程管理系统");
+        setTitle("工程养护系统");
         userMsgTv = (TextView) findViewById(R.id.user_msg_tv);
-        tzdBtn = (Button) findViewById(R.id.tzd_bt);
+        noticesBtn = (Button) findViewById(R.id.notices_bt);
+        checksBtn = (Button) findViewById(R.id.checks_bt);
         String name = App.getInstance().getUser().user_name;
         Company company = new Select().from(Company.class).where("id=" + App.getInstance().getUser().company_id).executeSingle();
         Maintenance maintenance = new Select().from(Maintenance.class).where("id=" + App.getInstance().getUser().maintenance_id).executeSingle();
 //        Management management=new Select().from(Management.class).where("id="+App.getInstance().getUser().maintenance_id).executeSingle();
         Role role = new Select().from(Role.class).where("id=" + App.getInstance().getUser().role_id).executeSingle();
+        if (name == null) {
+            name = "";
+        }
         userMsgTv.setText("用户：" + name +
                 "\n所属公司：" + company.name +
                 "\n所属养护科：" + maintenance.name +
@@ -58,8 +62,11 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onViewClick(View view) {
         switch (view.getId()) {
-            case R.id.tzd_bt:
+            case R.id.notices_bt:
                 startActivity(new Intent(mAct, NoticeListActivity.class));
+                break;
+            case R.id.checks_bt:
+                startActivity(new Intent(mAct, CheckListActivity.class));
                 break;
         }
     }
@@ -74,11 +81,11 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_quit) {
-            new AlertDialog.Builder(mAct).setMessage("退出当前帐号？").setNegativeButton("取消",null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            new AlertDialog.Builder(mAct).setMessage("退出当前帐号？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     App.getInstance().setUser(null);
-                    startActivity(new Intent(mAct,LoginActivity.class));
+                    startActivity(new Intent(mAct, LoginActivity.class));
                     finish();
                 }
             }).show();

@@ -21,10 +21,10 @@ import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
+import com.tzq.maintenance.bean.DealBean;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NormalBean;
-import com.tzq.maintenance.bean.NoticeDealBean;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.CompleteListener;
 
@@ -47,7 +47,7 @@ public class MyUtil {
         Toast.makeText(App.getInstance(), msgId, Toast.LENGTH_SHORT).show();
     }
 
-    public static String getNoticeStepStr(int step) {
+    public static String getStepStr(int step) {
         switch (step) {
             case 0:
                 return "新创建";
@@ -73,33 +73,51 @@ public class MyUtil {
         return "未知";
     }
 
-    public static NoticeDealBean getNoticeDealStr(int step, int createUserRoleId, int nowUseRoleId) {
-        NoticeDealBean bean = null;
+    public static DealBean getNoticeDealStr(int step, int createUserRoleId, int nowUseRoleId) {
+        DealBean bean = null;
         if (step == 0) {
             if (createUserRoleId == nowUseRoleId) {
                 if (createUserRoleId == 6) {//施工单位巡查人员
-                    return new NoticeDealBean("提交到施工管理", "for_5", null, null);
+                    return new DealBean("提交到施工管理", "for_5", null, null);
                 } else if (createUserRoleId == 5) {//施工单位管理
-                    return new NoticeDealBean("提交到养护科管理", "for_3", "不通过", "return_6");
+                    return new DealBean("提交到养护科管理", "for_3", "不通过", "return_6");
                 } else if (createUserRoleId == 4) {//养护科巡查人员
-                    return new NoticeDealBean("提交到养护科管理", "for_3", null, null);
+                    return new DealBean("提交到养护科管理", "for_3", null, null);
                 } else if (createUserRoleId == 3) {//养护科管理
-                    return new NoticeDealBean("提交到科长", "for_2", "不通过", "return_5");
+                    return new DealBean("提交到科长", "for_2", "不通过", "return_5");
                 } else if (createUserRoleId == 2) {//养护科管理
-                    return new NoticeDealBean("通过", "for_end", "不通过", "return_3");
+                    return new DealBean("通过", "for_end", "不通过", "return_3");
                 }
             }
         } else if (step == 10) {
             if (nowUseRoleId == 5) {//施工单位管理
-                return new NoticeDealBean("提交到养护科管理", "for_3", "不通过", "return_6");
+                return new DealBean("提交到养护科管理", "for_3", "不通过", "return_6");
             }
         } else if (step == 20) {
             if (nowUseRoleId == 3) {//养护科管理
-                return new NoticeDealBean("提交到科长", "for_2", "不通过", "return_5");
+                return new DealBean("提交到科长", "for_2", "不通过", "return_5");
             }
         } else if (step == 30) {
-            if (nowUseRoleId == 2) {//养护科管理
-                return new NoticeDealBean("通过", "for_end", "不通过", "return_3");
+            if (nowUseRoleId == 2) {//科长
+                return new DealBean("通过", "for_end", "不通过", "return_3");
+            }
+        }
+        return bean;
+    }
+
+    public static DealBean getCheckDealStr(int step, int nowUseRoleId) {
+        DealBean bean = null;
+        if (step == 0) {
+            if (nowUseRoleId == 5) {//施工单位管理
+                return new DealBean("提交到养护科管理", "for_3", null, null);
+            }
+        } else if (step == 10) {
+            if (nowUseRoleId == 3) {//养护科管理
+                return new DealBean("提交到科长", "for_2", "不通过", "return_5");
+            }
+        } else if (step == 30) {
+            if (nowUseRoleId == 2) {//科长
+                return new DealBean("通过", "for_end", "不通过", "return_3");
             }
         }
         return bean;

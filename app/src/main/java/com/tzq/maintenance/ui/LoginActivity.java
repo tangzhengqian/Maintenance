@@ -43,7 +43,7 @@ public class LoginActivity extends BaseActivity {
 
         phoneNumberEt = (EditText) findViewById(R.id.phone_number_et);
         passwordEt = (EditText) findViewById(R.id.password_et);
-        phoneNumberEt.setText("18780104203");
+        phoneNumberEt.setText("18780104205");
         passwordEt.setText("pangxie");
 
     }
@@ -54,7 +54,7 @@ public class LoginActivity extends BaseActivity {
                 ProgressDialogUtil.show(mAct);
                 new HttpTask(Config.url_login).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
-                    public void onComplete(ResponseData responseData) {
+                    public void onComplete(final ResponseData responseData) {
                         if (responseData.isSuccess()) {
                             User user = new Gson().fromJson(responseData.data, User.class);
                             App.getInstance().setUser(user);
@@ -69,13 +69,29 @@ public class LoginActivity extends BaseActivity {
                                                 public void run() {
                                                     MyUtil.toast("登录成功");
                                                     ProgressDialogUtil.hide(mAct);
-                                                    startActivity(new Intent(mAct , MainActivity.class));
+                                                    startActivity(new Intent(mAct, MainActivity.class));
                                                     finish();
                                                 }
                                             });
                                         }
                                     });
+                                }
 
+                                @Override
+                                public void onFail() {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    MyUtil.toast("获取资源失败");
+                                                    ProgressDialogUtil.hide(mAct);
+                                                    App.getInstance().setUser(null);
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             });
                             SyncUtil.startSync();

@@ -4,13 +4,13 @@ package com.tzq.maintenance.bean;
  * Created by Administrator on 2016/11/14.
  */
 
-public class NoticeDealBean {
+public class DealBean {
     public String nextStr;
     public String nextAct;
     public String cancelStr;
     public String cancelAct;
 
-    public NoticeDealBean(String nextStr, String nextAct, String cancelStr, String cancelAct) {
+    public DealBean(String nextStr, String nextAct, String cancelStr, String cancelAct) {
         this.nextStr = nextStr;
         this.nextAct = nextAct;
         this.cancelStr = cancelStr;
@@ -19,7 +19,7 @@ public class NoticeDealBean {
 
     @Override
     public String toString() {
-        return "NoticeDealBean{" +
+        return "DealBean{" +
                 "nextStr='" + nextStr + '\'' +
                 ", nextAct='" + nextAct + '\'' +
                 ", cancelStr='" + cancelStr + '\'' +

@@ -31,6 +31,7 @@ public class DetailActivity extends BaseActivity {
     List<DetailType> mDetailTypeList = new Select().from(DetailType.class).execute();
     List<Detail> mDetailList;
     Detail mDetail = new Detail();
+    boolean mEditable = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class DetailActivity extends BaseActivity {
 
         reset();
         mDetail = (Detail) getIntent().getSerializableExtra("detail");
+        mEditable = getIntent().getBooleanExtra("editable", true);
         MyUtil.setUpSp(mAct, mTypeSp, mDetailTypeList);
         mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(0).id).execute();
         MyUtil.setUpSp(mAct, mNameSp, mDetailList);
@@ -119,7 +121,9 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_detail_act, menu);
+        if (mEditable) {
+            getMenuInflater().inflate(R.menu.menu_detail_act, menu);
+        }
         return true;
     }
 

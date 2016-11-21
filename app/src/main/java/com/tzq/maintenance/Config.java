@@ -27,6 +27,10 @@ public class Config {
     public static final String url_contract_list = url_host + "/Home/Api/getContract";
     public static final String url_add_pic = url_host + "/Home/Api/addPic";
     public static final String url_del_pic = url_host + "/Home/Api/delPic";
+    public static final String url_check_list = url_host + "/Home/Api/getCheckList";
+    public static final String url_check_save = url_host + "/Home/Api/saveCheck";
+    public static final String url_check_delete = url_host + "/Home/Api/delCheck";
+    public static final String url_check_deal = url_host + "/Home/Api/dealCheck";
 
 
     public static final String prefs_key_login_user = "user";

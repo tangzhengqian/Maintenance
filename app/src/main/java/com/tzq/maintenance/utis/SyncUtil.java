@@ -37,14 +37,8 @@ public class SyncUtil {
         new Thread(){
             @Override
             public void run() {
+                sRetryCount = 0;
                 getCompanyList();
-                getManagementList();
-                getMaintenanceList();
-                getRoleList();
-                getStructureList();
-                getDetailTypeList();
-                getDetailList();
-                notifyComplete();
             }
         }.start();
 
@@ -65,7 +59,6 @@ public class SyncUtil {
 
 
     private static void getCompanyList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_company_list).setShowMessage(false).execute(new FormBody.Builder().build());
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
@@ -77,7 +70,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
-
+            sRetryCount = 0;
+            getManagementList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -89,7 +83,6 @@ public class SyncUtil {
     }
 
     private static void getManagementList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_management_list).setShowMessage(false).execute(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
@@ -103,6 +96,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getMaintenanceList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -114,7 +109,6 @@ public class SyncUtil {
     }
 
     private static void getMaintenanceList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_maintenance_list).setShowMessage(false).execute(new FormBody.Builder()
                 .add("company_id", App.getInstance().getUser().company_id + "")
                 .build());
@@ -128,6 +122,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getRoleList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -139,7 +135,6 @@ public class SyncUtil {
     }
 
     private static void getRoleList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_role_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
         if (responseData.isSuccess()) {
@@ -152,6 +147,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getStructureList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -163,7 +160,6 @@ public class SyncUtil {
     }
 
     private static void getStructureList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_structure_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
         if (responseData.isSuccess()) {
@@ -176,6 +172,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getDetailTypeList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -187,7 +185,6 @@ public class SyncUtil {
     }
 
     private static void getDetailTypeList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_detail_type_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
         if (responseData.isSuccess()) {
@@ -200,6 +197,8 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getDetailList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -211,7 +210,6 @@ public class SyncUtil {
     }
 
     private static void getDetailList() {
-        sRetryCount = 0;
         ResponseData responseData = new HttpTask(Config.url_detail_list).setShowMessage(false).execute(new FormBody.Builder()
                 .build());
         if (responseData.isSuccess()) {
@@ -224,6 +222,7 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+            notifyComplete();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
