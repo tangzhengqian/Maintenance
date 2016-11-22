@@ -30,15 +30,25 @@ import okhttp3.FormBody;
 public class SyncUtil {
     private static final int MAX_RETRY_COUNT = 5;
     private static int sRetryCount = 0;
+    private static boolean sIsSyncing = false;
 
     public static List<CompleteListener> sCompleteListeners = new ArrayList<>();
 
     public static void startSync() {
-        new Thread(){
+        if (sIsSyncing) {
+            return;
+        }
+        if (App.getInstance().getUser() == null) {
+            return;
+        }
+        sIsSyncing = true;
+        new Thread() {
             @Override
             public void run() {
+
                 sRetryCount = 0;
                 getCompanyList();
+                sIsSyncing = false;
             }
         }.start();
 

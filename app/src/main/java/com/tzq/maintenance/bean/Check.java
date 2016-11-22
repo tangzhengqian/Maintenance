@@ -19,7 +19,7 @@ public class Check implements Serializable {
     public String end_time;//
     public List<Detail> detail;//
     public List<Detail> detail_new;//
-    public String days;//
+//    public String days;//
     public String project_cost;//
     public String before_pic;//
     public int structure_id;//

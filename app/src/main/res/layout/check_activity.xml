@@ -99,7 +99,8 @@
                 android:hint="选择日期"/>
         </LinearLayout>
 
-        <LinearLayout style="@style/item_lay">
+        <LinearLayout style="@style/item_lay"
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="wrap_content"

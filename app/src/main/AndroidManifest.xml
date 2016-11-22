@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
 
     <application
         android:name=".App"
@@ -28,16 +30,18 @@
             android:launchMode="singleTask"></activity>
         <activity android:name=".ui.MainActivity"
             android:launchMode="singleTask"></activity>
-        <activity android:name=".ui.NoticeListActivity"></activity>
+        <activity android:name=".ui.NoticeListActivity"
+            android:launchMode="singleTop"></activity>
         <activity android:name=".ui.NoticeActivity"></activity>
         <activity android:name=".ui.DetailActivity" />
         <activity android:name=".ui.PhotoGridShowActivity" />
         <activity android:name=".ui.PhotoViewPagerActivity" />
         <activity android:name=".ui.PhotoSelectLocalActivity" />
-        <activity android:name=".ui.CheckListActivity" />
+        <activity android:name=".ui.CheckListActivity"
+            android:launchMode="singleTop"/>
         <activity android:name=".ui.CheckActivity" />
 
-        <service android:name=".service.CoreService"/>
+        <service android:name=".core.CoreService"/>
     </application>
 
 </manifest>

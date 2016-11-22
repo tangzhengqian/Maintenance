@@ -264,7 +264,7 @@ public class CheckActivity extends BaseActivity {
         mProjectNameEt.setText(mCheck.project_name);
         mCostEt.setText(mCheck.project_cost);
         mDateEt.setText(mCheck.created_at);
-        mDaysEt.setText(mCheck.days);
+//        mDaysEt.setText(mCheck.days);
 
         if (!Util.isEmpty(mCheck.before_pic)) {
             String[] urls = mCheck.before_pic.split(",");
@@ -453,7 +453,6 @@ public class CheckActivity extends BaseActivity {
         mCheck.project_name = mProjectNameEt.getText().toString();
         mCheck.start_time = mDateEt.getText().toString();
         mCheck.project_cost = mCostEt.getText().toString();
-        mCheck.days = mDaysEt.getText().toString();
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", mCheck.cate)
@@ -464,8 +463,7 @@ public class CheckActivity extends BaseActivity {
                 .add("project_name", mCheck.project_name + "")
                 .add("start_time", "" + mCheck.start_time)
                 .add("project_cost", "" + mCheck.project_cost)
-                .add("structure_id", "" + mCheck.structure_id)
-                .add("days", "" + mCheck.days);
+                .add("structure_id", "" + mCheck.structure_id);
         int count = mDetailListLay.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = mDetailListLay.getChildAt(i);

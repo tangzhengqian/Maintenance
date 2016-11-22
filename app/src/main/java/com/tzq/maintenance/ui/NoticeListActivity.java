@@ -73,6 +73,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             }
         });
         httpGetList(1);
+
     }
 
     @Override
@@ -156,7 +157,6 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
-//                .add("page_size", 10 + "")
                 .build());
     }
 

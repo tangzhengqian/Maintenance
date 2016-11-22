@@ -16,7 +16,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
@@ -24,6 +26,7 @@ import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.DealBean;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
+import com.tzq.maintenance.bean.NewTime;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.CompleteListener;
@@ -318,6 +321,23 @@ public class MyUtil {
             e.printStackTrace();
             LogUtil.e(e.getMessage(), e);
         }
+    }
+
+    public static void saveNewTime(NewTime newTime) {
+        String json = "";
+
+        if (!Util.isEmpty(newTime)) {
+            json = new Gson().toJson(newTime);
+        }
+        PrefsManager.getInstance().save(Config.prefs_key_new_time, json);
+    }
+
+    public static NewTime getNewTime() {
+        String json = PrefsManager.getInstance().getString(Config.prefs_key_new_time);
+        if (Util.isEmpty(json)) {
+            return null;
+        }
+        return new Gson().fromJson(json, NewTime.class);
     }
 
 }

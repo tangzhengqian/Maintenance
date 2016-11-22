@@ -31,10 +31,13 @@ public class Config {
     public static final String url_check_save = url_host + "/Home/Api/saveCheck";
     public static final String url_check_delete = url_host + "/Home/Api/delCheck";
     public static final String url_check_deal = url_host + "/Home/Api/dealCheck";
+    public static final String url_get_new_time = url_host + "/Home/Api/getNewTime";
 
 
     public static final String prefs_key_login_user = "user";
     public static final String prefs_key_sync_time = "sync_time";
+    public static final String prefs_key_new_time = "prefs_key_new_time";
+    public static final String prefs_key_check_list = "prefs_key_check_list";
 
     public static final long sync_delay = 1000 * 60 * 10;
 
