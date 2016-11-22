@@ -41,6 +41,7 @@
             android:launchMode="singleTop"/>
         <activity android:name=".ui.CheckActivity" />
 
+        <receiver android:name=".core.HeartbeatReceiver"/>
         <service android:name=".core.CoreService"/>
     </application>
 

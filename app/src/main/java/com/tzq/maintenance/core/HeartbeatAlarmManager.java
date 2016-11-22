@@ -14,7 +14,7 @@ import com.tzq.common.utils.LogUtil;
 
 public final class HeartbeatAlarmManager {
     private static final String TAG = "HeartbeatAlarmManager";
-    private static final long HEART_DELAY = 20 * 1000;
+    private static final long HEART_DELAY = 60 * 1000;
     private static HeartbeatAlarmManager sHeartbeatAlarmManager;
 
     private Context mContext;
@@ -35,8 +35,8 @@ public final class HeartbeatAlarmManager {
     public void scheduleAlarm() {
         cancelAlarm();
         AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(mContext, CoreService.class);
-        mAlarmIntent = PendingIntent.getService(mContext, 0,
+        Intent intent = new Intent(mContext, HeartbeatReceiver.class);
+        mAlarmIntent = PendingIntent.getBroadcast(mContext, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
         am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + HEART_DELAY, mAlarmIntent);
