@@ -165,31 +165,51 @@ public class HttpTask {
     }
 
 
-    public void download() {
-        Request request = new Request.Builder().url(mUrl).build();
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
+    public void download(final String fileName) {
+        LogUtil.i("download  url=" + mUrl);
+        final String dirPath = "/sdcard/tzqDownload";
+        File dir = new File(dirPath);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        if (!dir.isDirectory()) {
+            dir.delete();
+            dir.mkdirs();
+        }
+        showProgressDialog();
+        getCall(null).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
+                hideProgressDialog();
+                ResponseData responseData = new ResponseData();
+                responseData.code = 1;
+                onComplete(responseData);
             }
 
             @Override
             public void onResponse(Call call, Response response) {
                 InputStream inputStream = response.body().byteStream();
                 FileOutputStream fileOutputStream = null;
+                ResponseData responseData = new ResponseData();
                 try {
-                    fileOutputStream = new FileOutputStream(new File("/sdcard/wangshu.jpg"));
+                    File file = new File(dirPath, fileName);
+                    fileOutputStream = new FileOutputStream(file);
                     byte[] buffer = new byte[2048];
                     int len = 0;
                     while ((len = inputStream.read(buffer)) != -1) {
                         fileOutputStream.write(buffer, 0, len);
                     }
                     fileOutputStream.flush();
+                    responseData.code = 0;
+                    responseData.data = file.getAbsolutePath();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    responseData.code = 1;
                 } finally {
                     IOUtil.closeQuietly(fileOutputStream);
                 }
+                hideProgressDialog();
+                onComplete(responseData);
             }
         });
     }

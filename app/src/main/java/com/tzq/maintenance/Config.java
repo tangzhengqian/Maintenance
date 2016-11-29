@@ -34,6 +34,17 @@ public class Config {
     public static final String url_get_new_time = url_host + "/Home/Api/getNewTime";
 
 
+    public static final String url_export1 = url_host + "/Home/ApiDown/exportPaymentCheck";
+    public static final String url_export2 = url_host + "/Home/ApiDown/exportPaymentCover";
+    public static final String url_export3 = url_host + "/Home/ApiDown/exportCompileState";
+    public static final String url_export4 = url_host + "/Home/ApiDown/exportFinancialPayment";
+    public static final String url_export5 = url_host + "/Home/ApiDown/exportCalculatePayment";
+    public static final String url_export6 = url_host + "/Home/ApiDown/exportPaymentGather";
+    public static final String url_export7 = url_host + "/Home/ApiDown/exportCleanLook";
+    public static final String url_export8 = url_host + "/Home/ApiDown/exportAllContract";
+    public static final String url_export9 = url_host + "/Home/ApiDown/exportPatrolLog";
+
+
     public static final String prefs_key_login_user = "user";
     public static final String prefs_key_sync_time = "sync_time";
     public static final String prefs_key_new_time = "prefs_key_new_time";

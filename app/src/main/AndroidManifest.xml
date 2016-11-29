@@ -40,6 +40,7 @@
         <activity android:name=".ui.CheckListActivity"
             android:launchMode="singleTop"/>
         <activity android:name=".ui.CheckActivity" />
+        <activity android:name=".ui.ExportActivity" />
 
         <receiver android:name=".core.HeartbeatReceiver"/>
         <service android:name=".core.CoreService"/>

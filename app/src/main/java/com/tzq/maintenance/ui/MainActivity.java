@@ -68,6 +68,9 @@ public class MainActivity extends BaseActivity {
             case R.id.checks_bt:
                 startActivity(new Intent(mAct, CheckListActivity.class));
                 break;
+            case R.id.export_bt:
+                startActivity(new Intent(mAct, ExportActivity.class));
+                break;
         }
     }
 

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
+        <LinearLayout style="@style/item_lay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分类：" />
+
+            <Spinner
+                android:id="@+id/type_sp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+        <LinearLayout style="@style/item_lay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="起始时间：" />
+
+            <TextView
+                android:id="@+id/start_date_tv"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:layout_height="match_parent"
+                android:hint=""/>
+        </LinearLayout>
+        <LinearLayout style="@style/item_lay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="截止时间：" />
+
+            <TextView
+                android:id="@+id/end_date_tv"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:onClick="onClick"
+                android:gravity="center_vertical"
+                android:clickable="true"
+                android:layout_height="match_parent"
+                android:hint=""/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/export1_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出计量支付审核表"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export2_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出计量支付报表封面"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export3_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出编制说明"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export4_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出财务支付报表"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export5_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="计量支付报表"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export6_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="计量支付汇总表"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export7_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="道路保洁、巡查费用计算表"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export8_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出违约金"
+            style="@style/button"/>
+        <Button
+            android:id="@+id/export9_bt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="导出巡查日志"
+            style="@style/button"/>
+
+
+    </LinearLayout>
+</ScrollView>
