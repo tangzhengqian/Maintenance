@@ -39,6 +39,7 @@ public class HttpTask {
     private List<ProgressCallBack> mProgressCallBacks = new ArrayList<>();
     private Activity mActivity;
     private boolean mIsShowMessage = true;
+    private String mPrgressmsg;
 
     public HttpTask(String url) {
         mUrl = url;
@@ -70,6 +71,11 @@ public class HttpTask {
 
     public HttpTask setShowMessage(boolean b) {
         mIsShowMessage = b;
+        return this;
+    }
+
+    public HttpTask setProgressMsg(String msg) {
+        mPrgressmsg = msg;
         return this;
     }
 
@@ -216,7 +222,7 @@ public class HttpTask {
 
     private void showProgressDialog() {
         if (mActivity != null && mActivity instanceof Activity) {
-            ProgressDialogUtil.show(mActivity);
+            ProgressDialogUtil.show(mActivity, mPrgressmsg);
         }
     }
 

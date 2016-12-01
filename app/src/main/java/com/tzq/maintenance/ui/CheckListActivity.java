@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -44,6 +46,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     private int mPage = 1;
     private final int page_size = 10;
     private List<Check> mListData = new ArrayList<>();
+    private int mSelectPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +58,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         mListView = (ListView) findViewById(R.id.list_view);
         footerView = (TextView) getLayoutInflater().inflate(R.layout.list_footer_view, null);
+        registerForContextMenu(mListView);
 
         swipeRefreshLayout.setOnRefreshListener(this);
         mListView.addFooterView(footerView);
@@ -71,6 +75,39 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             }
         });
         httpGetList(1);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        mSelectPosition = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+        menu.add(0, 1, 0, "导出验收单");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case 1:
+                Check check = mListAdapter.getItem(mSelectPosition);
+                download(check);
+                break;
+        }
+        return true;
+    }
+
+    private void download(Check check) {
+        String surl = Config.url_export_check + "?id=" + check.id;
+        new HttpTask(surl).setActivity(mAct).setProgressMsg("正在下载...").addCompleteCallBack(new HttpTask.CompleteCallBack() {
+            @Override
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
+                    MyUtil.toast("下载成功，路径：" + responseData.data);
+                } else {
+                    MyUtil.toast("下载失败");
+                }
+            }
+        }).download("验收单_" + check.id + "_" + check.project_name + ".xls");
     }
 
     @Override

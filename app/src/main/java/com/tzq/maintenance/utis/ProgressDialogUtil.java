@@ -3,6 +3,8 @@ package com.tzq.maintenance.utis;
 import android.app.Activity;
 import android.app.ProgressDialog;
 
+import com.tzq.common.utils.Util;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +22,10 @@ public class ProgressDialogUtil {
     private static Map<Activity, PD> sProgressDialogMap = new HashMap<>();
 
     public static void show(Activity activity) {
+        show(activity, null);
+    }
+
+    public static void show(Activity activity, String msg) {
         if (activity == null || activity.isFinishing()) {
             return;
         }
@@ -32,6 +38,12 @@ public class ProgressDialogUtil {
             pd.progressDialog.setCancelable(false);
 
         }
+        if (Util.isEmpty(msg)) {
+            pd.progressDialog.setMessage("正在拼命加载数据....");
+        } else {
+            pd.progressDialog.setMessage(msg);
+        }
+
         pd.count++;
         sProgressDialogMap.put(activity, pd);
         if (pd.progressDialog.isShowing()) {

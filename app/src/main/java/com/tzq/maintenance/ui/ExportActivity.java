@@ -40,7 +40,7 @@ public class ExportActivity extends BaseActivity {
         String startDate = mStartDateTv.getText().toString();
         String endDate = mEndDateTv.getText().toString();
         String surl = url + "?start_time=" + startDate + "&end_time=" + endDate + "&cate=" + cate;
-        new HttpTask(surl).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+        new HttpTask(surl).setActivity(mAct).setProgressMsg("正在下载...").addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(ResponseData responseData) {
                 if (responseData.isSuccess()) {
@@ -63,31 +63,31 @@ public class ExportActivity extends BaseActivity {
                 MyUtil.showDateTimeDialog(mAct, mEndDateTv);
                 break;
             case R.id.export1_bt:
-                download(Config.url_export1,"计量支付审核表.xls");
+                download(Config.url_export1, "计量支付审核表.xls");
                 break;
             case R.id.export2_bt:
-                download(Config.url_export2,"计量支付报表封面.xls");
+                download(Config.url_export2, "计量支付报表封面.xls");
                 break;
             case R.id.export3_bt:
-                download(Config.url_export3,"编制说明.xls");
+                download(Config.url_export3, "编制说明.xls");
                 break;
             case R.id.export4_bt:
-                download(Config.url_export4,"财务支付报表.xls");
+                download(Config.url_export4, "财务支付报表.xls");
                 break;
             case R.id.export5_bt:
-                download(Config.url_export5,"支付报表.xls");
+                download(Config.url_export5, "支付报表.xls");
                 break;
             case R.id.export6_bt:
-                download(Config.url_export6,"支付汇总表.xls");
+                download(Config.url_export6, "支付汇总表.xls");
                 break;
             case R.id.export7_bt:
-                download(Config.url_export7,"道路保洁、巡查费用计算表.xls");
+                download(Config.url_export7, "道路保洁、巡查费用计算表.xls");
                 break;
             case R.id.export8_bt:
-                download(Config.url_export8,"违约金.xls");
+                download(Config.url_export8, "违约金.xls");
                 break;
             case R.id.export9_bt:
-                download(Config.url_export9,"巡查日志.xls");
+                download(Config.url_export9, "巡查日志.xls");
                 break;
         }
     }

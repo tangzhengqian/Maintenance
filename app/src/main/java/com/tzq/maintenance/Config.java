@@ -44,6 +44,9 @@ public class Config {
     public static final String url_export8 = url_host + "/Home/ApiDown/exportAllContract";
     public static final String url_export9 = url_host + "/Home/ApiDown/exportPatrolLog";
 
+    public static final String url_export_notice = url_host + "/Home/ApiDown/exportNotice";
+    public static final String url_export_check = url_host + "/Home/ApiDown/exportCheck";
+
 
     public static final String prefs_key_login_user = "user";
     public static final String prefs_key_sync_time = "sync_time";

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +47,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     private int mPage = 1;
     private final int page_size = 10;
     private List<Notice> mListData = new ArrayList<>();
+    private int mSelectPosition;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         mListView = (ListView) findViewById(R.id.tongzd_list);
         footerView = (TextView) getLayoutInflater().inflate(R.layout.list_footer_view, null);
+        registerForContextMenu(mListView);
 
         swipeRefreshLayout.setOnRefreshListener(this);
         mListView.addFooterView(footerView);
@@ -75,6 +78,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         httpGetList(1);
 
     }
+
 
     @Override
     public void onViewClick(View view) {
@@ -107,6 +111,40 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+        mSelectPosition = ((AdapterView.AdapterContextMenuInfo) menuInfo).position;
+        menu.add(0, 1, 0, "导出通知单");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case 1:
+                Notice notice = mListAdapter.getItem(mSelectPosition);
+                download(notice);
+                break;
+        }
+        return true;
+    }
+
+    private void download(Notice notice) {
+        String surl = Config.url_export_notice + "?id=" + notice.id;
+        new HttpTask(surl).setActivity(mAct).setProgressMsg("正在下载...").addCompleteCallBack(new HttpTask.CompleteCallBack() {
+            @Override
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
+                    MyUtil.toast("下载成功，路径：" + responseData.data);
+                } else {
+                    MyUtil.toast("下载失败");
+                }
+            }
+        }).download("通知单_" + notice.id + "_" + notice.project_name + ".xls");
+    }
+
 
     @Override
     public void onRefresh() {
