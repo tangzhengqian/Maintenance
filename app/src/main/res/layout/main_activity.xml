@@ -41,6 +41,12 @@
                 style="@style/button"
                 android:layout_marginTop="16dp"
                 android:text="验收单管理"/>
+
+            <Button
+                android:id="@+id/contract_bt"
+                style="@style/button"
+                android:layout_marginTop="16dp"
+                android:text="违约金管理"/>
             <Button
                 android:id="@+id/export_bt"
                 style="@style/button"

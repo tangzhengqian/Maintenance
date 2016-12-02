@@ -158,7 +158,8 @@ public class SyncUtil {
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
             sRetryCount = 0;
-            getStructureList();
+//            getStructureList();
+            notifyComplete();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {

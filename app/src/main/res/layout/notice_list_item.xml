@@ -25,7 +25,7 @@
             android:id="@+id/notice_type_tv"
             style="@style/notice_item_tv"
             android:layout_below="@+id/notice_name_tv"
-            android:text="工程名称：" />
+            android:text="分类：" />
 
         <TextView
             android:id="@+id/notice_cost_tv"

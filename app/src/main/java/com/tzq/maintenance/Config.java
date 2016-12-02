@@ -24,7 +24,6 @@ public class Config {
     public static final String url_structure_list = url_host + "/Home/Api/getStructure";
     public static final String url_detail_type_list = url_host + "/Home/Api/getDetailCate";
     public static final String url_detail_list = url_host + "/Home/Api/getDetail";
-    public static final String url_contract_list = url_host + "/Home/Api/getContract";
     public static final String url_add_pic = url_host + "/Home/Api/addPic";
     public static final String url_del_pic = url_host + "/Home/Api/delPic";
     public static final String url_check_list = url_host + "/Home/Api/getCheckList";
@@ -32,6 +31,8 @@ public class Config {
     public static final String url_check_delete = url_host + "/Home/Api/delCheck";
     public static final String url_check_deal = url_host + "/Home/Api/dealCheck";
     public static final String url_get_new_time = url_host + "/Home/Api/getNewTime";
+    public static final String url_contract_list = url_host + "/Home/Api/getContractList";
+    public static final String url_contract_save = url_host + "/Home/Api/addContract";
 
 
     public static final String url_export1 = url_host + "/Home/ApiDown/exportPaymentCheck";

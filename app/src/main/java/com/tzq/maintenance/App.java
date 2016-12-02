@@ -48,22 +48,6 @@ public class App extends com.activeandroid.app.Application {
         new Select().from(Company.class).execute();
     }
 
-//    public void start() {
-//        V8 v8 = V8.createV8Runtime();
-//        Console console = new Console();
-//        V8Object v8Console = new V8Object(v8);
-//        v8.add("console", v8Console);
-//        v8Console.registerJavaMethod(console, "log", "log", new Class<?>[] { String.class });
-//        v8Console.release();
-//        v8.executeScript("console.log('hello, world');");
-//    }
-//
-//    class Console {
-//        public void log(final String message) {
-//            LogUtil.i(message);
-//        }
-//    }
-
     @Override
     public void onTerminate() {
         super.onTerminate();

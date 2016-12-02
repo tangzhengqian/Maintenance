@@ -12,6 +12,7 @@ import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.User;
 import com.tzq.maintenance.core.CompleteListener;
+import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.SyncUtil;
 
 
@@ -41,7 +42,8 @@ public class SplashActivity extends BaseActivity {
 
                     @Override
                     public void onFail() {
-
+                        MyUtil.toast("同步数据资源出错!");
+                        finish();
                     }
                 });
                 SyncUtil.startSync();
