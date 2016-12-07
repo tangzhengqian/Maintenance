@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.common.utils.Util;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.NewTime;
 import com.tzq.maintenance.bean.ResponseData;
@@ -35,31 +37,33 @@ public class CoreService extends Service {
                     syncData();
                     break;
                 case what_check_time:
-                    new HttpTask(Config.url_get_new_time).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-                        @Override
-                        public void onComplete(ResponseData responseData) {
-                            if (responseData.isSuccess()) {
-                                NewTime newTime = new Gson().fromJson(responseData.data, NewTime.class);
-                                NewTime pNewTime = MyUtil.getNewTime();
-                                if (newTime != null) {
-                                    if (pNewTime == null) {
-                                        NotifyManager.getInstance().notifyNewNotice();
-                                        NotifyManager.getInstance().notifyNewCheck();
-                                    } else {
-                                        if (newTime.noticeCreateTime.compareTo(pNewTime.noticeCreateTime) > 0) {
+                    if (App.getInstance().getUser() != null && !Util.isEmpty(App.getInstance().getUser().token)) {
+                        new HttpTask(Config.url_get_new_time).setShowMessage(false).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                            @Override
+                            public void onComplete(ResponseData responseData) {
+                                if (responseData.isSuccess()) {
+                                    NewTime newTime = new Gson().fromJson(responseData.data, NewTime.class);
+                                    NewTime pNewTime = MyUtil.getNewTime();
+                                    if (newTime != null) {
+                                        if (pNewTime == null) {
                                             NotifyManager.getInstance().notifyNewNotice();
-                                        }
-                                        if (newTime.checkCreateTime.compareTo(pNewTime.checkCreateTime) > 0) {
                                             NotifyManager.getInstance().notifyNewCheck();
+                                        } else {
+                                            if (newTime.noticeCreateTime.compareTo(pNewTime.noticeCreateTime) > 0) {
+                                                NotifyManager.getInstance().notifyNewNotice();
+                                            }
+                                            if (newTime.checkCreateTime.compareTo(pNewTime.checkCreateTime) > 0) {
+                                                NotifyManager.getInstance().notifyNewCheck();
+                                            }
                                         }
+                                        MyUtil.saveNewTime(newTime);
                                     }
-                                    MyUtil.saveNewTime(newTime);
-                                }
 
+                                }
+                                checkTime();
                             }
-                            checkTime();
-                        }
-                    }).enqueue(null);
+                        }).enqueue(null);
+                    }
 
                     break;
             }

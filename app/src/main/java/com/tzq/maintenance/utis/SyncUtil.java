@@ -1,5 +1,7 @@
 package com.tzq.maintenance.utis;
 
+import android.os.Looper;
+
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.google.gson.Gson;
@@ -28,7 +30,7 @@ import okhttp3.FormBody;
  */
 
 public class SyncUtil {
-    private static final int MAX_RETRY_COUNT = 5;
+    private static final int MAX_RETRY_COUNT = 1;
     private static int sRetryCount = 0;
     private static boolean sIsSyncing = false;
 
@@ -55,10 +57,12 @@ public class SyncUtil {
     }
 
     private static void notifyComplete() {
+        Looper.loop();
         PrefsManager.getInstance().save(Config.prefs_key_sync_time, System.currentTimeMillis());
         for (CompleteListener l : sCompleteListeners) {
             l.onComplete(null);
         }
+        Looper.prepare();
     }
 
     private static void notifyFail() {
@@ -158,8 +162,9 @@ public class SyncUtil {
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
             sRetryCount = 0;
-//            getStructureList();
-            notifyComplete();
+            getStructureList();
+//            notifyComplete();
+//            getDetailTypeList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {

@@ -42,8 +42,13 @@ public class SplashActivity extends BaseActivity {
 
                     @Override
                     public void onFail() {
-                        MyUtil.toast("同步数据资源出错!");
-                        finish();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyUtil.toast("同步数据资源出错!");
+                                finish();
+                            }
+                        });
                     }
                 });
                 SyncUtil.startSync();

@@ -47,13 +47,13 @@ public class ContractActivity extends BaseActivity {
         if (mContract == null) {
             mContract = new Contract();
             mContract.id = -1;
+        } else {
+            mClauseEt.setText(mContract.clause);
+            mContentEt.setText(mContract.content);
+            mWithholdEt.setText(mContract.withholding);
+            mNoteEt.setText(mContract.notes);
+            mDateTv.setText(mContract.date);
         }
-
-        mClauseEt.setText(mContract.clause);
-        mContentEt.setText(mContract.content);
-        mWithholdEt.setText(mContract.withholding);
-        mNoteEt.setText(mContract.notes);
-        mDateTv.setText(mContract.date);
     }
 
     @Override
@@ -95,7 +95,8 @@ public class ContractActivity extends BaseActivity {
         mContract.date = mDateTv.getText().toString();
 
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add("clause", mContract.clause)
+        builder.add("id", mContract.id + "")
+                .add("clause", mContract.clause)
                 .add("content", mContract.content + "")
                 .add("withholding", mContract.withholding + "")
                 .add("date", mContract.date + "")
