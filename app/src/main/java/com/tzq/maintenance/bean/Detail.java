@@ -20,7 +20,7 @@ public class Detail extends Model implements Serializable {
     @Column
     public String detail_input_price;
     @Column
-    public String detail_already_price;
+    public String detail_already_price;//default price
     @Column
     public String detail_quantities;
     @Column
@@ -35,7 +35,7 @@ public class Detail extends Model implements Serializable {
     @Column
     public int company_id;
 
-    public String detail_price;
+    public String detail_price;//custom price
     public String detail_quantities1;
     public String detail_quantities2;
     public String detail_quantities3;

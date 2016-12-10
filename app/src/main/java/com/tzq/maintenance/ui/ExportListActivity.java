@@ -101,6 +101,7 @@ public class ExportListActivity extends BaseActivity implements SwipeRefreshLayo
             dir.mkdirs();
         }
         mListAdapter.setDataList(mListData);
+        setRefresh(false);
     }
 
     class Adapter extends CBaseAdapter<String> {

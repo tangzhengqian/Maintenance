@@ -25,7 +25,7 @@ public class SplashActivity extends BaseActivity {
         setContentView(R.layout.splash_activity);
         showTv = (TextView) findViewById(R.id.showTv);
         try {
-            showTv.setText("施工养护系统\t" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
+            showTv.setText("工程养护系统\t" + getPackageManager().getPackageInfo(getPackageName(), 0).versionName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,8 +62,13 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void gotoMain() {
-        startActivity(new Intent(mAct, MainActivity.class));
-        finish();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(mAct, MainActivity.class));
+                finish();
+            }
+        });
     }
 
     @Override

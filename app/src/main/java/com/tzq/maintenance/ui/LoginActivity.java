@@ -43,8 +43,8 @@ public class LoginActivity extends BaseActivity {
 
         phoneNumberEt = (EditText) findViewById(R.id.phone_number_et);
         passwordEt = (EditText) findViewById(R.id.password_et);
-//        phoneNumberEt.setText("18780104253");
-//        passwordEt.setText("pangxie");
+        phoneNumberEt.setText("18780104253");
+        passwordEt.setText("pangxie");
 
     }
 
@@ -95,6 +95,9 @@ public class LoginActivity extends BaseActivity {
                                 }
                             });
                             SyncUtil.startSync();
+                        }else {
+                            ProgressDialogUtil.hide(mAct);
+                            MyUtil.toast("登录失败");
                         }
                     }
                 }).enqueue(new FormBody.Builder()

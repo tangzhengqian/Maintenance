@@ -73,6 +73,7 @@ public class DetailActivity extends BaseActivity {
             mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(mTypeSp.getSelectedItemPosition()).id).execute();
             MyUtil.setUpSp(mAct, mNameSp, mDetailList);
 //            mNameSp.setSelection(0);
+            mPriceEt.setText(((Detail) mNameSp.getSelectedItem()).detail_already_price);
             mUnitEt.setText(((Detail) mNameSp.getSelectedItem()).detail_unit);
         }
 
@@ -106,6 +107,7 @@ public class DetailActivity extends BaseActivity {
                     mDetail = mDetailList.get(position);
                     if (mDetail != null) {
                         mUnitEt.setText(mDetail.detail_unit);
+                        mPriceEt.setText(mDetail.detail_already_price);
                     }
                 }
 
