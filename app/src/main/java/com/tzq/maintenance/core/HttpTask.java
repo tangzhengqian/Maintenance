@@ -171,9 +171,8 @@ public class HttpTask {
     }
 
 
-    public void download(final String fileName) {
+    public void download(final String dirPath,final String fileName) {
         LogUtil.i("download  url=" + mUrl);
-        final String dirPath = "/sdcard/tzqDownload";
         File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();

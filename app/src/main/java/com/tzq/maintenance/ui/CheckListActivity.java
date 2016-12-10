@@ -107,7 +107,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                     MyUtil.toast("下载失败");
                 }
             }
-        }).download("验收单_" + check.id + "_" + check.project_name + ".xls");
+        }).download(Config.exportDirPath,"验收单_" + check.id + "_" + check.project_name + ".xls");
     }
 
     @Override

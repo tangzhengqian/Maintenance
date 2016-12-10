@@ -1,7 +1,5 @@
 package com.tzq.maintenance.utis;
 
-import android.os.Looper;
-
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
 import com.google.gson.Gson;
@@ -57,12 +55,10 @@ public class SyncUtil {
     }
 
     private static void notifyComplete() {
-        Looper.loop();
         PrefsManager.getInstance().save(Config.prefs_key_sync_time, System.currentTimeMillis());
         for (CompleteListener l : sCompleteListeners) {
             l.onComplete(null);
         }
-        Looper.prepare();
     }
 
     private static void notifyFail() {

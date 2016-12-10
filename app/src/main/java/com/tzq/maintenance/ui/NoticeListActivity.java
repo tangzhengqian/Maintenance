@@ -142,7 +142,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                     MyUtil.toast("下载失败");
                 }
             }
-        }).download("通知单_" + notice.id + "_" + notice.project_name + ".xls");
+        }).download(Config.exportDirPath, "通知单_" + notice.id + "_" + notice.project_name + ".xls");
     }
 
 

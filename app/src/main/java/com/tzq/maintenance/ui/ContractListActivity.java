@@ -22,10 +22,8 @@ import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Contract;
-import com.tzq.maintenance.bean.Notice;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
-import com.tzq.maintenance.utis.MyUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,22 +108,6 @@ public class ContractListActivity extends BaseActivity implements SwipeRefreshLa
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-    private void download(Notice notice) {
-        String surl = Config.url_export_notice + "?id=" + notice.id;
-        new HttpTask(surl).setActivity(mAct).setProgressMsg("正在下载...").addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-                    MyUtil.toast("下载成功，路径：" + responseData.data);
-                } else {
-                    MyUtil.toast("下载失败");
-                }
-            }
-        }).download("通知单_" + notice.id + "_" + notice.project_name + ".xls");
-    }
-
 
     @Override
     public void onRefresh() {

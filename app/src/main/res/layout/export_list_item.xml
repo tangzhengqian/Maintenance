@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        android:gravity="center_vertical"
+        android:padding="5dp">
+        <ImageView
+            android:id="@+id/icon_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/xls2"/>
+
+        <TextView
+            android:id="@+id/nameTv"
+            style="@style/notice_item_tv"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_margin="3dp"
+            android:text="编号：" />
+        <Button
+            android:id="@+id/openBt"
+            android:layout_width="wrap_content"
+            android:paddingLeft="-20dp"
+            android:paddingRight="-20dp"
+            android:layout_height="wrap_content"
+            android:text="打开"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="#ddd" />
+
+</LinearLayout>

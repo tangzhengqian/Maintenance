@@ -71,4 +71,5 @@ public class Config {
         STAKES.add(new NormalBean("2", "下行"));
     }
 
+    public static final String exportDirPath = "/sdcard/tzqExport";
 }
