@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.LogUtil;
@@ -147,7 +146,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
-                                    List<Check> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Check>>() {
+                                    List<Check> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Check>>() {
                                     }.getType());
                                     mPage = p;
                                     if (p == 1) {

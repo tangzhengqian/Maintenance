@@ -39,4 +39,5 @@ public class Check implements Serializable {
     public String construction_pic;//"./Public/file_material/20161028/_14776327328b76397a5a12a9d2.jpg,./Public/file_material/20161028/_1477632736f10c40ed8075f45c.jpg,
     public String after_pic;//
 
+    public Check(){}
 }

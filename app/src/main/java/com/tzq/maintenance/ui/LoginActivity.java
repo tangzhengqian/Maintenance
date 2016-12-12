@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.EditText;
 
-import com.google.gson.Gson;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
@@ -56,7 +55,7 @@ public class LoginActivity extends BaseActivity {
                     @Override
                     public void onComplete(final ResponseData responseData) {
                         if (responseData.isSuccess()) {
-                            User user = new Gson().fromJson(responseData.data, User.class);
+                            User user = Config.gson.fromJson(responseData.data, User.class);
                             App.getInstance().setUser(user);
                             SyncUtil.sCompleteListeners.add(new CompleteListener() {
                                 @Override

@@ -5,7 +5,6 @@ import android.content.Intent;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 import com.activeandroid.query.Select;
-import com.google.gson.Gson;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.bean.Company;
@@ -59,7 +58,7 @@ public class App extends com.activeandroid.app.Application {
         if (user == null) {
             String json = PrefsManager.getInstance().getString(Config.prefs_key_login_user);
             if (!Util.isEmpty(json)) {
-                user = new Gson().fromJson(json, User.class);
+                user = Config.gson.fromJson(json, User.class);
             } else {
                 user = new User();
             }
@@ -72,7 +71,7 @@ public class App extends com.activeandroid.app.Application {
         if(user==null){
             PrefsManager.getInstance().save(Config.prefs_key_login_user, "");
         }else {
-            PrefsManager.getInstance().save(Config.prefs_key_login_user, new Gson().toJson(user));
+            PrefsManager.getInstance().save(Config.prefs_key_login_user, Config.gson.toJson(user));
         }
     }
 }

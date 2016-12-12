@@ -20,4 +20,6 @@ public class Contract implements Serializable {
     public int user_id;
     public int maintenance_id;
     public int management_id;
+
+    public Contract(){}
 }

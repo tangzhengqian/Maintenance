@@ -2,7 +2,6 @@ package com.tzq.maintenance.utis;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.maintenance.App;
@@ -73,7 +72,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Company.class).execute();
-            List<Company> list = new Gson().fromJson(responseData.data, new TypeToken<List<Company>>() {
+            List<Company> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Company>>() {
             }.getType());
             for (Company item : list) {
                 item.save();
@@ -99,7 +98,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Management.class).execute();
-            List<Management> list = new Gson().fromJson(responseData.data, new TypeToken<List<Management>>() {
+            List<Management> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Management>>() {
             }.getType());
             for (Management item : list) {
                 item.save();
@@ -125,7 +124,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Maintenance.class).execute();
-            List<Maintenance> list = new Gson().fromJson(responseData.data, new TypeToken<List<Maintenance>>() {
+            List<Maintenance> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Maintenance>>() {
             }.getType());
             for (Maintenance item : list) {
                 item.save();
@@ -150,7 +149,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Role.class).execute();
-            List<Role> list = new Gson().fromJson(responseData.data, new TypeToken<List<Role>>() {
+            List<Role> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Role>>() {
             }.getType());
             for (Role item : list) {
                 item.save();
@@ -177,7 +176,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Structure.class).execute();
-            List<Structure> list = new Gson().fromJson(responseData.data, new TypeToken<List<Structure>>() {
+            List<Structure> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Structure>>() {
             }.getType());
             for (Structure item : list) {
                 item.save();
@@ -202,7 +201,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(DetailType.class).execute();
-            List<DetailType> list = new Gson().fromJson(responseData.data, new TypeToken<List<DetailType>>() {
+            List<DetailType> list = Config.gson.fromJson(responseData.data, new TypeToken<List<DetailType>>() {
             }.getType());
             for (DetailType item : list) {
                 item.save();
@@ -227,7 +226,7 @@ public class SyncUtil {
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
             new Delete().from(Detail.class).execute();
-            List<Detail> list = new Gson().fromJson(responseData.data, new TypeToken<List<Detail>>() {
+            List<Detail> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Detail>>() {
             }.getType());
             for (Detail item : list) {
                 item.save();

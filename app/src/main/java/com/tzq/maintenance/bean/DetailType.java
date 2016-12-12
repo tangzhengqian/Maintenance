@@ -18,6 +18,7 @@ public class DetailType extends Model {
     @Column
     public int company_id;
 
+    public DetailType(){}
 
     @Override
     public String toString() {

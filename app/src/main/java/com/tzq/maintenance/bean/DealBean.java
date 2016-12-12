@@ -26,4 +26,6 @@ public class DealBean {
                 ", cancelAct='" + cancelAct + '\'' +
                 '}';
     }
+
+    public DealBean(){}
 }

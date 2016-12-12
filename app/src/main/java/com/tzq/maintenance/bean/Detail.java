@@ -41,6 +41,8 @@ public class Detail extends Model implements Serializable {
     public String detail_quantities3;
     public String detail_all_price;
 
+    public Detail(){}
+
     @Override
     public String toString() {
         return detail_name;

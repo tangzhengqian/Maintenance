@@ -7,4 +7,5 @@ import java.io.Serializable;
  */
 
 public class DetailNew implements Serializable {
+    public DetailNew(){}
 }

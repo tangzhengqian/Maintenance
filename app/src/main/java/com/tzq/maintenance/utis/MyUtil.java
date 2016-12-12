@@ -16,7 +16,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.LogUtil;
@@ -327,7 +326,7 @@ public class MyUtil {
         String json = "";
 
         if (!Util.isEmpty(newTime)) {
-            json = new Gson().toJson(newTime);
+            json = Config.gson.toJson(newTime);
         }
         PrefsManager.getInstance().save(Config.prefs_key_new_time, json);
     }
@@ -337,7 +336,7 @@ public class MyUtil {
         if (Util.isEmpty(json)) {
             return null;
         }
-        return new Gson().fromJson(json, NewTime.class);
+        return Config.gson.fromJson(json, NewTime.class);
     }
 
 }

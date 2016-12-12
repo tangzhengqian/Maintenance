@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.LogUtil;
@@ -130,7 +129,7 @@ public class ContractListActivity extends BaseActivity implements SwipeRefreshLa
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
-                                    List<Contract> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Contract>>() {
+                                    List<Contract> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Contract>>() {
                                     }.getType());
                                     mPage = p;
                                     if (p == 1) {

@@ -20,6 +20,8 @@ public class Company extends Model {
     @Column
     public String createtime;
 
+    public Company(){}
+
     @Override
     public String toString() {
         return "Company{" +

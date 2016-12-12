@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
-import com.google.gson.Gson;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
@@ -42,7 +41,7 @@ public class CoreService extends Service {
                             @Override
                             public void onComplete(ResponseData responseData) {
                                 if (responseData.isSuccess()) {
-                                    NewTime newTime = new Gson().fromJson(responseData.data, NewTime.class);
+                                    NewTime newTime = Config.gson.fromJson(responseData.data, NewTime.class);
                                     NewTime pNewTime = MyUtil.getNewTime();
                                     if (newTime != null) {
                                         if (pNewTime == null) {

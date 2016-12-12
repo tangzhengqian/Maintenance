@@ -22,4 +22,6 @@ public class Maintenance extends Model {
     @Column
     public String desc;
 
+    public Maintenance(){}
+
 }

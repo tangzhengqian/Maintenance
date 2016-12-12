@@ -19,4 +19,6 @@ public class Management extends Model {
     public String management_desc;
     @Column
     public String created_at;
+
+    public Management(){}
 }

@@ -1,7 +1,10 @@
 package com.tzq.maintenance;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tzq.maintenance.bean.NormalBean;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,4 +75,13 @@ public class Config {
     }
 
     public static final String exportDirPath = "/sdcard/tzqExport";
+
+
+    public static Gson gson;
+
+    static {
+        GsonBuilder builder = new GsonBuilder();
+        builder.excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC);
+        gson = builder.create();
+    }
 }

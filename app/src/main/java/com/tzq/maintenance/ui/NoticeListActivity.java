@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.LogUtil;
@@ -167,7 +166,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
-                                    List<Notice> list = new Gson().fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
+                                    List<Notice> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
                                     }.getType());
                                     mPage = p;
                                     if (p == 1) {
