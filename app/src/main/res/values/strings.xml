@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Maintenance</string>
+    <string name="app_name">工程养护系统</string>
     <string name="action_settings">Settings</string>
     <string name="login_title">用户登录</string>
 </resources>

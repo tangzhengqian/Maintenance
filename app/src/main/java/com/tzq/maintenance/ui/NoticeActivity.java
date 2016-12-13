@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+import com.tzq.common.utils.NumberUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
@@ -417,6 +418,18 @@ public class NoticeActivity extends BaseActivity {
         }
     }
 
+    private void cal() {
+        int count = mDetailListLay.getChildCount();
+        double sum = 0;
+        for (int i = 0; i < count; i++) {
+            View v = mDetailListLay.getChildAt(i);
+            Detail detail = (Detail) v.getTag();
+            double all = NumberUtil.strToDouble(detail.detail_all_price);
+            sum += all;
+        }
+        mCostEt.setText(NumberUtil.doubleToStr(sum));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -424,9 +437,11 @@ public class NoticeActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 addDetailView(detail);
+                cal();
             } else if (resultCode == Config.RESULT_DELETE) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 deleteDetailView(detail);
+                cal();
             }
 
         } else if (requestCode == REQUEST_PHOTO) {

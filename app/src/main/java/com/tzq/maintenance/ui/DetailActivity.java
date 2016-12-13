@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.activeandroid.query.Select;
+import com.tzq.common.utils.NumberUtil;
+import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Detail;
@@ -76,7 +78,7 @@ public class DetailActivity extends BaseActivity {
             mPriceEt.setText(((Detail) mNameSp.getSelectedItem()).detail_already_price);
             mUnitEt.setText(((Detail) mNameSp.getSelectedItem()).detail_unit);
         }
-
+        cal();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -108,6 +110,7 @@ public class DetailActivity extends BaseActivity {
                     if (mDetail != null) {
                         mUnitEt.setText(mDetail.detail_unit);
                         mPriceEt.setText(mDetail.detail_already_price);
+                        cal();
                     }
                 }
 
@@ -127,6 +130,24 @@ public class DetailActivity extends BaseActivity {
             getMenuInflater().inflate(R.menu.menu_detail_act, menu);
         }
         return true;
+    }
+
+    private void cal(){
+        double p= NumberUtil.strToDouble(mPriceEt.getText().toString());
+        double n1=1;
+        if(!Util.isEmpty(mQuantity1Et.getText().toString())){
+            n1=NumberUtil.strToDouble(mQuantity1Et.getText().toString());
+        }
+        double n2=1;
+        if(!Util.isEmpty(mQuantity2Et.getText().toString())){
+            n2=NumberUtil.strToDouble(mQuantity2Et.getText().toString());
+        }
+        double n3=1;
+        if(!Util.isEmpty(mQuantity3Et.getText().toString())){
+            n3=NumberUtil.strToDouble(mQuantity3Et.getText().toString());
+        }
+        double cost=p*n1*n2*n3;
+        mCostEt.setText(""+NumberUtil.doubleToStr(cost,2));
     }
 
     @Override

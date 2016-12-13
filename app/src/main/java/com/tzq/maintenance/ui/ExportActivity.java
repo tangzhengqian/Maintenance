@@ -67,7 +67,7 @@ public class ExportActivity extends BaseActivity {
         if (id == R.id.action_view) {
             startActivity(new Intent(mAct, ExportListActivity.class));
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

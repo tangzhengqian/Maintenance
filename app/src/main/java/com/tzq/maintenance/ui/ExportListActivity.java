@@ -40,7 +40,7 @@ public class ExportListActivity extends BaseActivity implements SwipeRefreshLayo
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.check_list_activity);
-        setTitle("导出文件列表");
+        setTitle("文件列表");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);

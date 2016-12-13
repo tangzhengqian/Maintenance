@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.tzq.common.utils.LogUtil;
+import com.tzq.common.utils.NumberUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
@@ -544,6 +545,9 @@ public class CheckActivity extends BaseActivity {
             case R.id.add_detail_iv:
                 startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL);
                 break;
+            case R.id.add_detail_new_iv:
+                startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL_NEW);
+                break;
             case R.id.brfore_pic_lay:
                 startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNewBeforePicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_BEFORE);
                 break;
@@ -559,6 +563,26 @@ public class CheckActivity extends BaseActivity {
         }
     }
 
+    private void cal() {
+        int count1 = mDetailListLay.getChildCount();
+        double sum = 0;
+        for (int i = 0; i < count1; i++) {
+            View v = mDetailListLay.getChildAt(i);
+            Detail detail = (Detail) v.getTag();
+            double all = NumberUtil.strToDouble(detail.detail_all_price);
+            sum += all;
+        }
+
+        int count2 = mDetailNewListLay.getChildCount();
+        for (int i = 0; i < count2; i++) {
+            View v = mDetailNewListLay.getChildAt(i);
+            Detail detail = (Detail) v.getTag();
+            double all = NumberUtil.strToDouble(detail.detail_all_price);
+            sum += all;
+        }
+        mCostEt.setText(NumberUtil.doubleToStr(sum));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -566,18 +590,22 @@ public class CheckActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 addDetailView(detail);
+                cal();
             } else if (resultCode == Config.RESULT_DELETE) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 deleteDetailView(detail);
+                cal();
             }
 
         } else if (requestCode == REQUEST_DETAIL_NEW) {
             if (resultCode == RESULT_OK) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 addDetailNewView(detail);
+                cal();
             } else if (resultCode == Config.RESULT_DELETE) {
                 Detail detail = (Detail) data.getSerializableExtra("detail");
                 deleteDetailNewView(detail);
+                cal();
             }
 
         } else if (requestCode == REQUEST_PHOTO_BEFORE) {
