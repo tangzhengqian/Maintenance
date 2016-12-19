@@ -183,6 +183,7 @@ public class NoticeActivity extends BaseActivity {
                             public void onComplete(ResponseData responseData) {
                                 if (responseData.isSuccess()) {
                                     MyUtil.toast("删除成功");
+                                    setResult(RESULT_OK);
                                     finish();
                                 }
                             }
@@ -196,6 +197,7 @@ public class NoticeActivity extends BaseActivity {
                     public void onComplete(ResponseData responseData) {
                         if (responseData.isSuccess()) {
                             MyUtil.toast("操作成功");
+                            setResult(RESULT_OK);
                             finish();
                         }
                     }
@@ -207,6 +209,7 @@ public class NoticeActivity extends BaseActivity {
                     public void onComplete(ResponseData responseData) {
                         if (responseData.isSuccess()) {
                             MyUtil.toast("操作成功");
+                            setResult(RESULT_OK);
                             finish();
                         }
                     }
@@ -397,6 +400,7 @@ public class NoticeActivity extends BaseActivity {
         Looper.prepare();
         if (responseData.isSuccess()) {
             MyUtil.toast("保存成功");
+            setResult(RESULT_OK);
             finish();
         }
         ProgressDialogUtil.hide(mAct);

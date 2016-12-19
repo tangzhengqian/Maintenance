@@ -39,6 +39,7 @@ import okhttp3.FormBody;
  */
 
 public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+    public static final int REQUEST_UPDATE_NOTICE = 22;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView mListView;
     private Adapter mListAdapter;
@@ -71,11 +72,10 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Notice item = mListAdapter.getItem(position);
-                startActivity(new Intent(mAct, NoticeActivity.class).putExtra("notice", item));
+                startActivityForResult(new Intent(mAct, NoticeActivity.class).putExtra("notice", item), REQUEST_UPDATE_NOTICE);
             }
         });
         httpGetList(1);
-
     }
 
 
@@ -105,7 +105,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_create) {
-            startActivity(new Intent(mAct, NoticeActivity.class));
+            startActivityForResult(new Intent(mAct, NoticeActivity.class), REQUEST_UPDATE_NOTICE);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -151,6 +151,9 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     }
 
     private void httpGetList(final int p) {
+        if (p == 1) {
+            setRefresh(true);
+        }
         footerView.setText("正在加载更多数据...");
         new HttpTask(Config.url_notice_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
@@ -195,6 +198,15 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
                 .build());
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==REQUEST_UPDATE_NOTICE){
+            if(resultCode==RESULT_OK){
+                httpGetList(1);
+            }
+        }
     }
 
     class Adapter extends CBaseAdapter<Notice> {

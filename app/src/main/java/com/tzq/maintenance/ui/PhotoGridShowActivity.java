@@ -30,7 +30,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
 import static com.tzq.maintenance.Config.photoDirPath;
 
 /**
@@ -139,7 +138,7 @@ public class PhotoGridShowActivity extends BaseActivity {
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-                    String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis();
+                    String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis()+".jpg";
                     ImageUtil.saveBitmapToLocal(photo, path, Bitmap.CompressFormat.JPEG);
                     LogUtil.i("---path=" + path);
                     mUris.add("file://" + path);

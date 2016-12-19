@@ -113,13 +113,7 @@ public class HttpTask {
             public void onResponse(Call call, final Response response) throws IOException {
                 hideProgressDialog();
                 ResponseData responseData = getResponseData(response);
-                if (responseData.code == 0) {
-                    onComplete(responseData);
-                } else {
-                    showMessage(responseData.msg);
-                    onComplete(responseData);
-                }
-
+                onComplete(responseData);
             }
         });
     }
@@ -153,25 +147,21 @@ public class HttpTask {
         return responseData;
     }
 
-    private void showMessage(String msg) {
-        Looper.prepare();
-        if (mIsShowMessage) {
-            MyUtil.toast(msg);
-        }
-        Looper.loop();
-    }
-
     private void onComplete(final ResponseData responseData) {
         Looper.prepare();
+        if (!responseData.isSuccess()) {
+            if (mIsShowMessage) {
+                MyUtil.toast(responseData.msg);
+            }
+        }
         for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
             completeCallBack.onComplete(responseData);
         }
         Looper.loop();
-
     }
 
 
-    public void download(final String dirPath,final String fileName) {
+    public void download(final String dirPath, final String fileName) {
         LogUtil.i("download  url=" + mUrl);
         File dir = new File(dirPath);
         if (!dir.exists()) {

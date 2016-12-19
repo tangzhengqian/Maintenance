@@ -75,6 +75,9 @@ public class MyUtil {
         return "未知";
     }
 
+    /**
+     * 通知单状态【0为创建时 10为提交到施工管理 20为提交到养护科管理人员 30为提交到科长】【11为施工管理通过 21为养护科管理通过 31 科长通过】【12施工管理不通过 22养护科管理不通过 32科长不通过 】
+     */
     public static DealBean getNoticeDealStr(int step, int createUserRoleId, int nowUseRoleId) {
         DealBean bean = null;
         if (step == 0) {
@@ -107,6 +110,9 @@ public class MyUtil {
         return bean;
     }
 
+    /**
+     * 验收单状态【0为已创建 10 养护科管理审核 20 科长审核  】【11为养护科管理通过  21为科长通过】【12为养护科管理未通过 22为科长未通过】
+     */
     public static DealBean getCheckDealStr(int step, int nowUseRoleId) {
         DealBean bean = null;
         if (step == 0) {
@@ -117,7 +123,7 @@ public class MyUtil {
             if (nowUseRoleId == 3) {//养护科管理
                 return new DealBean("提交到科长", "for_2", "不通过", "return_5");
             }
-        } else if (step == 30) {
+        } else if (step == 20) {
             if (nowUseRoleId == 2) {//科长
                 return new DealBean("通过", "for_end", "不通过", "return_3");
             }
