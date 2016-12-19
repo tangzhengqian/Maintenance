@@ -105,9 +105,16 @@
 
             <EditText
                 android:id="@+id/detail_cost_et"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:inputType="numberDecimal" />
+            <Button
+                android:id="@+id/refreshBt"
+                style="@style/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="刷新"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

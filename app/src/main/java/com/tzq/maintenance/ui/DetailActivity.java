@@ -22,6 +22,8 @@ import com.tzq.maintenance.utis.MyUtil;
 
 import java.util.List;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by Administrator on 2016/11/1.
  */
@@ -185,6 +187,11 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onViewClick(View view) {
+        switch (view.getId()){
+            case R.id.refreshBt:
+                cal();
+                break;
+        }
 
     }
 }

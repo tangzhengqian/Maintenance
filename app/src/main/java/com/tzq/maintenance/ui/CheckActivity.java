@@ -289,7 +289,7 @@ public class CheckActivity extends BaseActivity {
             if (mConsPicUris.size() >= 1) {
                 MyUtil.displayPic(mConsIv1, mConsPicUris.get(0));
             }
-            if (mBeforePicUris.size() >= 2) {
+            if (mConsPicUris.size() >= 2) {
                 MyUtil.displayPic(mConsIv2, mConsPicUris.get(1));
             }
         } else {
@@ -341,10 +341,10 @@ public class CheckActivity extends BaseActivity {
         mDateEt.setEnabled(b);
         mCostEt.setEnabled(b);
         if (b) {
-            findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
+//            findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
             findViewById(R.id.add_detail_new_iv).setVisibility(View.VISIBLE);
         } else {
-            findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
+//            findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
             findViewById(R.id.add_detail_new_iv).setVisibility(View.INVISIBLE);
         }
 

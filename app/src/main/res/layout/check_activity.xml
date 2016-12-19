@@ -135,6 +135,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:onClick="onClick"
+                    android:visibility="invisible"
                     android:src="@mipmap/add" />
             </LinearLayout>
 
@@ -241,7 +242,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="施工前照片：" />
+                android:text="施工中照片：" />
 
             <LinearLayout
                 android:id="@+id/construction_pic_lay"
@@ -279,7 +280,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="施工前照片：" />
+                android:text="施工完成照片：" />
 
             <LinearLayout
                 android:id="@+id/after_pic_lay"

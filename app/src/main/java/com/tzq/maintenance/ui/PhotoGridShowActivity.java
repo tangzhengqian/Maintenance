@@ -3,7 +3,11 @@ package com.tzq.maintenance.ui;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -14,14 +18,20 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.tzq.common.ui.CBaseAdapter;
+import com.tzq.common.utils.ImageUtil;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.utis.MyUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
+import static com.tzq.maintenance.Config.photoDirPath;
 
 /**
  * Created by Administrator on 2016/11/2.
@@ -29,6 +39,7 @@ import java.util.List;
 
 public class PhotoGridShowActivity extends BaseActivity {
     private final static int REQUEST_ADD_PIC = 11;
+    private final static int REQUEST_TAKE_PHOTO = 12;
     private GridView mGridView;
     PhotoAdapter mAdapter;
     ArrayList<String> mUris = new ArrayList<>();
@@ -89,6 +100,8 @@ public class PhotoGridShowActivity extends BaseActivity {
             }).setNegativeButton("取消", null).show();
         } else if (item.getItemId() == R.id.action_add_pic) {
             startActivityForResult(new Intent(mAct, PhotoSelectLocalActivity.class), REQUEST_ADD_PIC);
+        } else if (item.getItemId() == R.id.action_take_photo) {
+            openTakePhoto();
         } else if (item.getItemId() == R.id.action_complete) {
             setResult(RESULT_OK, new Intent().putStringArrayListExtra("uris", mUris));
             finish();
@@ -104,9 +117,46 @@ public class PhotoGridShowActivity extends BaseActivity {
                 String path = data.getStringExtra("path");
                 LogUtil.i("---path=" + path);
                 mUris.add("file://" + path);
-
                 mAdapter.setDataList(mUris);
             }
+        } else if (requestCode == REQUEST_TAKE_PHOTO) {
+            if (data.getData() != null || data.getExtras() != null) { //防止没有返回结果
+                Uri uri = data.getData();
+                Bitmap photo = null;
+                if (uri != null) {
+                    photo = BitmapFactory.decodeFile(uri.getPath()); //拿到图片
+                }
+                if (photo == null) {
+                    Bundle bundle = data.getExtras();
+                    if (bundle != null) {
+                        photo = (Bitmap) bundle.get("data");
+                    } else {
+                        Toast.makeText(getApplicationContext(), "找不到图片", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                if (photo != null) {
+                    File dir = new File(photoDirPath);
+                    if (!dir.exists()) {
+                        dir.mkdirs();
+                    }
+                    String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis();
+                    ImageUtil.saveBitmapToLocal(photo, path, Bitmap.CompressFormat.JPEG);
+                    LogUtil.i("---path=" + path);
+                    mUris.add("file://" + path);
+                    mAdapter.setDataList(mUris);
+                }
+
+            }
+        }
+    }
+
+    private void openTakePhoto() {
+        String state = Environment.getExternalStorageState(); //拿到sdcard是否可用的状态码
+        if (state.equals(Environment.MEDIA_MOUNTED)) {   //如果可用
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+            startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+        } else {
+            MyUtil.toast("sdcard不可用");
         }
     }
 

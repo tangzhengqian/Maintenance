@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/action_add_pic"
-        android:title="添加图片"
+        android:title="选择图片"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_take_photo"
+        android:title="拍照"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_delete"

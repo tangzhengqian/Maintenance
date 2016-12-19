@@ -75,6 +75,7 @@ public class Config {
     }
 
     public static final String exportDirPath = "/sdcard/tzqExport";
+    public static final String photoDirPath = "/sdcard/tzqPhoto";
 
 
     public static Gson gson;
