@@ -349,13 +349,36 @@ public class NoticeActivity extends BaseActivity {
 
     private void saveNotice() {
         mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
-        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).id;
+        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
         mNotice.stake_num1 = mStakeNum1Et.getText().toString();
         mNotice.stake_num2 = mStakeNum2Et.getText().toString();
         mNotice.project_name = mProjectNameEt.getText().toString();
         mNotice.start_time = mDateEt.getText().toString();
         mNotice.project_cost = mCostEt.getText().toString();
         mNotice.days = mDaysEt.getText().toString();
+        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
+        if (Util.isEmpty(mNotice.stake_num1)) {
+            MyUtil.toast("请输入桩号");
+            return;
+        } else {
+            float n1 = Float.valueOf(mNotice.stake_num1);
+            if (String.valueOf((int) n1).length() != 6) {
+                MyUtil.toast("桩号必须有6位整数");
+                return;
+            }
+        }
+
+        if (Util.isEmpty(mNotice.stake_num2)) {
+            MyUtil.toast("请输入桩号");
+            return;
+        } else {
+            float n2 = Float.valueOf(mNotice.stake_num2);
+            if (String.valueOf((int) n2).length() != 6) {
+                MyUtil.toast("桩号必须有6位整数");
+                return;
+            }
+        }
+
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", mNotice.cate)
@@ -375,6 +398,7 @@ public class NoticeActivity extends BaseActivity {
             builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
             builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
             builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
+            builder.add("detail[" + i + "][detail_num]", "" + childDetail.detail_num);
             builder.add("detail[" + i + "][detail_price]", "" + childDetail.detail_price);
             builder.add("detail[" + i + "][detail_unit]", "" + childDetail.detail_unit);
             builder.add("detail[" + i + "][detail_quantities1]", "" + childDetail.detail_quantities1);

@@ -44,6 +44,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="6dp"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
                 android:layout_weight="1" />
 
             <EditText
@@ -51,6 +53,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="6dp"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
                 android:layout_weight="1" />
         </LinearLayout>
 
@@ -110,6 +114,7 @@
             <EditText
                 android:id="@+id/days_et"
                 android:layout_width="0dp"
+                android:inputType="numberDecimal"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
         </LinearLayout>
