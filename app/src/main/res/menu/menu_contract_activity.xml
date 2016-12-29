@@ -4,7 +4,7 @@
     tools:context=".ui.MainActivity">
     <item
         android:id="@+id/action_save"
-        app:showAsAction="never"
+        app:showAsAction="always"
         android:title="保存"/>
 
     <!--<item-->

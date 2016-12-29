@@ -1,16 +1,21 @@
 package com.tzq.maintenance.ui;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -24,6 +29,7 @@ import com.tzq.maintenance.bean.Check;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
+import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.FormBody;
+
+import static com.tzq.maintenance.ui.NoticeListActivity.REQUEST_UPDATE_NOTICE;
 
 /**
  * Created by Administrator on 2016/10/20.
@@ -47,6 +55,8 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     private final int page_size = 10;
     private List<Check> mListData = new ArrayList<>();
     private int mSelectPosition;
+    private boolean isMutiSelectMode = false;
+    private List<Integer> selectPositions = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,6 +85,122 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             }
         });
         httpGetList(1);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (isMutiSelectMode) {
+            getMenuInflater().inflate(R.menu.notice_list_muti_select, menu);
+            String s = "";
+            if (!selectPositions.isEmpty()) {
+                s = "(" + selectPositions.size() + ")";
+
+            }
+            setTitle("多选" + s);
+            final CheckBox checkBox = (CheckBox) menu.findItem(R.id.action_select_all).getActionView();
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectPositions.clear();
+                    if (checkBox.isChecked()) {
+                        int size = mListData.size();
+                        for (int i = 0; i < size; i++) {
+                            if (!selectPositions.contains(i)) {
+                                selectPositions.add(i);
+                            }
+                        }
+                    }
+                    refreshMutiSelect();
+                }
+            });
+        } else {
+            getMenuInflater().inflate(R.menu.check_list, menu);
+            setTitle("验收单列表");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (isMutiSelectMode) {
+                    isMutiSelectMode = false;
+                } else {
+                    finish();
+                }
+                refreshMutiSelect();
+                break;
+            case R.id.action_create:
+                startActivityForResult(new Intent(mAct, NoticeActivity.class), REQUEST_UPDATE_NOTICE);
+                break;
+            case R.id.action_muti_select:
+                isMutiSelectMode = true;
+                refreshMutiSelect();
+                break;
+            case R.id.action_export:
+                new AlertDialog.Builder(mAct).setMessage("导出所选验收单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ProgressDialogUtil.show(mAct, "正在批量导出验收单...");
+                        for (int pos : selectPositions) {
+                            Check check = mListAdapter.getItem(selectPositions.get(pos));
+                            download(check);
+                        }
+                        isMutiSelectMode = false;
+                        refreshMutiSelect();
+                    }
+                }).show();
+
+                break;
+            case R.id.action_delete:
+                new AlertDialog.Builder(mAct).setMessage("删除所选验收单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ProgressDialogUtil.show(mAct, "正在批量删除验收单...");
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                for (int pos : selectPositions) {
+                                    Check check = mListAdapter.getItem(pos);
+                                    if (check.step != 21) {
+                                        new HttpTask(Config.url_check_delete + "?id=" + check.id).setActivity(mAct).execute(null);
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ProgressDialogUtil.hide(mAct);
+                                        MyUtil.toast("删除完成");
+                                        isMutiSelectMode = false;
+                                        refreshMutiSelect();
+                                        httpGetList(1);
+                                    }
+                                });
+                            }
+                        }.start();
+                    }
+                }).show();
+                break;
+
+        }
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isMutiSelectMode) {
+            isMutiSelectMode = false;
+            invalidateOptionsMenu();
+            mListAdapter.notifyDataSetChanged();
+        } else {
+            finish();
+        }
+    }
+
+    private void refreshMutiSelect() {
+        invalidateOptionsMenu();
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -178,7 +304,6 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
-//                .add("page_size", 10 + "")
                 .build());
     }
 
@@ -198,7 +323,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             VH vh = null;
             if (convertView == null) {
                 convertView = View.inflate(mAct, R.layout.notice_list_item, null);
@@ -209,7 +334,9 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                 vh.typeTv = (TextView) convertView.findViewById(R.id.notice_type_tv);
                 vh.costTv = (TextView) convertView.findViewById(R.id.notice_cost_tv);
                 vh.dateTv = (TextView) convertView.findViewById(R.id.notice_date_tv);
-                vh.statusTv = (TextView) convertView.findViewById(R.id.notice_status_tv);
+                vh.stepTv = (TextView) convertView.findViewById(R.id.notice_step_tv);
+                vh.checkBox = (CheckBox) convertView.findViewById(R.id.check);
+                vh.statusTv = (TextView) convertView.findViewById(R.id.statusTv);
             } else {
                 vh = (VH) convertView.getTag();
             }
@@ -219,8 +346,32 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             vh.noTv.setText("编号：" + item.id);
             vh.typeTv.setText("分类：" + MyUtil.getNoticeCateStr(item.cate));
             vh.costTv.setText("造价：" + item.project_cost);
-            vh.statusTv.setText("状态：" + MyUtil.getStepStr(Integer.valueOf(item.step)));
+            vh.stepTv.setText("状态：" + MyUtil.getStepStrForCheck(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
+            vh.statusTv.setText("" + MyUtil.getStatusStrForCheck(Integer.valueOf(item.step)));
+            vh.statusTv.setTextColor(MyUtil.getStatusColorForCheck(Integer.valueOf(item.step)));
+            vh.checkBox.setOnCheckedChangeListener(null);
+            if (isMutiSelectMode) {
+                vh.checkBox.setVisibility(View.VISIBLE);
+                vh.checkBox.setChecked(selectPositions.contains(position));
+                vh.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            if (!selectPositions.contains(position)) {
+                                selectPositions.add(position);
+                            }
+                        } else {
+                            if (selectPositions.contains(Integer.valueOf(position))) {
+                                selectPositions.remove(Integer.valueOf(position));
+                            }
+                        }
+                        refreshMutiSelect();
+                    }
+                });
+            } else {
+                vh.checkBox.setVisibility(View.GONE);
+            }
             return convertView;
         }
 
@@ -230,6 +381,8 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             public TextView typeTv;
             public TextView costTv;
             public TextView dateTv;
+            public TextView stepTv;
+            public CheckBox checkBox;
             public TextView statusTv;
         }
     }

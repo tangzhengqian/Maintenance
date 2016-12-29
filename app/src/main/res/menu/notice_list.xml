@@ -4,6 +4,10 @@
     tools:context=".ui.MainActivity">
     <item
         android:id="@+id/action_create"
-        app:showAsAction="always"
-        android:title="创建违约金"/>
+        app:showAsAction="ifRoom"
+        android:title="创建通知单"/>
+    <item
+        android:id="@+id/action_muti_select"
+        app:showAsAction="ifRoom"
+        android:title="多选"/>
 </menu>

@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.MainActivity">
+    <item
+        android:id="@+id/action_select_all"
+        android:title="全选"
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_delete"
+        android:title="删除"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_export"
+        android:title="导出"
+        app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/action_commit"-->
+        <!--android:title="提交"-->
+        <!--app:showAsAction="ifRoom" />-->
+</menu>

@@ -3,7 +3,6 @@ package com.tzq.maintenance.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -73,7 +72,6 @@ public class CheckActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.check_activity);
-        setTitle("通知单");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mTypeSp = (Spinner) findViewById(R.id.type_sp);
@@ -105,7 +103,7 @@ public class CheckActivity extends BaseActivity {
     }
 
     private boolean isEditable() {
-        if (mCheck.step == 31) {
+        if (mCheck.step == 21) {
             return false;
         }
         return true;
@@ -120,6 +118,8 @@ public class CheckActivity extends BaseActivity {
         MenuItem dealNextMenu = menu.findItem(R.id.action_deal_next);
         MenuItem dealCancelMenu = menu.findItem(R.id.action_deal_cancel);
         MenuItem deleteMenu = menu.findItem(R.id.action_delete);
+        MenuItem saveMenu = menu.findItem(R.id.action_save);
+
         if (App.getInstance().getUser().role_id == 1) {
             deleteMenu.setVisible(true);
         } else {
@@ -151,7 +151,8 @@ public class CheckActivity extends BaseActivity {
                 }
             }
         }
-
+        saveMenu.setVisible(isEditable());
+        deleteMenu.setVisible(isEditable());
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -166,7 +167,19 @@ public class CheckActivity extends BaseActivity {
                         updatePic(mBeforePicUris, mNewBeforePicUris);
                         updatePic(mConsPicUris, mNewConsPicUris);
                         updatePic(mAfterPicUris, mNewAfterPicUris);
-                        saveNotice();
+
+                        final boolean result = httpSave();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressDialogUtil.hide(mAct);
+                                if (result) {
+                                    MyUtil.toast("保存成功");
+                                    setResult(RESULT_OK);
+                                    finish();
+                                }
+                            }
+                        });
                     }
                 }.start();
 
@@ -449,7 +462,7 @@ public class CheckActivity extends BaseActivity {
         }
     }
 
-    private void saveNotice() {
+    private boolean httpSave() {
         mCheck.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
         mCheck.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
         mCheck.stake_num1 = mStakeNum1Et.getText().toString();
@@ -461,23 +474,23 @@ public class CheckActivity extends BaseActivity {
 
         if (Util.isEmpty(mCheck.stake_num1)) {
             MyUtil.toast("请输入桩号");
-            return;
+            return false;
         } else {
             float n1 = Float.valueOf(mCheck.stake_num1);
             if (String.valueOf((int) n1).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
-                return;
+                return false;
             }
         }
 
         if (Util.isEmpty(mCheck.stake_num2)) {
             MyUtil.toast("请输入桩号");
-            return;
+            return false;
         } else {
             float n2 = Float.valueOf(mCheck.stake_num2);
             if (String.valueOf((int) n2).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
-                return;
+                return false;
             }
         }
 
@@ -554,17 +567,8 @@ public class CheckActivity extends BaseActivity {
             }
             builder.add("after_pic", sb.toString());
         }
-
-
         ResponseData responseData = new HttpTask(Config.url_check_save).execute(builder.build());
-        Looper.prepare();
-        if (responseData.isSuccess()) {
-            MyUtil.toast("保存成功");
-            setResult(RESULT_OK);
-            finish();
-        }
-        ProgressDialogUtil.hide(mAct);
-        Looper.loop();
+        return responseData.isSuccess();
     }
 
     @Override

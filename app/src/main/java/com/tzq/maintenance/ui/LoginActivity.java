@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.EditText;
 
-import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
@@ -51,11 +50,10 @@ public class LoginActivity extends BaseActivity {
     public void onViewClick(View view) {
         switch (view.getId()) {
             case R.id.login_bt:
-                ProgressDialogUtil.show(mAct);
+                ProgressDialogUtil.show(mAct, "正在登录...");
                 new HttpTask(Config.url_login).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
                     public void onComplete(final ResponseData responseData) {
-                        LogUtil.e("-------responseData.isSuccess()"+responseData.isSuccess());
                         if (responseData.isSuccess()) {
                             User user = Config.gson.fromJson(responseData.data, User.class);
                             App.getInstance().setUser(user);
@@ -65,15 +63,10 @@ public class LoginActivity extends BaseActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    MyUtil.toast("登录成功");
-                                                    ProgressDialogUtil.hide(mAct);
-                                                    startActivity(new Intent(mAct, MainActivity.class));
-                                                    finish();
-                                                }
-                                            });
+                                            MyUtil.toast("登录成功");
+                                            ProgressDialogUtil.hide(mAct);
+                                            startActivity(new Intent(mAct, MainActivity.class));
+                                            finish();
                                         }
                                     });
                                 }
@@ -83,20 +76,17 @@ public class LoginActivity extends BaseActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    MyUtil.toast("获取资源失败");
-                                                    ProgressDialogUtil.hide(mAct);
-                                                    App.getInstance().setUser(null);
-                                                }
-                                            });
+                                            MyUtil.toast("获取资源失败");
+                                            ProgressDialogUtil.hide(mAct);
+                                            App.getInstance().setUser(null);
                                         }
                                     });
                                 }
+
                             });
                             SyncUtil.startSync();
-                        }else {
+                        } else {
+
                             ProgressDialogUtil.hide(mAct);
                             MyUtil.toast("登录失败");
                         }

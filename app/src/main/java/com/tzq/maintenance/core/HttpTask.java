@@ -1,6 +1,7 @@
 package com.tzq.maintenance.core;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.os.Looper;
 
 import com.tzq.common.utils.IOUtil;
@@ -148,16 +149,19 @@ public class HttpTask {
     }
 
     private void onComplete(final ResponseData responseData) {
-        Looper.prepare();
-        if (!responseData.isSuccess()) {
-            if (mIsShowMessage) {
-                MyUtil.toast(responseData.msg);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                if (!responseData.isSuccess()) {
+                    if (mIsShowMessage) {
+                        MyUtil.toast(responseData.msg);
+                    }
+                }
+                for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
+                    completeCallBack.onComplete(responseData);
+                }
             }
-        }
-        for (CompleteCallBack completeCallBack : mCompleteCallBacks) {
-            completeCallBack.onComplete(responseData);
-        }
-        Looper.loop();
+        });
     }
 
 

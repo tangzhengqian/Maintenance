@@ -4,10 +4,10 @@
     tools:context=".ui.MainActivity">
     <item
         android:id="@+id/action_ok"
-        android:orderInCategory="100"
+        app:showAsAction="ifRoom"
         android:title="完成"/>
     <item
         android:id="@+id/action_delete"
-        android:orderInCategory="100"
+        app:showAsAction="ifRoom"
         android:title="删除"/>
 </menu>

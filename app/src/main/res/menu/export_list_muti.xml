@@ -3,7 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ui.MainActivity">
     <item
-        android:id="@+id/action_create"
+        android:id="@+id/action_select_all"
+        android:title="全选"
         app:showAsAction="always"
-        android:title="创建违约金"/>
+        app:actionViewClass="android.widget.CheckBox" />
+    <item
+        android:id="@+id/action_muti_delete"
+        android:title="删除"
+        app:showAsAction="ifRoom" />
 </menu>

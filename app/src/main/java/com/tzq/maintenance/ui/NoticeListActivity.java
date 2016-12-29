@@ -1,17 +1,21 @@
 package com.tzq.maintenance.ui;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +29,7 @@ import com.tzq.maintenance.bean.Notice;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
+import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +53,8 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     private final int page_size = 10;
     private List<Notice> mListData = new ArrayList<>();
     private int mSelectPosition;
+    private boolean isMutiSelectMode = false;
+    private List<Integer> selectPositions = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -95,20 +102,126 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         }, 500);
     }
 
+    boolean isFisrtCreate = true;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main_notice_list, menu);
+        if (isMutiSelectMode) {
+            getMenuInflater().inflate(R.menu.notice_list_muti_select, menu);
+            String s = "";
+            if (!selectPositions.isEmpty()) {
+                s = "(" + selectPositions.size() + ")";
+
+            }
+            setTitle("多选" + s);
+            final CheckBox checkBox = (CheckBox) menu.findItem(R.id.action_select_all).getActionView();
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    selectPositions.clear();
+                    if (checkBox.isChecked()) {
+                        int size = mListData.size();
+                        for (int i = 0; i < size; i++) {
+                            if (!selectPositions.contains(i)) {
+                                selectPositions.add(i);
+                            }
+                        }
+                    }
+                    refreshMutiSelect();
+                }
+            });
+        } else {
+            getMenuInflater().inflate(R.menu.notice_list, menu);
+            setTitle("通知单列表");
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_create) {
-            startActivityForResult(new Intent(mAct, NoticeActivity.class), REQUEST_UPDATE_NOTICE);
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (isMutiSelectMode) {
+                    isMutiSelectMode = false;
+                } else {
+                    finish();
+                }
+                refreshMutiSelect();
+                break;
+            case R.id.action_create:
+                startActivityForResult(new Intent(mAct, NoticeActivity.class), REQUEST_UPDATE_NOTICE);
+                break;
+            case R.id.action_muti_select:
+                isMutiSelectMode = true;
+                refreshMutiSelect();
+                break;
+            case R.id.action_export:
+                new AlertDialog.Builder(mAct).setMessage("导出所选通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ProgressDialogUtil.show(mAct, "正在批量导出通知单...");
+                        for (int pos : selectPositions) {
+                            Notice notice = mListAdapter.getItem(selectPositions.get(pos));
+                            download(notice);
+                        }
+                        isMutiSelectMode = false;
+                        refreshMutiSelect();
+                    }
+                }).show();
+
+                break;
+//            case R.id.action_commit:
+//                ProgressDialogUtil.show(mAct, "正在批量提交...");
+//                new Thread() {
+//                    @Override
+//                    public void run() {
+//                        for (int pos : selectPositions) {
+//                            Notice notice = mListAdapter.getItem(selectPositions.get(pos));
+//                            NoticeActivity.httpSave(notice);
+//                            Looper.prepare();
+//                            ProgressDialogUtil.hide(mAct);
+//                            MyUtil.toast("提交完成");
+//                            Looper.loop();
+//                        }
+//                    }
+//                }.start();
+//
+//                isMutiSelectMode = false;
+//                refreshMutiSelect();
+//                break;
+            case R.id.action_delete:
+                new AlertDialog.Builder(mAct).setMessage("删除所选通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ProgressDialogUtil.show(mAct, "正在批量删除通知单...");
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                for (int pos : selectPositions) {
+                                    Notice notice = mListAdapter.getItem(pos);
+                                    if (notice.step != 31) {
+                                        new HttpTask(Config.url_notice_delete + "?id=" + notice.id).setActivity(mAct).execute(null);
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ProgressDialogUtil.hide(mAct);
+                                        MyUtil.toast("删除完成");
+                                        isMutiSelectMode = false;
+                                        refreshMutiSelect();
+                                        httpGetList(1);
+                                    }
+                                });
+                            }
+                        }.start();
+                    }
+                }).show();
+
+                break;
+
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     @Override
@@ -128,6 +241,17 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isMutiSelectMode) {
+            isMutiSelectMode = false;
+            invalidateOptionsMenu();
+            mListAdapter.notifyDataSetChanged();
+        } else {
+            finish();
+        }
     }
 
     private void download(Notice notice) {
@@ -181,6 +305,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                                 LogUtil.e(e.getMessage(), e);
                             }
                             mListAdapter.setDataList(mListData);
+                            refreshMutiSelect();
                         }
                         if (mListData.size() >= count) {
                             footerView.setText("没有更多的数据了");
@@ -202,11 +327,16 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==REQUEST_UPDATE_NOTICE){
-            if(resultCode==RESULT_OK){
+        if (requestCode == REQUEST_UPDATE_NOTICE) {
+            if (resultCode == RESULT_OK) {
                 httpGetList(1);
             }
         }
+    }
+
+    private void refreshMutiSelect() {
+        invalidateOptionsMenu();
+        mListAdapter.notifyDataSetChanged();
     }
 
     class Adapter extends CBaseAdapter<Notice> {
@@ -216,7 +346,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             VH vh = null;
             if (convertView == null) {
                 convertView = View.inflate(mAct, R.layout.notice_list_item, null);
@@ -227,18 +357,45 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 vh.typeTv = (TextView) convertView.findViewById(R.id.notice_type_tv);
                 vh.costTv = (TextView) convertView.findViewById(R.id.notice_cost_tv);
                 vh.dateTv = (TextView) convertView.findViewById(R.id.notice_date_tv);
-                vh.statusTv = (TextView) convertView.findViewById(R.id.notice_status_tv);
+                vh.stepTv = (TextView) convertView.findViewById(R.id.notice_step_tv);
+                vh.checkBox = (CheckBox) convertView.findViewById(R.id.check);
+                vh.statusTv = (TextView) convertView.findViewById(R.id.statusTv);
             } else {
                 vh = (VH) convertView.getTag();
             }
 
-            Notice item = getItem(position);
+            final Notice item = getItem(position);
             vh.nameTv.setText("名称：" + item.project_name);
             vh.noTv.setText("编号：" + item.id);
             vh.typeTv.setText("分类：" + MyUtil.getNoticeCateStr(item.cate));
             vh.costTv.setText("造价：" + item.project_cost);
-            vh.statusTv.setText("状态：" + MyUtil.getStepStr(Integer.valueOf(item.step)));
+            vh.stepTv.setText("状态：" + MyUtil.getStepStrForNotice(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
+            vh.statusTv.setText("" + MyUtil.getStatusStrForNotice(Integer.valueOf(item.step)));
+            vh.statusTv.setTextColor(MyUtil.getStatusColorForNotice(Integer.valueOf(item.step)));
+            vh.checkBox.setOnCheckedChangeListener(null);
+            if (isMutiSelectMode) {
+                vh.checkBox.setVisibility(View.VISIBLE);
+                vh.checkBox.setChecked(selectPositions.contains(position));
+                vh.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            if (!selectPositions.contains(position)) {
+                                selectPositions.add(position);
+                            }
+                        } else {
+                            if (selectPositions.contains(Integer.valueOf(position))) {
+                                selectPositions.remove(Integer.valueOf(position));
+                            }
+                        }
+                        refreshMutiSelect();
+                    }
+                });
+            } else {
+                vh.checkBox.setVisibility(View.GONE);
+            }
+
             return convertView;
         }
 
@@ -248,6 +405,8 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             public TextView typeTv;
             public TextView costTv;
             public TextView dateTv;
+            public TextView stepTv;
+            public CheckBox checkBox;
             public TextView statusTv;
         }
     }

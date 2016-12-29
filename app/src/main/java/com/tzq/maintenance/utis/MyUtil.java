@@ -5,6 +5,9 @@ import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -41,16 +44,23 @@ import java.util.List;
  */
 
 public class MyUtil {
-    public static void toast(String msg) {
-        Toast.makeText(App.getInstance(), msg, Toast.LENGTH_SHORT).show();
+    public static void toast(final String msg) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(App.getInstance(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public static void toast(int msgId) {
         Toast.makeText(App.getInstance(), msgId, Toast.LENGTH_SHORT).show();
     }
 
-    public static String getStepStr(int step) {
+    public static String getStepStrForNotice(int step) {
         switch (step) {
+            case -1:
+                return "离线";
             case 0:
                 return "新创建";
             case 10:
@@ -73,6 +83,46 @@ public class MyUtil {
                 return "不通过";
         }
         return "未知";
+    }
+
+    public static String getStatusStrForNotice(int step) {
+        switch (step) {
+            case -1:
+                return "离线缓存中";
+            case 0:
+                return "目前已开单";
+            case 10:
+            case 20:
+            case 30:
+                return "正在处理";
+            case 31:
+                return "已验收";
+            case 12:
+            case 22:
+            case 32:
+                return "未通过";
+        }
+        return "未知";
+    }
+
+    public static int getStatusColorForNotice(int step) {
+        switch (step) {
+            case -1:
+                return Color.GRAY;
+            case 0:
+                return Color.MAGENTA;
+            case 10:
+            case 20:
+            case 30:
+                return Color.BLUE;
+            case 31://科长通过
+                return Color.GREEN;
+            case 12:
+            case 22:
+            case 32:
+                return Color.RED;
+        }
+        return Color.BLACK;
     }
 
     /**
@@ -108,6 +158,64 @@ public class MyUtil {
             }
         }
         return bean;
+    }
+
+    public static String getStepStrForCheck(int step) {
+        switch (step) {
+            case -1:
+                return "离线";
+            case 0:
+                return "新创建";
+            case 10:
+                return "养护科审核";
+            case 20:
+                return "科长审核";
+            case 11://养护科管理通过
+                return "通过";
+            case 21://科长通过
+                return "通过";
+            case 12://养护科管理不通过
+                return "不通过";
+            case 22://科长不通过
+                return "不通过";
+        }
+        return "未知";
+    }
+
+    public static String getStatusStrForCheck(int step) {
+        switch (step) {
+            case -1:
+                return "离线缓存中";
+            case 0:
+                return "目前已开单";
+            case 10:
+            case 20:
+                return "正在处理";
+            case 21://科长通过
+                return "已验收";
+            case 12://养护科管理不通过
+            case 22://科长不通过
+                return "未通过";
+        }
+        return "未知";
+    }
+
+    public static int getStatusColorForCheck(int step) {
+        switch (step) {
+            case -1:
+                return Color.GRAY;
+            case 0:
+                return Color.MAGENTA;
+            case 10:
+            case 20:
+                return Color.BLUE;
+            case 21://科长通过
+                return Color.GREEN;
+            case 12:
+            case 22:
+                return Color.RED;
+        }
+        return Color.BLACK;
     }
 
     /**
@@ -344,5 +452,4 @@ public class MyUtil {
         }
         return Config.gson.fromJson(json, NewTime.class);
     }
-
 }

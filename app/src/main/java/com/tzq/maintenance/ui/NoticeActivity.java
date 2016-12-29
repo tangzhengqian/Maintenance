@@ -169,7 +169,51 @@ public class NoticeActivity extends BaseActivity {
                                 }
                             }
                         }
-                        saveNotice();
+
+                        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
+                        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
+                        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
+                        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
+                        mNotice.project_name = mProjectNameEt.getText().toString();
+                        mNotice.start_time = mDateEt.getText().toString();
+                        mNotice.project_cost = mCostEt.getText().toString();
+                        mNotice.days = mDaysEt.getText().toString();
+                        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
+                        if (mNotice.detail == null) {
+                            mNotice.detail = new ArrayList<Detail>();
+                        }
+                        int count = mDetailListLay.getChildCount();
+                        for (int i = 0; i < count; i++) {
+                            View child = mDetailListLay.getChildAt(i);
+                            Detail childDetail = (Detail) child.getTag();
+                            mNotice.detail.add(childDetail);
+                        }
+                        mNotice.before_pic = "";
+                        if (mBeforePicUris != null) {
+                            StringBuffer sb = new StringBuffer();
+
+                            for (String url : mBeforePicUris) {
+                                if (sb.length() > 0) {
+                                    sb.append(",");
+                                }
+                                sb.append(url);
+                            }
+                            mNotice.before_pic = sb.toString();
+                        }
+                        final boolean result = httpSave(mNotice);
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressDialogUtil.hide(mAct);
+                                if (result) {
+                                    MyUtil.toast("保存成功");
+                                    setResult(RESULT_OK);
+                                    finish();
+                                }
+                            }
+                        });
+
                     }
                 }.start();
 
@@ -218,20 +262,6 @@ public class NoticeActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private void getNoticeDetail(int noticeId) {
-        new HttpTask(Config.url_notice_detail).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-
-                }
-            }
-        }).enqueue(new FormBody.Builder()
-                .add("id", noticeId + "")
-                .build());
-    }
-
 
     private void init() {
         if (mNotice == null) {
@@ -295,7 +325,6 @@ public class NoticeActivity extends BaseActivity {
         } else {
             findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
         }
-
     }
 
     private void addDetailView(final Detail detail) {
@@ -347,54 +376,44 @@ public class NoticeActivity extends BaseActivity {
         }
     }
 
-    private void saveNotice() {
-        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
-        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
-        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
-        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
-        mNotice.project_name = mProjectNameEt.getText().toString();
-        mNotice.start_time = mDateEt.getText().toString();
-        mNotice.project_cost = mCostEt.getText().toString();
-        mNotice.days = mDaysEt.getText().toString();
-        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
-        if (Util.isEmpty(mNotice.stake_num1)) {
+    //it will block thread
+    public static boolean httpSave(Notice notice) {
+        if (Util.isEmpty(notice.stake_num1)) {
             MyUtil.toast("请输入桩号");
-            return;
+            return false;
         } else {
-            float n1 = Float.valueOf(mNotice.stake_num1);
+            float n1 = Float.valueOf(notice.stake_num1);
             if (String.valueOf((int) n1).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
-                return;
+                return false;
             }
         }
 
-        if (Util.isEmpty(mNotice.stake_num2)) {
+        if (Util.isEmpty(notice.stake_num2)) {
             MyUtil.toast("请输入桩号");
-            return;
+            return false;
         } else {
-            float n2 = Float.valueOf(mNotice.stake_num2);
+            float n2 = Float.valueOf(notice.stake_num2);
             if (String.valueOf((int) n2).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
-                return;
+                return false;
             }
         }
 
 
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add("cate", mNotice.cate)
-                .add("id", mNotice.id + "")
-                .add("stake_ud", mNotice.stake_ud + "")
-                .add("stake_num1", mNotice.stake_num1 + "")
-                .add("stake_num2", mNotice.stake_num2 + "")
-                .add("project_name", mNotice.project_name + "")
-                .add("start_time", "" + mNotice.start_time)
-                .add("project_cost", "" + mNotice.project_cost)
-                .add("structure_id", "" + mNotice.structure_id)
-                .add("days", "" + mNotice.days);
-        int count = mDetailListLay.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = mDetailListLay.getChildAt(i);
-            Detail childDetail = (Detail) child.getTag();
+        builder.add("cate", notice.cate)
+                .add("id", notice.id + "")
+                .add("stake_ud", notice.stake_ud + "")
+                .add("stake_num1", notice.stake_num1 + "")
+                .add("stake_num2", notice.stake_num2 + "")
+                .add("project_name", notice.project_name + "")
+                .add("start_time", "" + notice.start_time)
+                .add("project_cost", "" + notice.project_cost)
+                .add("structure_id", "" + notice.structure_id)
+                .add("days", "" + notice.days);
+        int i = 0;
+        for (Detail childDetail : notice.detail) {
             builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
             builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
             builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
@@ -405,30 +424,14 @@ public class NoticeActivity extends BaseActivity {
             builder.add("detail[" + i + "][detail_quantities2]", "" + childDetail.detail_quantities2);
             builder.add("detail[" + i + "][detail_quantities3]", "" + childDetail.detail_quantities3);
             builder.add("detail[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
+            i++;
         }
-
-        if (mBeforePicUris != null) {
-            StringBuffer sb = new StringBuffer();
-
-            for (String url : mBeforePicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
-            }
-            builder.add("before_pic", sb.toString());
-        }
+        builder.add("before_pic", notice.before_pic);
 
 
         ResponseData responseData = new HttpTask(Config.url_notice_save).execute(builder.build());
         Looper.prepare();
-        if (responseData.isSuccess()) {
-            MyUtil.toast("保存成功");
-            setResult(RESULT_OK);
-            finish();
-        }
-        ProgressDialogUtil.hide(mAct);
-        Looper.loop();
+        return responseData.isSuccess();
     }
 
     @Override
