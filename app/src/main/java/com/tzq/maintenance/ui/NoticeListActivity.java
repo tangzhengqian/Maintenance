@@ -131,6 +131,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 }
             });
         } else {
+            selectPositions.clear();
             getMenuInflater().inflate(R.menu.notice_list, menu);
             setTitle("通知单列表");
         }
@@ -321,6 +322,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                         }
 
                         setRefresh(false);
+                        refreshMutiSelect();
                     }
                 });
 

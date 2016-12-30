@@ -224,6 +224,7 @@ public class ExportListActivity extends BaseActivity implements SwipeRefreshLayo
 
             final String item = getItem(position);
             vh.nameTv.setText("" + item);
+            vh.openBt.setVisibility(isMutiSelectMode ? View.GONE : View.VISIBLE);
             vh.openBt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

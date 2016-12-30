@@ -1,6 +1,7 @@
 package com.tzq.maintenance.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,8 +35,12 @@ public class Notice implements Serializable {
     public int maintenance_id;//
     public int role_id;//
 
+    public List<String> beforePicUris ;//just for cache
+    public ArrayList<String> newBeforePicUris ;//just offline save
+
 
     public String offlineId;//
 
-    public Notice(){}
+    public Notice() {
+    }
 }
