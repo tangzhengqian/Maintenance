@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -169,37 +170,8 @@ public class NoticeActivity extends BaseActivity {
                                 }
                             }
                         }
+                        prepareNotice();
 
-                        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
-                        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
-                        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
-                        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
-                        mNotice.project_name = mProjectNameEt.getText().toString();
-                        mNotice.start_time = mDateEt.getText().toString();
-                        mNotice.project_cost = mCostEt.getText().toString();
-                        mNotice.days = mDaysEt.getText().toString();
-                        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
-                        if (mNotice.detail == null) {
-                            mNotice.detail = new ArrayList<Detail>();
-                        }
-                        int count = mDetailListLay.getChildCount();
-                        for (int i = 0; i < count; i++) {
-                            View child = mDetailListLay.getChildAt(i);
-                            Detail childDetail = (Detail) child.getTag();
-                            mNotice.detail.add(childDetail);
-                        }
-                        mNotice.before_pic = "";
-                        if (mBeforePicUris != null) {
-                            StringBuffer sb = new StringBuffer();
-
-                            for (String url : mBeforePicUris) {
-                                if (sb.length() > 0) {
-                                    sb.append(",");
-                                }
-                                sb.append(url);
-                            }
-                            mNotice.before_pic = sb.toString();
-                        }
                         final boolean result = httpSave(mNotice);
 
                         runOnUiThread(new Runnable() {
@@ -207,6 +179,7 @@ public class NoticeActivity extends BaseActivity {
                             public void run() {
                                 ProgressDialogUtil.hide(mAct);
                                 if (result) {
+                                    MyUtil.deleteOfflineNotice(mNotice);
                                     MyUtil.toast("保存成功");
                                     setResult(RESULT_OK);
                                     finish();
@@ -222,16 +195,22 @@ public class NoticeActivity extends BaseActivity {
                 new AlertDialog.Builder(mAct).setMessage("删除该通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-                            @Override
-                            public void onComplete(ResponseData responseData) {
-                                if (responseData.isSuccess()) {
-                                    MyUtil.toast("删除成功");
-                                    setResult(RESULT_OK);
-                                    finish();
+                        if (!Util.isEmpty(mNotice.offlineId)) {
+                            MyUtil.deleteOfflineNotice(mNotice);
+                        }
+                        if (mNotice.id > 0) {
+                            new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                                @Override
+                                public void onComplete(ResponseData responseData) {
+                                    if (responseData.isSuccess()) {
+                                        MyUtil.toast("删除成功");
+                                        setResult(RESULT_OK);
+                                        finish();
+                                    }
                                 }
-                            }
-                        }).enqueue();
+                            }).enqueue();
+                        }
+
                     }
                 }).show();
                 break;
@@ -259,8 +238,51 @@ public class NoticeActivity extends BaseActivity {
                     }
                 }).enqueue();
                 break;
+            case R.id.action_offline_save:
+                prepareNotice();
+                if (Util.isEmpty(mNotice.offlineId)) {
+                    mNotice.offlineId = UUID.randomUUID().toString();
+                }
+                MyUtil.saveOfflineNotice(mNotice);
+                MyUtil.toast("保存成功");
+                setResult(RESULT_OK);
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void prepareNotice() {
+        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
+        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
+        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
+        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
+        mNotice.project_name = mProjectNameEt.getText().toString();
+        mNotice.start_time = mDateEt.getText().toString();
+        mNotice.project_cost = mCostEt.getText().toString();
+        mNotice.days = mDaysEt.getText().toString();
+        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
+        if (mNotice.detail == null) {
+            mNotice.detail = new ArrayList<>();
+        }
+        int count = mDetailListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mDetailListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            mNotice.detail.add(childDetail);
+        }
+        mNotice.before_pic = "";
+        if (mBeforePicUris != null) {
+            StringBuffer sb = new StringBuffer();
+
+            for (String url : mBeforePicUris) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(url);
+            }
+            mNotice.before_pic = sb.toString();
+        }
     }
 
     private void init() {
@@ -282,7 +304,7 @@ public class NoticeActivity extends BaseActivity {
             mStakeNum2Et.setText(mNotice.stake_num2);
             mProjectNameEt.setText(mNotice.project_name);
             mCostEt.setText(mNotice.project_cost);
-            mDateEt.setText(mNotice.created_at);
+            mDateEt.setText(mNotice.start_time);
             mDaysEt.setText(mNotice.days);
             if (!Util.isEmpty(mNotice.before_pic)) {
                 String[] beforePicUrls = mNotice.before_pic.split(",");
@@ -369,7 +391,6 @@ public class NoticeActivity extends BaseActivity {
             View child = mDetailListLay.getChildAt(i);
             Detail childDetail = (Detail) child.getTag();
             if (childDetail.id == detail.id) {
-                childDetail = detail;
                 mDetailListLay.removeView(child);
                 return;
             }
@@ -399,7 +420,6 @@ public class NoticeActivity extends BaseActivity {
                 return false;
             }
         }
-
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", notice.cate)

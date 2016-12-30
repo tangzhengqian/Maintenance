@@ -199,7 +199,10 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                             public void run() {
                                 for (int pos : selectPositions) {
                                     Notice notice = mListAdapter.getItem(pos);
-                                    if (notice.step != 31) {
+                                    if (!Util.isEmpty(notice.offlineId)) {
+                                        MyUtil.deleteOfflineNotice(notice);
+                                    }
+                                    if (notice.step != 31 && notice.id > 0) {
                                         new HttpTask(Config.url_notice_delete + "?id=" + notice.id).setActivity(mAct).execute(null);
                                     }
                                 }
@@ -304,9 +307,11 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                             } catch (JSONException e) {
                                 LogUtil.e(e.getMessage(), e);
                             }
-                            mListAdapter.setDataList(mListData);
+
                             refreshMutiSelect();
                         }
+                        mergeOffline();
+                        mListAdapter.setDataList(mListData);
                         if (mListData.size() >= count) {
                             footerView.setText("没有更多的数据了");
                             footerView.setEnabled(false);
@@ -323,6 +328,26 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
                 .build());
+    }
+
+    private void mergeOffline() {
+        List<Notice> noticeList = MyUtil.getOfflineNotices();
+        for (Notice n1 : noticeList) {
+            for (Notice n2 : mListData) {
+                if (n1.id <= 0) {
+                    if (n1.offlineId != null && n1.offlineId.equals(n2.offlineId)) {
+                        mListData.remove(n2);
+                        break;
+                    }
+                } else {
+                    if (n1.id == n2.id) {
+                        mListData.remove(n2);
+                        break;
+                    }
+                }
+            }
+            mListData.add(0, n1);
+        }
     }
 
     @Override
@@ -371,8 +396,14 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             vh.costTv.setText("造价：" + item.project_cost);
             vh.stepTv.setText("状态：" + MyUtil.getStepStrForNotice(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
-            vh.statusTv.setText("" + MyUtil.getStatusStrForNotice(Integer.valueOf(item.step)));
-            vh.statusTv.setTextColor(MyUtil.getStatusColorForNotice(Integer.valueOf(item.step)));
+            if (Util.isEmpty(item.offlineId)) {
+                vh.statusTv.setText("" + MyUtil.getStatusStrForNotice(Integer.valueOf(item.step)));
+                vh.statusTv.setTextColor(MyUtil.getStatusColorForNotice(Integer.valueOf(item.step)));
+            } else {
+                vh.statusTv.setText("离线缓存中");
+                vh.statusTv.setTextColor(MyUtil.getStatusColorForNotice(-1));
+            }
+
             vh.checkBox.setOnCheckedChangeListener(null);
             if (isMutiSelectMode) {
                 vh.checkBox.setVisibility(View.VISIBLE);

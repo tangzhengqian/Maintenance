@@ -19,22 +19,26 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
+import com.tzq.maintenance.bean.Check;
 import com.tzq.maintenance.bean.DealBean;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NewTime;
 import com.tzq.maintenance.bean.NormalBean;
+import com.tzq.maintenance.bean.Notice;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.CompleteListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -87,8 +91,6 @@ public class MyUtil {
 
     public static String getStatusStrForNotice(int step) {
         switch (step) {
-            case -1:
-                return "离线缓存中";
             case 0:
                 return "目前已开单";
             case 10:
@@ -451,5 +453,117 @@ public class MyUtil {
             return null;
         }
         return Config.gson.fromJson(json, NewTime.class);
+    }
+
+    public static List<Notice> getOfflineNotices() {
+        String json = PrefsManager.getInstance().getString(Config.prefs_key_offline_notice_list);
+        if (Util.isEmpty(json)) {
+            return new ArrayList<>();
+        }
+        return Config.gson.fromJson(json, new TypeToken<List<Notice>>() {
+        }.getType());
+    }
+
+    public static void saveOfflineNotice(Notice notice) {
+        List<Notice> list = getOfflineNotices();
+        for (Notice n : list) {
+            if (n.id <= 0) {
+                if (n.offlineId != null && n.offlineId.equals(notice.offlineId)) {
+                    list.remove(n);
+                    break;
+                }
+            } else {
+                if (n.id == notice.id) {
+                    list.remove(n);
+                    break;
+                }
+            }
+        }
+        list.add(notice);
+        String json = "";
+
+        if (!Util.isEmpty(list)) {
+            json = Config.gson.toJson(list);
+        }
+        PrefsManager.getInstance().save(Config.prefs_key_offline_notice_list, json);
+    }
+
+    public static void deleteOfflineNotice(Notice notice) {
+        List<Notice> list = getOfflineNotices();
+        for (Notice n : list) {
+            if (n.id <= 0) {
+                if (n.offlineId != null && n.offlineId.equals(notice.offlineId)) {
+                    list.remove(n);
+                    break;
+                }
+            } else {
+                if (n.id == notice.id) {
+                    list.remove(n);
+                    break;
+                }
+            }
+        }
+        String json = "";
+
+        if (!Util.isEmpty(list)) {
+            json = Config.gson.toJson(list);
+        }
+        PrefsManager.getInstance().save(Config.prefs_key_offline_notice_list, json);
+    }
+
+    public static List<Check> getOfflineChecks() {
+        String json = PrefsManager.getInstance().getString(Config.prefs_key_offline_check_list);
+        if (Util.isEmpty(json)) {
+            return new ArrayList<>();
+        }
+        return Config.gson.fromJson(json, new TypeToken<List<Check>>() {
+        }.getType());
+    }
+
+    public static void saveOfflineCheck(Check check) {
+        List<Check> list = getOfflineChecks();
+        for (Check n : list) {
+            if (n.id <= 0) {
+                if (n.offlineId != null && n.offlineId.equals(check.offlineId)) {
+                    list.remove(n);
+                    break;
+                }
+            } else {
+                if (n.id == check.id) {
+                    list.remove(n);
+                    break;
+                }
+            }
+        }
+        list.add(check);
+        String json = "";
+
+        if (!Util.isEmpty(list)) {
+            json = Config.gson.toJson(list);
+        }
+        PrefsManager.getInstance().save(Config.prefs_key_offline_check_list, json);
+    }
+
+    public static void deleteOfflineCheck(Check check) {
+        List<Check> list = getOfflineChecks();
+        for (Check n : list) {
+            if (n.id <= 0) {
+                if (n.offlineId != null && n.offlineId.equals(check.offlineId)) {
+                    list.remove(n);
+                    break;
+                }
+            } else {
+                if (n.id == check.id) {
+                    list.remove(n);
+                    break;
+                }
+            }
+        }
+        String json = "";
+
+        if (!Util.isEmpty(list)) {
+            json = Config.gson.toJson(list);
+        }
+        PrefsManager.getInstance().save(Config.prefs_key_offline_check_list, json);
     }
 }

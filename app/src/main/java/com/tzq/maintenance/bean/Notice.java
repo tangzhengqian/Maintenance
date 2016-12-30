@@ -33,4 +33,9 @@ public class Notice implements Serializable {
     public int company_id;//
     public int maintenance_id;//
     public int role_id;//
+
+
+    public String offlineId;//
+
+    public Notice(){}
 }

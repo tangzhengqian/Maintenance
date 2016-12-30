@@ -55,7 +55,8 @@ public class Config {
     public static final String prefs_key_login_user = "user";
     public static final String prefs_key_sync_time = "sync_time";
     public static final String prefs_key_new_time = "prefs_key_new_time";
-    public static final String prefs_key_check_list = "prefs_key_check_list";
+    public static final String prefs_key_offline_notice_list = "offline_notice_list";
+    public static final String prefs_key_offline_check_list = "offline_check_list";
 
     public static final long sync_delay = 1000 * 60 * 10;
 
