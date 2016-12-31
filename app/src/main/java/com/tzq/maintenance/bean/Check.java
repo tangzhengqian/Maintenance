@@ -1,6 +1,7 @@
 package com.tzq.maintenance.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,8 +39,17 @@ public class Check implements Serializable {
     public int notice_pass;//
     public String construction_pic;//"./Public/file_material/20161028/_14776327328b76397a5a12a9d2.jpg,./Public/file_material/20161028/_1477632736f10c40ed8075f45c.jpg,
     public String after_pic;//
-
     public String offlineId;//
+
+    public List<String> beforePicUris ;//just for cache
+    public ArrayList<String> newBeforePicUris ;//just offline save
+
+    public List<String> constructionPics ;//just for cache
+    public ArrayList<String> newConstructionPics ;//just offline save
+
+    public List<String> afterPics ;//just for cache
+    public ArrayList<String> newAfterPics;//just offline save
+
 
     public Check() {
     }

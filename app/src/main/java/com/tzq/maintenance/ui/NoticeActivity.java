@@ -146,11 +146,8 @@ public class NoticeActivity extends BaseActivity {
                 new Thread() {
                     @Override
                     public void run() {
-
                         prepareNotice();
-
                         final boolean result = httpSave(mNotice);
-
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -186,6 +183,10 @@ public class NoticeActivity extends BaseActivity {
                                     }
                                 }
                             }).enqueue();
+                        } else {
+                            MyUtil.toast("删除成功");
+                            setResult(RESULT_OK);
+                            finish();
                         }
 
                     }
@@ -248,18 +249,7 @@ public class NoticeActivity extends BaseActivity {
             Detail childDetail = (Detail) child.getTag();
             mNotice.detail.add(childDetail);
         }
-        mNotice.before_pic = "";
-        if (mNotice.beforePicUris != null) {
-            StringBuffer sb = new StringBuffer();
 
-            for (String url : mNotice.beforePicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
-            }
-            mNotice.before_pic = sb.toString();
-        }
     }
 
     private void init() {
@@ -269,7 +259,6 @@ public class NoticeActivity extends BaseActivity {
             setTitle("新建通知单");
             mDetailListLay.removeAllViews();
             setEditable(true);
-
             findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
         } else {
             setTitle("通知单详情");
@@ -295,20 +284,7 @@ public class NoticeActivity extends BaseActivity {
                     }
                 }
             }
-            if (mNotice.newBeforePicUris == null) {
-                mNotice.newBeforePicUris = new ArrayList<>();
-            }
-            if (mNotice.newBeforePicUris != null) {
-                if (mNotice.newBeforePicUris.size() >= 1) {
-                    MyUtil.displayPic(mBeforeIv1, mNotice.newBeforePicUris.get(0));
-                }
-                if (mNotice.newBeforePicUris.size() >= 2) {
-                    MyUtil.displayPic(mBeforeIv2, mNotice.newBeforePicUris.get(1));
-                }
-            } else {
-                MyUtil.displayPic(mBeforeIv1, "");
-                MyUtil.displayPic(mBeforeIv1, "");
-            }
+
 
             List<Detail> detailList = mNotice.detail;
             mDetailListLay.removeAllViews();
@@ -317,6 +293,24 @@ public class NoticeActivity extends BaseActivity {
                     addDetailView(detail);
                 }
             }
+        }
+
+        if (mNotice.beforePicUris == null) {
+            mNotice.beforePicUris = new ArrayList<>();
+        }
+        if (mNotice.newBeforePicUris == null) {
+            mNotice.newBeforePicUris = new ArrayList<>();
+        }
+        if (mNotice.newBeforePicUris != null) {
+            if (mNotice.newBeforePicUris.size() >= 1) {
+                MyUtil.displayPic(mBeforeIv1, mNotice.newBeforePicUris.get(0));
+            }
+            if (mNotice.newBeforePicUris.size() >= 2) {
+                MyUtil.displayPic(mBeforeIv2, mNotice.newBeforePicUris.get(1));
+            }
+        } else {
+            MyUtil.displayPic(mBeforeIv1, "");
+            MyUtil.displayPic(mBeforeIv1, "");
         }
     }
 
@@ -429,10 +423,11 @@ public class NoticeActivity extends BaseActivity {
                         .addFormDataPart("image", file.getName(), fileBody)
                         .build());
                 if (responseData.isSuccess()) {
-                    notice.beforePicUris.add(responseData.data);
+                    uri = responseData.data;
                 }
             }
         }
+
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", notice.cate)
@@ -459,7 +454,19 @@ public class NoticeActivity extends BaseActivity {
             builder.add("detail[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
             i++;
         }
-        builder.add("before_pic", notice.before_pic);
+
+        String before = "";
+        if (notice.newBeforePicUris != null) {
+            StringBuffer sb = new StringBuffer();
+            for (String url : notice.newBeforePicUris) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(url);
+            }
+            before = sb.toString();
+        }
+        builder.add("before_pic", before);
 
 
         ResponseData responseData = new HttpTask(Config.url_notice_save).execute(builder.build());

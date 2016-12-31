@@ -48,6 +48,7 @@
             <EditText
                 android:id="@+id/withholding_et"
                 android:layout_width="0dp"
+                android:inputType="numberDecimal"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
         </LinearLayout>

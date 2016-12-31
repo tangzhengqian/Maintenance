@@ -170,6 +170,17 @@ public class ExportListActivity extends BaseActivity implements SwipeRefreshLayo
 //        }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (isMutiSelectMode) {
+            isMutiSelectMode = false;
+            invalidateOptionsMenu();
+            mListAdapter.notifyDataSetChanged();
+        } else {
+            finish();
+        }
+    }
+
     private void setRefresh(final boolean b) {
         new Handler().postDelayed(new Runnable() {
             @Override

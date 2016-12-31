@@ -308,8 +308,6 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                             } catch (JSONException e) {
                                 LogUtil.e(e.getMessage(), e);
                             }
-
-                            refreshMutiSelect();
                         }
                         mergeOffline();
                         mListAdapter.setDataList(mListData);
@@ -333,8 +331,8 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     }
 
     private void mergeOffline() {
-        List<Notice> noticeList = MyUtil.getOfflineNotices();
-        for (Notice n1 : noticeList) {
+        List<Notice> list = MyUtil.getOfflineNotices();
+        for (Notice n1 : list) {
             for (Notice n2 : mListData) {
                 if (n1.id <= 0) {
                     if (n1.offlineId != null && n1.offlineId.equals(n2.offlineId)) {

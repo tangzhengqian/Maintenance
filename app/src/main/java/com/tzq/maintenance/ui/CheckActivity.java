@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import okhttp3.FormBody;
 import okhttp3.MediaType;
@@ -59,12 +60,6 @@ public class CheckActivity extends BaseActivity {
     ImageView mConsIv1, mConsIv2, mConsMoreIv;
     ImageView mAfterIv1, mAfterIv2, mAfterMoreIv;
     LinearLayout mDetailListLay, mDetailNewListLay;
-    List<String> mBeforePicUris = new ArrayList<>();
-    List<String> mConsPicUris = new ArrayList<>();
-    List<String> mAfterPicUris = new ArrayList<>();
-    ArrayList<String> mNewBeforePicUris = new ArrayList<>();
-    ArrayList<String> mNewConsPicUris = new ArrayList<>();
-    ArrayList<String> mNewAfterPicUris = new ArrayList<>();
     DealBean mNoticeDealBean;
 
 
@@ -126,6 +121,9 @@ public class CheckActivity extends BaseActivity {
             deleteMenu.setVisible(false);
         }
         if (mCheck.id <= 0) {
+            deleteMenu.setVisible(false);
+        }
+        if (mCheck.id <= 0) {
             dealNextMenu.setVisible(false);
             dealCancelMenu.setVisible(false);
         } else {
@@ -164,16 +162,18 @@ public class CheckActivity extends BaseActivity {
                 new Thread() {
                     @Override
                     public void run() {
-                        updatePic(mBeforePicUris, mNewBeforePicUris);
-                        updatePic(mConsPicUris, mNewConsPicUris);
-                        updatePic(mAfterPicUris, mNewAfterPicUris);
+                        updatePic(mCheck.beforePicUris, mCheck.newBeforePicUris);
+                        updatePic(mCheck.constructionPics, mCheck.newConstructionPics);
+                        updatePic(mCheck.afterPics, mCheck.newAfterPics);
 
+                        prepareCheck();
                         final boolean result = httpSave();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 ProgressDialogUtil.hide(mAct);
                                 if (result) {
+                                    MyUtil.deleteOfflineCheck(mCheck);
                                     MyUtil.toast("保存成功");
                                     setResult(RESULT_OK);
                                     finish();
@@ -186,18 +186,29 @@ public class CheckActivity extends BaseActivity {
                 break;
             case R.id.action_delete:
                 new AlertDialog.Builder(mAct).setMessage("删除该验收单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new HttpTask(Config.url_check_delete + "?id=" + mCheck.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-                            @Override
-                            public void onComplete(ResponseData responseData) {
-                                if (responseData.isSuccess()) {
-                                    MyUtil.toast("删除成功");
-                                    setResult(RESULT_OK);
-                                    finish();
+                        if (!Util.isEmpty(mCheck.offlineId)) {
+                            MyUtil.deleteOfflineCheck(mCheck);
+                        }
+                        if (mCheck.id > 0) {
+                            new HttpTask(Config.url_check_delete + "?id=" + mCheck.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                                @Override
+                                public void onComplete(ResponseData responseData) {
+                                    if (responseData.isSuccess()) {
+                                        MyUtil.toast("删除成功");
+                                        setResult(RESULT_OK);
+                                        finish();
+                                    }
                                 }
-                            }
-                        }).enqueue();
+                            }).enqueue();
+                        } else {
+                            MyUtil.toast("删除成功");
+                            setResult(RESULT_OK);
+                            finish();
+                        }
+
                     }
                 }).show();
                 break;
@@ -225,6 +236,16 @@ public class CheckActivity extends BaseActivity {
                     }
                 }).enqueue();
                 break;
+            case R.id.action_offline_save:
+                prepareCheck();
+                if (Util.isEmpty(mCheck.offlineId)) {
+                    mCheck.offlineId = UUID.randomUUID().toString();
+                }
+                MyUtil.saveOfflineCheck(mCheck);
+                MyUtil.toast("保存成功");
+                setResult(RESULT_OK);
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -249,7 +270,7 @@ public class CheckActivity extends BaseActivity {
                         .addFormDataPart("image", file.getName(), fileBody)
                         .build());
                 if (responseData.isSuccess()) {
-                    uris.add(responseData.data);
+                    uri = responseData.data;
                 }
             }
         }
@@ -283,49 +304,82 @@ public class CheckActivity extends BaseActivity {
         mDateEt.setText(mCheck.created_at);
 //        mDaysEt.setText(mCheck.days);
 
+        //-----------------------------------
         if (!Util.isEmpty(mCheck.before_pic)) {
             String[] urls = mCheck.before_pic.split(",");
-            mBeforePicUris = Arrays.asList(urls);
-            mNewBeforePicUris.addAll(mBeforePicUris);
-            if (mBeforePicUris.size() >= 1) {
-                MyUtil.displayPic(mBeforeIv1, mBeforePicUris.get(0));
+            mCheck.beforePicUris = Arrays.asList(urls);
+            if (mCheck.beforePicUris != null) {
+                if (mCheck.newBeforePicUris == null) {
+                    mCheck.newBeforePicUris = new ArrayList<>();
+                    mCheck.newBeforePicUris.addAll(mCheck.beforePicUris);
+                }
             }
-            if (mBeforePicUris.size() >= 2) {
-                MyUtil.displayPic(mBeforeIv2, mBeforePicUris.get(1));
-            }
-        } else {
-            MyUtil.displayPic(mBeforeIv1, "");
-            MyUtil.displayPic(mBeforeIv1, "");
+        }
+        if (mCheck.beforePicUris == null) {
+            mCheck.beforePicUris = new ArrayList<>();
+        }
+        if (mCheck.newBeforePicUris == null) {
+            mCheck.newBeforePicUris = new ArrayList<>();
+        }
+        MyUtil.displayPic(mBeforeIv1, "");
+        MyUtil.displayPic(mBeforeIv2, "");
+        if (mCheck.newBeforePicUris.size() >= 1) {
+            MyUtil.displayPic(mBeforeIv1, mCheck.newBeforePicUris.get(0));
+        }
+        if (mCheck.newBeforePicUris.size() >= 2) {
+            MyUtil.displayPic(mBeforeIv2, mCheck.newBeforePicUris.get(1));
         }
 
+        //------------------------------------------
         if (!Util.isEmpty(mCheck.construction_pic)) {
             String[] urls = mCheck.construction_pic.split(",");
-            mConsPicUris = Arrays.asList(urls);
-            mNewConsPicUris.addAll(mConsPicUris);
-            if (mConsPicUris.size() >= 1) {
-                MyUtil.displayPic(mConsIv1, mConsPicUris.get(0));
+            mCheck.constructionPics = Arrays.asList(urls);
+            if (mCheck.constructionPics != null) {
+                if (mCheck.newConstructionPics == null) {
+                    mCheck.newConstructionPics = new ArrayList<>();
+                    mCheck.newConstructionPics.addAll(mCheck.constructionPics);
+                }
             }
-            if (mConsPicUris.size() >= 2) {
-                MyUtil.displayPic(mConsIv2, mConsPicUris.get(1));
-            }
-        } else {
-            MyUtil.displayPic(mConsIv1, "");
-            MyUtil.displayPic(mConsIv2, "");
+        }
+        if (mCheck.constructionPics == null) {
+            mCheck.constructionPics = new ArrayList<>();
+        }
+        if (mCheck.newConstructionPics == null) {
+            mCheck.newConstructionPics = new ArrayList<>();
+        }
+        MyUtil.displayPic(mConsIv1, "");
+        MyUtil.displayPic(mConsIv2, "");
+        if (mCheck.newConstructionPics.size() >= 1) {
+            MyUtil.displayPic(mConsIv1, mCheck.newConstructionPics.get(0));
+        }
+        if (mCheck.newConstructionPics.size() >= 2) {
+            MyUtil.displayPic(mConsIv2, mCheck.newConstructionPics.get(1));
         }
 
+        //------------------------------------------
         if (!Util.isEmpty(mCheck.after_pic)) {
             String[] urls = mCheck.after_pic.split(",");
-            mAfterPicUris = Arrays.asList(urls);
-            mNewAfterPicUris.addAll(mConsPicUris);
-            if (mAfterPicUris.size() >= 1) {
-                MyUtil.displayPic(mAfterIv1, mAfterPicUris.get(0));
+            mCheck.afterPics = Arrays.asList(urls);
+            if (mCheck.afterPics != null) {
+                if (mCheck.newAfterPics == null) {
+                    mCheck.newAfterPics = new ArrayList<>();
+                    mCheck.newAfterPics.addAll(mCheck.afterPics);
+                }
             }
-            if (mAfterPicUris.size() >= 2) {
-                MyUtil.displayPic(mAfterIv2, mAfterPicUris.get(1));
-            }
-        } else {
-            MyUtil.displayPic(mAfterIv1, "");
-            MyUtil.displayPic(mAfterIv2, "");
+        }
+        if (mCheck.afterPics == null) {
+            mCheck.afterPics = new ArrayList<>();
+        }
+        if (mCheck.newAfterPics == null) {
+            mCheck.newAfterPics = new ArrayList<>();
+        }
+        MyUtil.displayPic(mAfterIv1, "");
+        MyUtil.displayPic(mAfterIv2, "");
+        if (mCheck.newAfterPics.size() >= 1) {
+            MyUtil.displayPic(mAfterIv1, mCheck.newAfterPics.get(0));
+        }
+        if (mCheck.newAfterPics.size() >= 2) {
+            MyUtil.displayPic(mAfterIv2, mCheck.newAfterPics.get(1));
         }
 
         List<Detail> detailList = mCheck.detail;
@@ -403,7 +457,7 @@ public class CheckActivity extends BaseActivity {
             return;
         }
         View view = null;
-        int count = mDetailListLay.getChildCount();
+        int count = mDetailNewListLay.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = mDetailNewListLay.getChildAt(i);
             Detail childDetail = (Detail) child.getTag();
@@ -462,7 +516,7 @@ public class CheckActivity extends BaseActivity {
         }
     }
 
-    private boolean httpSave() {
+    private void prepareCheck() {
         mCheck.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
         mCheck.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
         mCheck.stake_num1 = mStakeNum1Et.getText().toString();
@@ -472,6 +526,24 @@ public class CheckActivity extends BaseActivity {
         mCheck.project_cost = mCostEt.getText().toString();
         mCheck.structure_id = ((Structure) structureSp.getSelectedItem()).id;
 
+        int count = mDetailListLay.getChildCount();
+        mCheck.detail = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            View child = mDetailListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            mCheck.detail.add(childDetail);
+        }
+
+        int detailNewCount = mDetailNewListLay.getChildCount();
+        mCheck.detail_new_edit = new ArrayList<>();
+        for (int i = 0; i < detailNewCount; i++) {
+            View child = mDetailNewListLay.getChildAt(i);
+            Detail childDetail = (Detail) child.getTag();
+            mCheck.detail_new_edit.add(childDetail);
+        }
+    }
+
+    private boolean httpSave() {
         if (Util.isEmpty(mCheck.stake_num1)) {
             MyUtil.toast("请输入桩号");
             return false;
@@ -504,71 +576,59 @@ public class CheckActivity extends BaseActivity {
                 .add("start_time", "" + mCheck.start_time)
                 .add("project_cost", "" + mCheck.project_cost)
                 .add("structure_id", "" + mCheck.structure_id);
-        int count = mDetailListLay.getChildCount();
-        for (int i = 0; i < count; i++) {
-            View child = mDetailListLay.getChildAt(i);
-            Detail childDetail = (Detail) child.getTag();
-            builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
-            builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
-            builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
-            builder.add("detail[" + i + "][detail_num]", "" + childDetail.detail_num);
-            builder.add("detail[" + i + "][detail_price]", "" + childDetail.detail_price);
-            builder.add("detail[" + i + "][detail_unit]", "" + childDetail.detail_unit);
-            builder.add("detail[" + i + "][detail_quantities1]", "" + childDetail.detail_quantities1);
-            builder.add("detail[" + i + "][detail_quantities2]", "" + childDetail.detail_quantities2);
-            builder.add("detail[" + i + "][detail_quantities3]", "" + childDetail.detail_quantities3);
-            builder.add("detail[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
+        int i = 0;
+        for (Detail detail : mCheck.detail) {
+            builder.add("detail[" + i + "][detail_name_cate]", "" + detail.cate_id);
+            builder.add("detail[" + i + "][detail_id]", "" + detail.id);
+            builder.add("detail[" + i + "][detail_name]", "" + detail.detail_name);
+            builder.add("detail[" + i + "][detail_num]", "" + detail.detail_num);
+            builder.add("detail[" + i + "][detail_price]", "" + detail.detail_price);
+            builder.add("detail[" + i + "][detail_unit]", "" + detail.detail_unit);
+            builder.add("detail[" + i + "][detail_quantities1]", "" + detail.detail_quantities1);
+            builder.add("detail[" + i + "][detail_quantities2]", "" + detail.detail_quantities2);
+            builder.add("detail[" + i + "][detail_quantities3]", "" + detail.detail_quantities3);
+            builder.add("detail[" + i + "][detail_all_price]", "" + detail.detail_all_price);
+            i++;
         }
 
+        int j = 0;
         int detailNewCount = mDetailNewListLay.getChildCount();
-        for (int i = 0; i < detailNewCount; i++) {
-            View child = mDetailNewListLay.getChildAt(i);
-            Detail childDetail = (Detail) child.getTag();
-            builder.add("detail_new_edit[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
-            builder.add("detail_new_edit[" + i + "][detail_id]", "" + childDetail.id);
-            builder.add("detail_new_edit[" + i + "][detail_name]", "" + childDetail.detail_name);
-            builder.add("detail_new_edit[" + i + "][detail_price]", "" + childDetail.detail_price);
-            builder.add("detail_new_edit[" + i + "][detail_unit]", "" + childDetail.detail_unit);
-            builder.add("detail_new_edit[" + i + "][detail_quantities1]", "" + childDetail.detail_quantities1);
-            builder.add("detail_new_edit[" + i + "][detail_quantities2]", "" + childDetail.detail_quantities2);
-            builder.add("detail_new_edit[" + i + "][detail_quantities3]", "" + childDetail.detail_quantities3);
-            builder.add("detail_new_edit[" + i + "][detail_all_price]", "" + childDetail.detail_all_price);
+        for (Detail detail : mCheck.detail_new_edit) {
+            builder.add("detail_new_edit[" + j + "][detail_name_cate]", "" + detail.cate_id);
+            builder.add("detail_new_edit[" + j + "][detail_id]", "" + detail.id);
+            builder.add("detail_new_edit[" + j + "][detail_name]", "" + detail.detail_name);
+            builder.add("detail_new_edit[" + i + "][detail_num]", "" + detail.detail_num);
+            builder.add("detail_new_edit[" + j + "][detail_price]", "" + detail.detail_price);
+            builder.add("detail_new_edit[" + j + "][detail_unit]", "" + detail.detail_unit);
+            builder.add("detail_new_edit[" + j + "][detail_quantities1]", "" + detail.detail_quantities1);
+            builder.add("detail_new_edit[" + j + "][detail_quantities2]", "" + detail.detail_quantities2);
+            builder.add("detail_new_edit[" + j + "][detail_quantities3]", "" + detail.detail_quantities3);
+            builder.add("detail_new_edit[" + j + "][detail_all_price]", "" + detail.detail_all_price);
+            j++;
         }
 
-        if (mBeforePicUris != null) {
-            StringBuffer sb = new StringBuffer();
-            for (String url : mBeforePicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
-            }
-            builder.add("before_pic", sb.toString());
-        }
+        builder.add("before_pic", getFormPic(mCheck.newBeforePicUris));
+        builder.add("construction_pic", getFormPic(mCheck.newConstructionPics));
+        builder.add("after_pic", getFormPic(mCheck.newAfterPics));
 
-        if (mConsPicUris != null) {
-            StringBuffer sb = new StringBuffer();
-            for (String url : mConsPicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
-            }
-            builder.add("construction_pic", sb.toString());
-        }
-
-        if (mAfterPicUris != null) {
-            StringBuffer sb = new StringBuffer();
-            for (String url : mAfterPicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
-            }
-            builder.add("after_pic", sb.toString());
-        }
         ResponseData responseData = new HttpTask(Config.url_check_save).execute(builder.build());
         return responseData.isSuccess();
+    }
+
+    private String getFormPic(List<String> uris) {
+        String s = "";
+        if (uris != null) {
+            StringBuffer sb = new StringBuffer();
+
+            for (String url : uris) {
+                if (sb.length() > 0) {
+                    sb.append(",");
+                }
+                sb.append(url);
+            }
+            s = sb.toString();
+        }
+        return s;
     }
 
     @Override
@@ -581,13 +641,13 @@ public class CheckActivity extends BaseActivity {
                 startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL_NEW);
                 break;
             case R.id.brfore_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNewBeforePicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_BEFORE);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newBeforePicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_BEFORE);
                 break;
             case R.id.construction_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNewConsPicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_CONSTRUCTION);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newConstructionPics).putExtra("editable", isEditable()), REQUEST_PHOTO_CONSTRUCTION);
                 break;
             case R.id.after_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNewAfterPicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_AFTER);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newAfterPics).putExtra("editable", isEditable()), REQUEST_PHOTO_AFTER);
                 break;
             case R.id.date_tv:
                 MyUtil.showDateTimeDialog(mAct, mDateEt);
@@ -642,47 +702,47 @@ public class CheckActivity extends BaseActivity {
 
         } else if (requestCode == REQUEST_PHOTO_BEFORE) {
             if (resultCode == RESULT_OK) {
-                mNewBeforePicUris = new ArrayList<>();
+                mCheck.newBeforePicUris = new ArrayList<>();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mNewBeforePicUris.addAll(uris);
+                mCheck.newBeforePicUris.addAll(uris);
 
                 MyUtil.displayPic(mBeforeIv1, "");
                 MyUtil.displayPic(mBeforeIv2, "");
-                if (mNewBeforePicUris.size() >= 1) {
-                    MyUtil.displayPic(mBeforeIv1, mNewBeforePicUris.get(0));
+                if (mCheck.newBeforePicUris.size() >= 1) {
+                    MyUtil.displayPic(mBeforeIv1, mCheck.newBeforePicUris.get(0));
                 }
-                if (mNewBeforePicUris.size() >= 2) {
-                    MyUtil.displayPic(mBeforeIv2, mNewBeforePicUris.get(1));
+                if (mCheck.newBeforePicUris.size() >= 2) {
+                    MyUtil.displayPic(mBeforeIv2, mCheck.newBeforePicUris.get(1));
                 }
             }
         } else if (requestCode == REQUEST_PHOTO_CONSTRUCTION) {
             if (resultCode == RESULT_OK) {
-                mNewConsPicUris = new ArrayList<>();
+                mCheck.newConstructionPics = new ArrayList<>();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mNewConsPicUris.addAll(uris);
+                mCheck.newConstructionPics.addAll(uris);
 
                 MyUtil.displayPic(mConsIv1, "");
                 MyUtil.displayPic(mConsIv2, "");
-                if (mNewConsPicUris.size() >= 1) {
-                    MyUtil.displayPic(mConsIv1, mNewConsPicUris.get(0));
+                if (mCheck.newConstructionPics.size() >= 1) {
+                    MyUtil.displayPic(mConsIv1, mCheck.newConstructionPics.get(0));
                 }
-                if (mNewConsPicUris.size() >= 2) {
-                    MyUtil.displayPic(mConsIv2, mNewConsPicUris.get(1));
+                if (mCheck.newConstructionPics.size() >= 2) {
+                    MyUtil.displayPic(mConsIv2, mCheck.newConstructionPics.get(1));
                 }
             }
         } else if (requestCode == REQUEST_PHOTO_AFTER) {
             if (resultCode == RESULT_OK) {
-                mNewAfterPicUris = new ArrayList<>();
+                mCheck.newAfterPics = new ArrayList<>();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mNewAfterPicUris.addAll(uris);
+                mCheck.newAfterPics.addAll(uris);
 
                 MyUtil.displayPic(mAfterIv1, "");
                 MyUtil.displayPic(mAfterIv2, "");
-                if (mNewAfterPicUris.size() >= 1) {
-                    MyUtil.displayPic(mAfterIv1, mNewAfterPicUris.get(0));
+                if (mCheck.newAfterPics.size() >= 1) {
+                    MyUtil.displayPic(mAfterIv1, mCheck.newAfterPics.get(0));
                 }
-                if (mNewAfterPicUris.size() >= 2) {
-                    MyUtil.displayPic(mAfterIv2, mNewAfterPicUris.get(1));
+                if (mCheck.newAfterPics.size() >= 2) {
+                    MyUtil.displayPic(mAfterIv2, mCheck.newAfterPics.get(1));
                 }
             }
         }

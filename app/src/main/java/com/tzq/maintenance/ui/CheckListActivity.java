@@ -163,6 +163,9 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                             public void run() {
                                 for (int pos : selectPositions) {
                                     Check check = mListAdapter.getItem(pos);
+                                    if (!Util.isEmpty(check.offlineId)) {
+                                        MyUtil.deleteOfflineCheck(check);
+                                    }
                                     if (check.step != 21) {
                                         new HttpTask(Config.url_check_delete + "?id=" + check.id).setActivity(mAct).execute(null);
                                     }
@@ -287,8 +290,9 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                             } catch (JSONException e) {
                                 LogUtil.e(e.getMessage(), e);
                             }
-                            mListAdapter.setDataList(mListData);
                         }
+                        mergeOffline();
+                        mListAdapter.setDataList(mListData);
                         if (mListData.size() >= count) {
                             footerView.setText("没有更多的数据了");
                             footerView.setEnabled(false);
@@ -298,6 +302,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                         }
 
                         setRefresh(false);
+                        refreshMutiSelect();
                     }
                 });
 
@@ -305,6 +310,26 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
                 .build());
+    }
+
+    private void mergeOffline() {
+        List<Check> list = MyUtil.getOfflineChecks();
+        for (Check n1 : list) {
+            for (Check n2 : mListData) {
+                if (n1.id <= 0) {
+                    if (n1.offlineId != null && n1.offlineId.equals(n2.offlineId)) {
+                        mListData.remove(n2);
+                        break;
+                    }
+                } else {
+                    if (n1.id == n2.id) {
+                        mListData.remove(n2);
+                        break;
+                    }
+                }
+            }
+            mListData.add(0, n1);
+        }
     }
 
     @Override
@@ -348,8 +373,13 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             vh.costTv.setText("造价：" + item.project_cost);
             vh.stepTv.setText("状态：" + MyUtil.getStepStrForCheck(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
-            vh.statusTv.setText("" + MyUtil.getStatusStrForCheck(Integer.valueOf(item.step)));
-            vh.statusTv.setTextColor(MyUtil.getStatusColorForCheck(Integer.valueOf(item.step)));
+            if (Util.isEmpty(item.offlineId)) {
+                vh.statusTv.setText("" + MyUtil.getStatusStrForCheck(Integer.valueOf(item.step)));
+                vh.statusTv.setTextColor(MyUtil.getStatusColorForCheck(Integer.valueOf(item.step)));
+            } else {
+                vh.statusTv.setText("离线缓存中");
+                vh.statusTv.setTextColor(MyUtil.getStatusColorForNotice(-1));
+            }
             vh.checkBox.setOnCheckedChangeListener(null);
             if (isMutiSelectMode) {
                 vh.checkBox.setVisibility(View.VISIBLE);
