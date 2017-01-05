@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
+
+
+
+        <LinearLayout style="@style/item_lay">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="桩号：" />
+
+            <Spinner
+                android:id="@+id/stake_sp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <EditText
+                android:id="@+id/stake_num1_et"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/stake_num2_et"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="6dp"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            style="@style/item_lay"
+            android:layout_height="82dp"
+            android:clickable="true"
+            android:onClick="onClick">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="施工前照片：" />
+
+            <LinearLayout
+                android:id="@+id/brfore_pic_lay"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="right|center_vertical">
+
+                <ImageView
+                    android:id="@+id/before_iv1"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp" />
+
+                <ImageView
+                    android:id="@+id/before_iv2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/before_more_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/arrow_right" />
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            style="@style/item_lay"
+            android:layout_height="82dp"
+            android:clickable="true"
+            android:onClick="onClick">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="施工中照片：" />
+
+            <LinearLayout
+                android:id="@+id/construction_pic_lay"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="right|center_vertical">
+
+                <ImageView
+                    android:id="@+id/construction_iv1"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp" />
+
+                <ImageView
+                    android:id="@+id/construction_iv2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/construction_more_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/arrow_right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/item_lay"
+            android:layout_height="82dp"
+            android:clickable="true"
+            android:onClick="onClick">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="施工完成照片：" />
+
+            <LinearLayout
+                android:id="@+id/after_pic_lay"
+                android:clickable="true"
+                android:onClick="onClick"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="right|center_vertical">
+
+                <ImageView
+                    android:id="@+id/after_iv1"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp" />
+
+                <ImageView
+                    android:id="@+id/after_iv2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/after_more_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/arrow_right" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

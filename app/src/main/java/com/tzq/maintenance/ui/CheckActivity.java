@@ -26,6 +26,7 @@ import com.tzq.maintenance.bean.DealBean;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.ResponseData;
+import com.tzq.maintenance.bean.Stake;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
@@ -33,7 +34,6 @@ import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,17 +49,16 @@ import okhttp3.RequestBody;
 public class CheckActivity extends BaseActivity {
     final int REQUEST_DETAIL = 101;
     final int REQUEST_DETAIL_NEW = 102;
-    final int REQUEST_PHOTO_BEFORE = 103;
-    final int REQUEST_PHOTO_CONSTRUCTION = 104;
-    final int REQUEST_PHOTO_AFTER = 105;
+    final int REQUEST_STAKE = 106;
+    final int REQUEST_TUZHI = 107;
+    final int REQUEST_ATTACH = 108;
     Check mCheck;
     Spinner mTypeSp, mStakeSp, structureSp;
     EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDaysEt, mCostEt;
     TextView mDateEt;
-    ImageView mBeforeIv1, mBeforeIv2, mBeforeMoreIv;
-    ImageView mConsIv1, mConsIv2, mConsMoreIv;
-    ImageView mAfterIv1, mAfterIv2, mAfterMoreIv;
-    LinearLayout mDetailListLay, mDetailNewListLay;
+    ImageView mTuzhiIv1, mTuzhiIv2;
+    ImageView mAttachIv1, mAttachIv2;
+    LinearLayout mDetailListLay, mDetailNewListLay, mSubStakeListLay;
     DealBean mNoticeDealBean;
 
 
@@ -78,17 +77,13 @@ public class CheckActivity extends BaseActivity {
         mDaysEt = (EditText) findViewById(R.id.days_et);
         mDateEt = (TextView) findViewById(R.id.date_tv);
         mCostEt = (EditText) findViewById(R.id.cost_et);
-        mBeforeIv1 = (ImageView) findViewById(R.id.before_iv1);
-        mBeforeIv2 = (ImageView) findViewById(R.id.before_iv2);
-        mBeforeMoreIv = (ImageView) findViewById(R.id.before_more_iv);
-        mConsIv1 = (ImageView) findViewById(R.id.construction_iv1);
-        mConsIv2 = (ImageView) findViewById(R.id.construction_iv2);
-        mConsMoreIv = (ImageView) findViewById(R.id.construction_more_iv);
-        mAfterIv1 = (ImageView) findViewById(R.id.after_iv1);
-        mAfterIv2 = (ImageView) findViewById(R.id.after_iv2);
-        mAfterMoreIv = (ImageView) findViewById(R.id.after_more_iv);
+        mTuzhiIv1 = (ImageView) findViewById(R.id.tuzhi_iv1);
+        mTuzhiIv2 = (ImageView) findViewById(R.id.tuzhi_iv2);
+        mAttachIv1 = (ImageView) findViewById(R.id.attach_iv1);
+        mAttachIv2 = (ImageView) findViewById(R.id.attach_iv2);
         mDetailListLay = (LinearLayout) findViewById(R.id.detail_list_lay);
         mDetailNewListLay = (LinearLayout) findViewById(R.id.detail_new_list_lay);
+        mSubStakeListLay = (LinearLayout) findViewById(R.id.substake_list_lay);
 
         mCheck = (Check) getIntent().getSerializableExtra("check");
         MyUtil.setUpSp(mAct, mTypeSp, Config.CATES);
@@ -97,16 +92,10 @@ public class CheckActivity extends BaseActivity {
         init();
     }
 
-    private boolean isEditable() {
-        if (mCheck.step == 21) {
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!isEditable()) {
+        if (!MyUtil.isCheckEditable(mCheck)) {
             return true;
         }
         getMenuInflater().inflate(R.menu.notice_act, menu);
@@ -149,8 +138,8 @@ public class CheckActivity extends BaseActivity {
                 }
             }
         }
-        saveMenu.setVisible(isEditable());
-        deleteMenu.setVisible(isEditable());
+        saveMenu.setVisible(MyUtil.isCheckEditable(mCheck));
+        deleteMenu.setVisible(MyUtil.isCheckEditable(mCheck));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -162,9 +151,8 @@ public class CheckActivity extends BaseActivity {
                 new Thread() {
                     @Override
                     public void run() {
-                        updatePic(mCheck.beforePicUris, mCheck.newBeforePicUris);
-                        updatePic(mCheck.constructionPics, mCheck.newConstructionPics);
-                        updatePic(mCheck.afterPics, mCheck.newAfterPics);
+                        updatePic(mCheck.getTuzhiPicUris(), mCheck.getTuzhiNewPicUris());
+                        updatePic(mCheck.getAttachPicUris(), mCheck.getAttachNewPicUris());
 
                         prepareCheck();
                         final boolean result = httpSave();
@@ -276,23 +264,10 @@ public class CheckActivity extends BaseActivity {
         }
     }
 
-    private void getNoticeDetail(int noticeId) {
-        new HttpTask(Config.url_notice_detail).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-            @Override
-            public void onComplete(ResponseData responseData) {
-                if (responseData.isSuccess()) {
-
-                }
-            }
-        }).enqueue(new FormBody.Builder()
-                .add("id", noticeId + "")
-                .build());
-    }
-
 
     private void init() {
         setTitle("验收单详情");
-        setEditable(isEditable());
+        setEditable(MyUtil.isCheckEditable(mCheck));
 
         mTypeSp.setSelection(MyUtil.getNoticeCateIndex(mCheck.cate));
         mStakeSp.setSelection(MyUtil.getNoticeStakeIndex(mCheck.stake_ud));
@@ -302,85 +277,7 @@ public class CheckActivity extends BaseActivity {
         mProjectNameEt.setText(mCheck.project_name);
         mCostEt.setText(mCheck.project_cost);
         mDateEt.setText(mCheck.created_at);
-//        mDaysEt.setText(mCheck.days);
-
-        //-----------------------------------
-        if (!Util.isEmpty(mCheck.before_pic)) {
-            String[] urls = mCheck.before_pic.split(",");
-            mCheck.beforePicUris = Arrays.asList(urls);
-            if (mCheck.beforePicUris != null) {
-                if (mCheck.newBeforePicUris == null) {
-                    mCheck.newBeforePicUris = new ArrayList<>();
-                    mCheck.newBeforePicUris.addAll(mCheck.beforePicUris);
-                }
-            }
-        }
-        if (mCheck.beforePicUris == null) {
-            mCheck.beforePicUris = new ArrayList<>();
-        }
-        if (mCheck.newBeforePicUris == null) {
-            mCheck.newBeforePicUris = new ArrayList<>();
-        }
-        MyUtil.displayPic(mBeforeIv1, "");
-        MyUtil.displayPic(mBeforeIv2, "");
-        if (mCheck.newBeforePicUris.size() >= 1) {
-            MyUtil.displayPic(mBeforeIv1, mCheck.newBeforePicUris.get(0));
-        }
-        if (mCheck.newBeforePicUris.size() >= 2) {
-            MyUtil.displayPic(mBeforeIv2, mCheck.newBeforePicUris.get(1));
-        }
-
-        //------------------------------------------
-        if (!Util.isEmpty(mCheck.construction_pic)) {
-            String[] urls = mCheck.construction_pic.split(",");
-            mCheck.constructionPics = Arrays.asList(urls);
-            if (mCheck.constructionPics != null) {
-                if (mCheck.newConstructionPics == null) {
-                    mCheck.newConstructionPics = new ArrayList<>();
-                    mCheck.newConstructionPics.addAll(mCheck.constructionPics);
-                }
-            }
-        }
-        if (mCheck.constructionPics == null) {
-            mCheck.constructionPics = new ArrayList<>();
-        }
-        if (mCheck.newConstructionPics == null) {
-            mCheck.newConstructionPics = new ArrayList<>();
-        }
-        MyUtil.displayPic(mConsIv1, "");
-        MyUtil.displayPic(mConsIv2, "");
-        if (mCheck.newConstructionPics.size() >= 1) {
-            MyUtil.displayPic(mConsIv1, mCheck.newConstructionPics.get(0));
-        }
-        if (mCheck.newConstructionPics.size() >= 2) {
-            MyUtil.displayPic(mConsIv2, mCheck.newConstructionPics.get(1));
-        }
-
-        //------------------------------------------
-        if (!Util.isEmpty(mCheck.after_pic)) {
-            String[] urls = mCheck.after_pic.split(",");
-            mCheck.afterPics = Arrays.asList(urls);
-            if (mCheck.afterPics != null) {
-                if (mCheck.newAfterPics == null) {
-                    mCheck.newAfterPics = new ArrayList<>();
-                    mCheck.newAfterPics.addAll(mCheck.afterPics);
-                }
-            }
-        }
-        if (mCheck.afterPics == null) {
-            mCheck.afterPics = new ArrayList<>();
-        }
-        if (mCheck.newAfterPics == null) {
-            mCheck.newAfterPics = new ArrayList<>();
-        }
-        MyUtil.displayPic(mAfterIv1, "");
-        MyUtil.displayPic(mAfterIv2, "");
-        if (mCheck.newAfterPics.size() >= 1) {
-            MyUtil.displayPic(mAfterIv1, mCheck.newAfterPics.get(0));
-        }
-        if (mCheck.newAfterPics.size() >= 2) {
-            MyUtil.displayPic(mAfterIv2, mCheck.newAfterPics.get(1));
-        }
+//        mDaysEt.setText(mBean.days);
 
         List<Detail> detailList = mCheck.detail;
         mDetailListLay.removeAllViews();
@@ -390,13 +287,22 @@ public class CheckActivity extends BaseActivity {
             }
         }
 
-        List<Detail> detailNewList = mCheck.detail_new_edit;
         mDetailNewListLay.removeAllViews();
-        if (!Util.isEmpty(detailNewList)) {
-            for (Detail detail : detailNewList) {
+        if (!Util.isEmpty(mCheck.detail_new_edit)) {
+            for (Detail detail : mCheck.detail_new_edit) {
                 addDetailNewView(detail);
             }
         }
+
+        mSubStakeListLay.removeAllViews();
+        if (!Util.isEmpty(mCheck.sub_stakes)) {
+            for (Stake stake : mCheck.sub_stakes) {
+                addSubStakeView(stake);
+            }
+        }
+
+        MyUtil.showImage(mCheck.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
+        MyUtil.showImage(mCheck.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
     }
 
 
@@ -411,13 +317,10 @@ public class CheckActivity extends BaseActivity {
         mDateEt.setEnabled(b);
         mCostEt.setEnabled(b);
         if (b) {
-//            findViewById(R.id.add_detail_iv).setVisibility(View.VISIBLE);
             findViewById(R.id.add_detail_new_iv).setVisibility(View.VISIBLE);
         } else {
-//            findViewById(R.id.add_detail_iv).setVisibility(View.INVISIBLE);
             findViewById(R.id.add_detail_new_iv).setVisibility(View.INVISIBLE);
         }
-
     }
 
     private void addDetailView(final Detail detail) {
@@ -447,7 +350,7 @@ public class CheckActivity extends BaseActivity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", isEditable()), REQUEST_DETAIL);
+                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_DETAIL);
             }
         });
     }
@@ -479,7 +382,7 @@ public class CheckActivity extends BaseActivity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", isEditable()), REQUEST_DETAIL_NEW);
+                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_DETAIL_NEW);
             }
         });
     }
@@ -511,6 +414,60 @@ public class CheckActivity extends BaseActivity {
             if (childDetail.id == detail.id) {
                 childDetail = detail;
                 mDetailNewListLay.removeView(child);
+                return;
+            }
+        }
+    }
+
+    private void addSubStakeView(final Stake stake) {
+        if (stake == null) {
+            return;
+        }
+        View view = null;
+        int count = mSubStakeListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mSubStakeListLay.getChildAt(i);
+            Stake childTag = (Stake) child.getTag();
+            if (childTag.id == stake.id) {
+                view = child;
+            }
+        }
+        if (view == null) {
+            view = View.inflate(mAct, R.layout.notice_sub_stake_lay, null);
+            mSubStakeListLay.addView(view);
+        }
+        view.setTag(stake);
+        TextView stakeTv = (TextView) view.findViewById(R.id.stake_name_tv);
+        TextView stakeN1Tv = (TextView) view.findViewById(R.id.stake_num1_tv);
+        TextView stakeN2Tv = (TextView) view.findViewById(R.id.stake_num2_tv);
+        ImageView beforeIv = (ImageView) view.findViewById(R.id.before_iv);
+        ImageView consIv = (ImageView) view.findViewById(R.id.construct_iv);
+        ImageView afterIv = (ImageView) view.findViewById(R.id.after_iv);
+        stakeTv.setText(stake.stake_ud);
+        stakeN1Tv.setText(stake.stake_num1);
+        stakeN2Tv.setText(stake.stake_num2);
+        MyUtil.showImage(stake.getBeforeNewPics(), beforeIv, null);
+        MyUtil.showImage(stake.getConstructionNewPics(), consIv, null);
+        MyUtil.showImage(stake.getAfterNewPics(), afterIv, null);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(mAct, StakeActivity.class).putExtra("stake", stake).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_STAKE);
+            }
+        });
+    }
+
+    private void deleteStakeView(final Stake stake) {
+        if (stake == null) {
+            return;
+        }
+        int count = mSubStakeListLay.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View child = mSubStakeListLay.getChildAt(i);
+            Stake childTag = (Stake) child.getTag();
+            if (childTag.id == stake.id) {
+                childTag = stake;
+                mSubStakeListLay.removeView(child);
                 return;
             }
         }
@@ -607,9 +564,9 @@ public class CheckActivity extends BaseActivity {
             j++;
         }
 
-        builder.add("before_pic", getFormPic(mCheck.newBeforePicUris));
-        builder.add("construction_pic", getFormPic(mCheck.newConstructionPics));
-        builder.add("after_pic", getFormPic(mCheck.newAfterPics));
+//        builder.add("before_pic", getFormPic(mCheck.get));
+        builder.add("tuzhi", getFormPic(mCheck.getTuzhiNewPicUris()));
+        builder.add("attach", getFormPic(mCheck.getAttachNewPicUris()));
 
         ResponseData responseData = new HttpTask(Config.url_check_save).execute(builder.build());
         return responseData.isSuccess();
@@ -640,17 +597,17 @@ public class CheckActivity extends BaseActivity {
             case R.id.add_detail_new_iv:
                 startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL_NEW);
                 break;
-            case R.id.brfore_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newBeforePicUris).putExtra("editable", isEditable()), REQUEST_PHOTO_BEFORE);
-                break;
-            case R.id.construction_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newConstructionPics).putExtra("editable", isEditable()), REQUEST_PHOTO_CONSTRUCTION);
-                break;
-            case R.id.after_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.newAfterPics).putExtra("editable", isEditable()), REQUEST_PHOTO_AFTER);
-                break;
             case R.id.date_tv:
                 MyUtil.showDateTimeDialog(mAct, mDateEt);
+                break;
+            case R.id.add_substake_iv:
+                startActivityForResult(new Intent(mAct, StakeActivity.class).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_STAKE);
+                break;
+            case R.id.tuzhi_pic_lay:
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.getTuzhiNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_TUZHI);
+                break;
+            case R.id.attach_lay:
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mCheck.getAttachNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mCheck)), REQUEST_ATTACH);
                 break;
         }
     }
@@ -700,50 +657,28 @@ public class CheckActivity extends BaseActivity {
                 cal();
             }
 
-        } else if (requestCode == REQUEST_PHOTO_BEFORE) {
+        } else if (requestCode == REQUEST_STAKE) {
             if (resultCode == RESULT_OK) {
-                mCheck.newBeforePicUris = new ArrayList<>();
-                ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mCheck.newBeforePicUris.addAll(uris);
-
-                MyUtil.displayPic(mBeforeIv1, "");
-                MyUtil.displayPic(mBeforeIv2, "");
-                if (mCheck.newBeforePicUris.size() >= 1) {
-                    MyUtil.displayPic(mBeforeIv1, mCheck.newBeforePicUris.get(0));
-                }
-                if (mCheck.newBeforePicUris.size() >= 2) {
-                    MyUtil.displayPic(mBeforeIv2, mCheck.newBeforePicUris.get(1));
-                }
+                Stake stake = (Stake) data.getSerializableExtra("stake");
+                addSubStakeView(stake);
+            } else if (resultCode == Config.RESULT_DELETE) {
+                Stake stake = (Stake) data.getSerializableExtra("stake");
+                deleteStakeView(stake);
             }
-        } else if (requestCode == REQUEST_PHOTO_CONSTRUCTION) {
-            if (resultCode == RESULT_OK) {
-                mCheck.newConstructionPics = new ArrayList<>();
-                ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mCheck.newConstructionPics.addAll(uris);
 
-                MyUtil.displayPic(mConsIv1, "");
-                MyUtil.displayPic(mConsIv2, "");
-                if (mCheck.newConstructionPics.size() >= 1) {
-                    MyUtil.displayPic(mConsIv1, mCheck.newConstructionPics.get(0));
-                }
-                if (mCheck.newConstructionPics.size() >= 2) {
-                    MyUtil.displayPic(mConsIv2, mCheck.newConstructionPics.get(1));
-                }
+        } else if (requestCode == REQUEST_TUZHI) {
+            if (resultCode == RESULT_OK) {
+                mCheck.getTuzhiNewPicUris().clear();
+                ArrayList<String> uris = data.getStringArrayListExtra("uris");
+                mCheck.getTuzhiNewPicUris().addAll(uris);
+                MyUtil.showImage(mCheck.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
             }
-        } else if (requestCode == REQUEST_PHOTO_AFTER) {
+        } else if (requestCode == REQUEST_ATTACH) {
             if (resultCode == RESULT_OK) {
-                mCheck.newAfterPics = new ArrayList<>();
+                mCheck.getAttachNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mCheck.newAfterPics.addAll(uris);
-
-                MyUtil.displayPic(mAfterIv1, "");
-                MyUtil.displayPic(mAfterIv2, "");
-                if (mCheck.newAfterPics.size() >= 1) {
-                    MyUtil.displayPic(mAfterIv1, mCheck.newAfterPics.get(0));
-                }
-                if (mCheck.newAfterPics.size() >= 2) {
-                    MyUtil.displayPic(mAfterIv2, mCheck.newAfterPics.get(1));
-                }
+                mCheck.getAttachNewPicUris().addAll(uris);
+                MyUtil.showImage(mCheck.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
             }
         }
     }

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/stake_name_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:text="上行" />
+
+            <TextView
+                android:id="@+id/stake_num1_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:text="453647" />
+
+            <TextView
+                android:id="@+id/stake_num2_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:text="34747" />
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/before_iv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/arrow_right" />
+
+        <ImageView
+            android:id="@+id/construct_iv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="3dp"
+            android:src="@mipmap/arrow_right" />
+
+        <ImageView
+            android:id="@+id/after_iv"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="3dp"
+            android:src="@mipmap/arrow_right" />
+
+        <ImageView
+            android:id="@+id/more_iv"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/arrow_right" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ddd" />
+</LinearLayout>

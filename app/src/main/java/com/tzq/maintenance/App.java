@@ -4,15 +4,15 @@ import android.content.Intent;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
-import com.activeandroid.query.Select;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.Util;
-import com.tzq.maintenance.bean.Company;
 import com.tzq.maintenance.bean.User;
 import com.tzq.maintenance.core.CoreService;
 import com.tzq.maintenance.core.CrashHandler;
 import com.tzq.maintenance.core.HeartbeatAlarmManager;
 import com.tzq.maintenance.core.NotifyManager;
+
+import java.io.File;
 
 /**
  * Created by Administrator on 2016/8/29.
@@ -44,7 +44,13 @@ public class App extends com.activeandroid.app.Application {
         ActiveAndroid.initialize(dbConfiguration);
         startService(new Intent(mInstance, CoreService.class));
 
-        new Select().from(Company.class).execute();
+        File crashFile = new File(Config.crash_info_file);
+        if (crashFile.exists()) {
+            long lastTime = crashFile.lastModified();
+            if (System.currentTimeMillis() - lastTime > 1000 * 60 * 60 * 24 * 6) {//6 days
+                crashFile.delete();
+            }
+        }
     }
 
     @Override
@@ -68,9 +74,9 @@ public class App extends com.activeandroid.app.Application {
 
     synchronized public void setUser(User user) {
         this.user = user;
-        if(user==null){
+        if (user == null) {
             PrefsManager.getInstance().save(Config.prefs_key_login_user, "");
-        }else {
+        } else {
             PrefsManager.getInstance().save(Config.prefs_key_login_user, Config.gson.toJson(user));
         }
     }

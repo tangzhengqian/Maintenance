@@ -1,7 +1,10 @@
 package com.tzq.maintenance.bean;
 
+import com.tzq.common.utils.Util;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,12 +38,37 @@ public class Notice implements Serializable {
     public int maintenance_id;//
     public int role_id;//
 
-    public List<String> beforePicUris ;//just for cache
-    public ArrayList<String> newBeforePicUris ;//just offline save
+    private List<String> beforePicUris;//just for cache
+    private ArrayList<String> newBeforePicUris;//just offline save
 
 
     public String offlineId;//
 
     public Notice() {
+    }
+
+    public List<String> getBeforePics() {
+        if (!Util.isEmpty(beforePicUris)) {
+            return beforePicUris;
+        }
+        if (!Util.isEmpty(before_pic)) {
+            String[] urls = before_pic.split(",");
+            beforePicUris = Arrays.asList(urls);
+        }
+
+        if (beforePicUris == null) {
+            beforePicUris = new ArrayList<>();
+        }
+        return beforePicUris;
+    }
+
+    public ArrayList<String> getBeforeNewPics() {
+        if (newBeforePicUris != null) {
+            return newBeforePicUris;
+        }
+
+        newBeforePicUris = new ArrayList<>();
+        newBeforePicUris.addAll(getBeforePics());
+        return newBeforePicUris;
     }
 }

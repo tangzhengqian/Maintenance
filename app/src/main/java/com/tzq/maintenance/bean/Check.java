@@ -1,7 +1,10 @@
 package com.tzq.maintenance.bean;
 
+import com.tzq.common.utils.Util;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -10,7 +13,7 @@ import java.util.List;
 
 public class Check implements Serializable {
     public int id;
-    public String stake_ud;//上行
+    public String stake_ud;//桩号
     public String cate;//
     public String stake_num1;//
     public String stake_num2;//
@@ -37,20 +40,62 @@ public class Check implements Serializable {
     public String check_time;//
     public List<Detail> detail_new_edit;//
     public int notice_pass;//
-    public String construction_pic;//"./Public/file_material/20161028/_14776327328b76397a5a12a9d2.jpg,./Public/file_material/20161028/_1477632736f10c40ed8075f45c.jpg,
-    public String after_pic;//
     public String offlineId;//
 
-    public List<String> beforePicUris ;//just for cache
-    public ArrayList<String> newBeforePicUris ;//just offline save
-
-    public List<String> constructionPics ;//just for cache
-    public ArrayList<String> newConstructionPics ;//just offline save
-
-    public List<String> afterPics ;//just for cache
-    public ArrayList<String> newAfterPics;//just offline save
-
+    public List<Stake> sub_stakes;
+    public String tuzhi;
+    public String attach;
+    private List<String> tuzhiPicUris;//just for cache
+    private ArrayList<String> newTuzhiPicUris;//just offline save
+    private List<String> attachPicUris;//just for cache
+    private ArrayList<String> newAttachPicUris;//just offline save
 
     public Check() {
+    }
+
+    public List<String> getTuzhiPicUris() {
+        if (!Util.isEmpty(tuzhiPicUris)) {
+            return tuzhiPicUris;
+        }
+        if (!Util.isEmpty(tuzhi)) {
+            String[] urls = tuzhi.split(",");
+            tuzhiPicUris = Arrays.asList(urls);
+        }
+        if (tuzhiPicUris == null) {
+            tuzhiPicUris = new ArrayList<>();
+        }
+        return tuzhiPicUris;
+    }
+
+    public ArrayList<String> getTuzhiNewPicUris() {
+        if (newTuzhiPicUris != null) {
+            return newTuzhiPicUris;
+        }
+        newTuzhiPicUris = new ArrayList<>();
+        newTuzhiPicUris.addAll(getTuzhiPicUris());
+        return newTuzhiPicUris;
+    }
+
+    public List<String> getAttachPicUris() {
+        if (!Util.isEmpty(attachPicUris)) {
+            return attachPicUris;
+        }
+        if (!Util.isEmpty(attach)) {
+            String[] urls = attach.split(",");
+            attachPicUris = Arrays.asList(urls);
+        }
+        if (attachPicUris == null) {
+            attachPicUris = new ArrayList<>();
+        }
+        return attachPicUris;
+    }
+
+    public ArrayList<String> getAttachNewPicUris() {
+        if (newAttachPicUris != null) {
+            return newAttachPicUris;
+        }
+        newAttachPicUris = new ArrayList<>();
+        newAttachPicUris.addAll(getAttachPicUris());
+        return newAttachPicUris;
     }
 }

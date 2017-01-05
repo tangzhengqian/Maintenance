@@ -33,7 +33,6 @@ import com.tzq.maintenance.utis.ProgressDialogUtil;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +48,7 @@ import okhttp3.RequestBody;
 public class NoticeActivity extends BaseActivity {
     final int REQUEST_DETAIL = 101;
     final int REQUEST_PHOTO = 102;
-    Notice mNotice;
+    Notice mBean;
     Spinner mTypeSp, mStakeSp, structureSp;
     EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDaysEt, mCostEt;
     TextView mDateEt;
@@ -79,7 +78,7 @@ public class NoticeActivity extends BaseActivity {
         mBeforeMoreIv = (ImageView) findViewById(R.id.before_more_iv);
         mDetailListLay = (LinearLayout) findViewById(R.id.detail_list_lay);
 
-        mNotice = (Notice) getIntent().getSerializableExtra("notice");
+        mBean = (Notice) getIntent().getSerializableExtra("notice");
         MyUtil.setUpSp(mAct, mTypeSp, Config.CATES);
         MyUtil.setUpSp(mAct, mStakeSp, Config.STAKES);
         MyUtil.setUpSp(mAct, structureSp, new Select().from(Structure.class).execute());
@@ -87,7 +86,7 @@ public class NoticeActivity extends BaseActivity {
     }
 
     private boolean isEditable() {
-        if (mNotice.step == 31) {
+        if (mBean.step == 31) {
             return false;
         }
         return true;
@@ -104,16 +103,16 @@ public class NoticeActivity extends BaseActivity {
         MenuItem deleteMenu = menu.findItem(R.id.action_delete);
         MenuItem saveMenu = menu.findItem(R.id.action_save);
 
-        if (mNotice.created_user_id == App.getInstance().getUser().user_id || App.getInstance().getUser().role_id == 1) {
+        if (mBean.created_user_id == App.getInstance().getUser().user_id || App.getInstance().getUser().role_id == 1) {
             deleteMenu.setVisible(true);
         } else {
             deleteMenu.setVisible(false);
         }
-        if (mNotice.id <= 0) {
+        if (mBean.id <= 0) {
             dealNextMenu.setVisible(false);
             dealCancelMenu.setVisible(false);
         } else {
-            mNoticeDealBean = MyUtil.getNoticeDealStr(mNotice.step, mNotice.role_id, App.getInstance().getUser().role_id);
+            mNoticeDealBean = MyUtil.getNoticeDealStr(mBean.step, mBean.role_id, App.getInstance().getUser().role_id);
             if (mNoticeDealBean == null) {
                 dealNextMenu.setVisible(false);
                 dealCancelMenu.setVisible(false);
@@ -147,13 +146,13 @@ public class NoticeActivity extends BaseActivity {
                     @Override
                     public void run() {
                         prepareNotice();
-                        final boolean result = httpSave(mNotice);
+                        final boolean result = httpSave(mBean);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 ProgressDialogUtil.hide(mAct);
                                 if (result) {
-                                    MyUtil.deleteOfflineNotice(mNotice);
+                                    MyUtil.deleteOfflineNotice(mBean);
                                     MyUtil.toast("保存成功");
                                     setResult(RESULT_OK);
                                     finish();
@@ -169,11 +168,11 @@ public class NoticeActivity extends BaseActivity {
                 new AlertDialog.Builder(mAct).setMessage("删除该通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (!Util.isEmpty(mNotice.offlineId)) {
-                            MyUtil.deleteOfflineNotice(mNotice);
+                        if (!Util.isEmpty(mBean.offlineId)) {
+                            MyUtil.deleteOfflineNotice(mBean);
                         }
-                        if (mNotice.id > 0) {
-                            new HttpTask(Config.url_notice_delete + "?id=" + mNotice.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                        if (mBean.id > 0) {
+                            new HttpTask(Config.url_notice_delete + "?id=" + mBean.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                                 @Override
                                 public void onComplete(ResponseData responseData) {
                                     if (responseData.isSuccess()) {
@@ -193,7 +192,7 @@ public class NoticeActivity extends BaseActivity {
                 }).show();
                 break;
             case R.id.action_deal_next:
-                new HttpTask(Config.url_notice_deal + "?id=" + mNotice.id + "&act=" + mNoticeDealBean.nextAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                new HttpTask(Config.url_notice_deal + "?id=" + mBean.id + "&act=" + mNoticeDealBean.nextAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
                     public void onComplete(ResponseData responseData) {
                         if (responseData.isSuccess()) {
@@ -205,7 +204,7 @@ public class NoticeActivity extends BaseActivity {
                 }).enqueue();
                 break;
             case R.id.action_deal_cancel:
-                new HttpTask(Config.url_notice_deal + "?id=" + mNotice.id + "&act=" + mNoticeDealBean.cancelAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                new HttpTask(Config.url_notice_deal + "?id=" + mBean.id + "&act=" + mNoticeDealBean.cancelAct).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
                     @Override
                     public void onComplete(ResponseData responseData) {
                         if (responseData.isSuccess()) {
@@ -218,10 +217,10 @@ public class NoticeActivity extends BaseActivity {
                 break;
             case R.id.action_offline_save:
                 prepareNotice();
-                if (Util.isEmpty(mNotice.offlineId)) {
-                    mNotice.offlineId = UUID.randomUUID().toString();
+                if (Util.isEmpty(mBean.offlineId)) {
+                    mBean.offlineId = UUID.randomUUID().toString();
                 }
-                MyUtil.saveOfflineNotice(mNotice);
+                MyUtil.saveOfflineNotice(mBean);
                 MyUtil.toast("保存成功");
                 setResult(RESULT_OK);
                 finish();
@@ -231,31 +230,30 @@ public class NoticeActivity extends BaseActivity {
     }
 
     private void prepareNotice() {
-        mNotice.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
-        mNotice.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
-        mNotice.stake_num1 = mStakeNum1Et.getText().toString();
-        mNotice.stake_num2 = mStakeNum2Et.getText().toString();
-        mNotice.project_name = mProjectNameEt.getText().toString();
-        mNotice.start_time = mDateEt.getText().toString();
-        mNotice.project_cost = mCostEt.getText().toString();
-        mNotice.days = mDaysEt.getText().toString();
-        mNotice.structure_id = ((Structure) structureSp.getSelectedItem()).id;
-        if (mNotice.detail == null) {
-            mNotice.detail = new ArrayList<>();
+        mBean.cate = ((NormalBean) mTypeSp.getSelectedItem()).id;
+        mBean.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
+        mBean.stake_num1 = mStakeNum1Et.getText().toString();
+        mBean.stake_num2 = mStakeNum2Et.getText().toString();
+        mBean.project_name = mProjectNameEt.getText().toString();
+        mBean.start_time = mDateEt.getText().toString();
+        mBean.project_cost = mCostEt.getText().toString();
+        mBean.days = mDaysEt.getText().toString();
+        mBean.structure_id = ((Structure) structureSp.getSelectedItem()).id;
+        if (mBean.detail == null) {
+            mBean.detail = new ArrayList<>();
         }
         int count = mDetailListLay.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = mDetailListLay.getChildAt(i);
             Detail childDetail = (Detail) child.getTag();
-            mNotice.detail.add(childDetail);
+            mBean.detail.add(childDetail);
         }
 
     }
 
     private void init() {
-        if (mNotice == null) {
-            mNotice = new Notice();
-            mNotice.newBeforePicUris = new ArrayList<>();
+        if (mBean == null) {
+            mBean = new Notice();
             setTitle("新建通知单");
             mDetailListLay.removeAllViews();
             setEditable(true);
@@ -264,29 +262,17 @@ public class NoticeActivity extends BaseActivity {
             setTitle("通知单详情");
             setEditable(isEditable());
 
-            mTypeSp.setSelection(MyUtil.getNoticeCateIndex(mNotice.cate));
-            mStakeSp.setSelection(MyUtil.getNoticeStakeIndex(mNotice.stake_ud));
-            structureSp.setSelection(MyUtil.getStructureIndex(mNotice.structure_id));
-            mStakeNum1Et.setText(mNotice.stake_num1);
-            mStakeNum2Et.setText(mNotice.stake_num2);
-            mProjectNameEt.setText(mNotice.project_name);
-            mCostEt.setText(mNotice.project_cost);
-            mDateEt.setText(mNotice.start_time);
-            mDaysEt.setText(mNotice.days);
+            mTypeSp.setSelection(MyUtil.getNoticeCateIndex(mBean.cate));
+            mStakeSp.setSelection(MyUtil.getNoticeStakeIndex(mBean.stake_ud));
+            structureSp.setSelection(MyUtil.getStructureIndex(mBean.structure_id));
+            mStakeNum1Et.setText(mBean.stake_num1);
+            mStakeNum2Et.setText(mBean.stake_num2);
+            mProjectNameEt.setText(mBean.project_name);
+            mCostEt.setText(mBean.project_cost);
+            mDateEt.setText(mBean.start_time);
+            mDaysEt.setText(mBean.days);
 
-            if (!Util.isEmpty(mNotice.before_pic)) {
-                String[] beforePicUrls = mNotice.before_pic.split(",");
-                mNotice.beforePicUris = Arrays.asList(beforePicUrls);
-                if (mNotice.beforePicUris != null) {
-                    if (mNotice.newBeforePicUris == null) {
-                        mNotice.newBeforePicUris = new ArrayList<>();
-                        mNotice.newBeforePicUris.addAll(mNotice.beforePicUris);
-                    }
-                }
-            }
-
-
-            List<Detail> detailList = mNotice.detail;
+            List<Detail> detailList = mBean.detail;
             mDetailListLay.removeAllViews();
             if (!Util.isEmpty(detailList)) {
                 for (Detail detail : detailList) {
@@ -295,23 +281,7 @@ public class NoticeActivity extends BaseActivity {
             }
         }
 
-        if (mNotice.beforePicUris == null) {
-            mNotice.beforePicUris = new ArrayList<>();
-        }
-        if (mNotice.newBeforePicUris == null) {
-            mNotice.newBeforePicUris = new ArrayList<>();
-        }
-        if (mNotice.newBeforePicUris != null) {
-            if (mNotice.newBeforePicUris.size() >= 1) {
-                MyUtil.displayPic(mBeforeIv1, mNotice.newBeforePicUris.get(0));
-            }
-            if (mNotice.newBeforePicUris.size() >= 2) {
-                MyUtil.displayPic(mBeforeIv2, mNotice.newBeforePicUris.get(1));
-            }
-        } else {
-            MyUtil.displayPic(mBeforeIv1, "");
-            MyUtil.displayPic(mBeforeIv1, "");
-        }
+        MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
     }
 
 
@@ -406,14 +376,14 @@ public class NoticeActivity extends BaseActivity {
 
 
         //del pic
-        for (String uri : notice.beforePicUris) {
-            if (!notice.newBeforePicUris.contains(uri)) {
+        for (String uri : notice.getBeforePics()) {
+            if (!notice.getBeforeNewPics().contains(uri)) {
                 new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
-                notice.beforePicUris.remove(uri);
+                notice.getBeforePics().remove(uri);
             }
         }
         //upload pic
-        for (String uri : notice.newBeforePicUris) {
+        for (String uri : notice.getBeforeNewPics()) {
             if (uri.startsWith("file://")) {
                 String path = uri.substring("file://".length());
                 File file = new File(path);
@@ -456,16 +426,14 @@ public class NoticeActivity extends BaseActivity {
         }
 
         String before = "";
-        if (notice.newBeforePicUris != null) {
-            StringBuffer sb = new StringBuffer();
-            for (String url : notice.newBeforePicUris) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(url);
+        StringBuffer sb = new StringBuffer();
+        for (String url : notice.getBeforeNewPics()) {
+            if (sb.length() > 0) {
+                sb.append(",");
             }
-            before = sb.toString();
+            sb.append(url);
         }
+        before = sb.toString();
         builder.add("before_pic", before);
 
 
@@ -481,7 +449,7 @@ public class NoticeActivity extends BaseActivity {
                 startActivityForResult(new Intent(mAct, DetailActivity.class), REQUEST_DETAIL);
                 break;
             case R.id.brfore_pic_lay:
-                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mNotice.newBeforePicUris).putExtra("editable", isEditable()), REQUEST_PHOTO);
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mBean.getBeforeNewPics()).putExtra("editable", isEditable()), REQUEST_PHOTO);
                 break;
             case R.id.date_tv:
                 MyUtil.showDateTimeDialog(mAct, mDateEt);
@@ -517,18 +485,10 @@ public class NoticeActivity extends BaseActivity {
 
         } else if (requestCode == REQUEST_PHOTO) {
             if (resultCode == RESULT_OK) {
-                mNotice.newBeforePicUris.clear();
+                mBean.getBeforeNewPics().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
-                mNotice.newBeforePicUris.addAll(uris);
-
-                MyUtil.displayPic(mBeforeIv1, "");
-                MyUtil.displayPic(mBeforeIv2, "");
-                if (mNotice.newBeforePicUris.size() >= 1) {
-                    MyUtil.displayPic(mBeforeIv1, mNotice.newBeforePicUris.get(0));
-                }
-                if (mNotice.newBeforePicUris.size() >= 2) {
-                    MyUtil.displayPic(mBeforeIv2, mNotice.newBeforePicUris.get(1));
-                }
+                mBean.getBeforeNewPics().addAll(uris);
+                MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
             }
         }
     }

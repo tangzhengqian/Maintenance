@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import com.tzq.common.utils.FileUtil;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.maintenance.App;
+import com.tzq.maintenance.Config;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -45,7 +46,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             for (StackTraceElement element : ex.getStackTrace()) {
                 sb.append(element.toString()).append("\n");
             }
-            FileUtil.writeStringToFile(new File("/sdcard/tzq_crash"), sb.toString(), true);
+            FileUtil.writeStringToFile(new File(Config.crash_info_file), sb.toString(), true);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

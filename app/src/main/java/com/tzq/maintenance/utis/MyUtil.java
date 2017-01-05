@@ -566,4 +566,28 @@ public class MyUtil {
         }
         PrefsManager.getInstance().save(Config.prefs_key_offline_check_list, json);
     }
+
+    public static boolean isCheckEditable(Check check) {
+        if (check.step == 21) {
+            return false;
+        }
+        return true;
+    }
+
+    public static void showImage(List<String> pics, ImageView iv1, ImageView iv2) {
+        if (iv1 != null) {
+            MyUtil.displayPic(iv1, "");
+            if (pics.size() >= 1) {
+                MyUtil.displayPic(iv1, pics.get(0));
+            }
+        }
+
+        if (iv2 != null) {
+            MyUtil.displayPic(iv2, "");
+            if (pics.size() >= 2) {
+                MyUtil.displayPic(iv2, pics.get(1));
+            }
+        }
+
+    }
 }
