@@ -88,13 +88,20 @@ public class PhotoGridShowActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_delete) {
             new AlertDialog.Builder(mAct).setMessage("确定要删除所选图片？").setPositiveButton("确定", new DialogInterface.OnClickListener() {
+
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    for (int index : mSelectPostion) {
-                        mUris.remove(index);
+                    ArrayList<String> newUris = new ArrayList<String>();
+                    for (int i = 0; i < mUris.size(); i++) {
+                        if (!mSelectPostion.contains(Integer.valueOf(i))) {
+                            newUris.add(mUris.get(i));
+                        }
                     }
                     mSelectPostion.clear();
+                    mUris.clear();
+                    mUris.addAll(newUris);
                     mAdapter.setDataList(mUris);
+                    invalidateOptionsMenu();
                 }
             }).setNegativeButton("取消", null).show();
         } else if (item.getItemId() == R.id.action_add_pic) {
@@ -119,7 +126,7 @@ public class PhotoGridShowActivity extends BaseActivity {
                 mAdapter.setDataList(mUris);
             }
         } else if (requestCode == REQUEST_TAKE_PHOTO) {
-            if (data.getData() != null || data.getExtras() != null) { //防止没有返回结果
+            if (data != null) { //防止没有返回结果
                 Uri uri = data.getData();
                 Bitmap photo = null;
                 if (uri != null) {
@@ -138,7 +145,7 @@ public class PhotoGridShowActivity extends BaseActivity {
                     if (!dir.exists()) {
                         dir.mkdirs();
                     }
-                    String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis()+".jpg";
+                    String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".jpg";
                     ImageUtil.saveBitmapToLocal(photo, path, Bitmap.CompressFormat.JPEG);
                     LogUtil.i("---path=" + path);
                     mUris.add("file://" + path);

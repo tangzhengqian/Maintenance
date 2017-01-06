@@ -4,7 +4,6 @@ import com.tzq.common.utils.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -57,13 +56,17 @@ public class Check implements Serializable {
         if (!Util.isEmpty(tuzhiPicUris)) {
             return tuzhiPicUris;
         }
-        if (!Util.isEmpty(tuzhi)) {
-            String[] urls = tuzhi.split(",");
-            tuzhiPicUris = Arrays.asList(urls);
-        }
+
         if (tuzhiPicUris == null) {
             tuzhiPicUris = new ArrayList<>();
         }
+        if (!Util.isEmpty(tuzhi)) {
+            String[] urls = tuzhi.split(",");
+            for (String s : urls) {
+                tuzhiPicUris.add(s);
+            }
+        }
+
         return tuzhiPicUris;
     }
 
@@ -80,13 +83,17 @@ public class Check implements Serializable {
         if (!Util.isEmpty(attachPicUris)) {
             return attachPicUris;
         }
-        if (!Util.isEmpty(attach)) {
-            String[] urls = attach.split(",");
-            attachPicUris = Arrays.asList(urls);
-        }
+
         if (attachPicUris == null) {
             attachPicUris = new ArrayList<>();
         }
+        if (!Util.isEmpty(attach)) {
+            String[] urls = attach.split(",");
+            for (String s : urls) {
+                attachPicUris.add(s);
+            }
+        }
+
         return attachPicUris;
     }
 

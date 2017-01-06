@@ -3,7 +3,6 @@ package com.tzq.maintenance.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
@@ -31,15 +30,11 @@ import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import okhttp3.FormBody;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/10/31.
@@ -242,6 +237,7 @@ public class NoticeActivity extends BaseActivity {
         if (mBean.detail == null) {
             mBean.detail = new ArrayList<>();
         }
+        mBean.detail.clear();
         int count = mDetailListLay.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = mDetailListLay.getChildAt(i);
@@ -351,23 +347,23 @@ public class NoticeActivity extends BaseActivity {
     }
 
     //it will block thread
-    public static boolean httpSave(Notice notice) {
-        if (Util.isEmpty(notice.stake_num1)) {
+    public static boolean httpSave(Notice mBean) {
+        if (Util.isEmpty(mBean.stake_num1)) {
             MyUtil.toast("请输入桩号");
             return false;
         } else {
-            float n1 = Float.valueOf(notice.stake_num1);
+            float n1 = Float.valueOf(mBean.stake_num1);
             if (String.valueOf((int) n1).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
                 return false;
             }
         }
 
-        if (Util.isEmpty(notice.stake_num2)) {
+        if (Util.isEmpty(mBean.stake_num2)) {
             MyUtil.toast("请输入桩号");
             return false;
         } else {
-            float n2 = Float.valueOf(notice.stake_num2);
+            float n2 = Float.valueOf(mBean.stake_num2);
             if (String.valueOf((int) n2).length() != 6) {
                 MyUtil.toast("桩号必须有6位整数");
                 return false;
@@ -375,43 +371,21 @@ public class NoticeActivity extends BaseActivity {
         }
 
 
-        //del pic
-        for (String uri : notice.getBeforePics()) {
-            if (!notice.getBeforeNewPics().contains(uri)) {
-                new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
-                notice.getBeforePics().remove(uri);
-            }
-        }
-        //upload pic
-        for (String uri : notice.getBeforeNewPics()) {
-            if (uri.startsWith("file://")) {
-                String path = uri.substring("file://".length());
-                File file = new File(path);
-                RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
-                ResponseData responseData = new HttpTask(Config.url_add_pic).execute(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("image", file.getName(), fileBody)
-                        .build());
-                if (responseData.isSuccess()) {
-                    uri = responseData.data;
-                }
-            }
-        }
-
+        MyUtil.updatePic(mBean.getBeforePics(), mBean.getBeforeNewPics());
 
         FormBody.Builder builder = new FormBody.Builder();
-        builder.add("cate", notice.cate)
-                .add("id", notice.id + "")
-                .add("stake_ud", notice.stake_ud + "")
-                .add("stake_num1", notice.stake_num1 + "")
-                .add("stake_num2", notice.stake_num2 + "")
-                .add("project_name", notice.project_name + "")
-                .add("start_time", "" + notice.start_time)
-                .add("project_cost", "" + notice.project_cost)
-                .add("structure_id", "" + notice.structure_id)
-                .add("days", "" + notice.days);
+        builder.add("cate", mBean.cate)
+                .add("id", mBean.id + "")
+                .add("stake_ud", mBean.stake_ud + "")
+                .add("stake_num1", mBean.stake_num1 + "")
+                .add("stake_num2", mBean.stake_num2 + "")
+                .add("project_name", mBean.project_name + "")
+                .add("start_time", "" + mBean.start_time)
+                .add("project_cost", "" + mBean.project_cost)
+                .add("structure_id", "" + mBean.structure_id)
+                .add("days", "" + mBean.days);
         int i = 0;
-        for (Detail childDetail : notice.detail) {
+        for (Detail childDetail : mBean.detail) {
             builder.add("detail[" + i + "][detail_name_cate]", "" + childDetail.cate_id);
             builder.add("detail[" + i + "][detail_id]", "" + childDetail.id);
             builder.add("detail[" + i + "][detail_name]", "" + childDetail.detail_name);
@@ -427,7 +401,7 @@ public class NoticeActivity extends BaseActivity {
 
         String before = "";
         StringBuffer sb = new StringBuffer();
-        for (String url : notice.getBeforeNewPics()) {
+        for (String url : mBean.getBeforeNewPics()) {
             if (sb.length() > 0) {
                 sb.append(",");
             }
@@ -438,7 +412,6 @@ public class NoticeActivity extends BaseActivity {
 
 
         ResponseData responseData = new HttpTask(Config.url_notice_save).execute(builder.build());
-        Looper.prepare();
         return responseData.isSuccess();
     }
 

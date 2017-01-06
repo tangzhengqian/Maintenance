@@ -4,7 +4,6 @@ import com.tzq.common.utils.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -51,13 +50,12 @@ public class Notice implements Serializable {
         if (!Util.isEmpty(beforePicUris)) {
             return beforePicUris;
         }
+        beforePicUris = new ArrayList<>();
         if (!Util.isEmpty(before_pic)) {
             String[] urls = before_pic.split(",");
-            beforePicUris = Arrays.asList(urls);
-        }
-
-        if (beforePicUris == null) {
-            beforePicUris = new ArrayList<>();
+            for (String s : urls) {
+                beforePicUris.add(s);
+            }
         }
         return beforePicUris;
     }

@@ -33,15 +33,23 @@ import com.tzq.maintenance.bean.DetailType;
 import com.tzq.maintenance.bean.NewTime;
 import com.tzq.maintenance.bean.NormalBean;
 import com.tzq.maintenance.bean.Notice;
+import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.bean.Structure;
 import com.tzq.maintenance.core.CompleteListener;
+import com.tzq.maintenance.core.HttpTask;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 /**
  * Created by Administrator on 2016/10/23.
@@ -589,5 +597,39 @@ public class MyUtil {
             }
         }
 
+    }
+
+    public static void updatePic(List<String> uris, ArrayList<String> newUris) {
+        //del pic
+        List<String> pics = new ArrayList<>();
+        for (String uri : uris) {
+            if (!newUris.contains(uri)) {
+                new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
+            }else {
+                pics.add(uri);
+            }
+        }
+        uris.clear();
+        uris.addAll(pics);
+        //upload pic
+        List<String> pics2 = new ArrayList<>();
+        for (String uri : newUris) {
+            if (uri.startsWith("file://")) {
+                String path = uri.substring("file://".length());
+                File file = new File(path);
+                RequestBody fileBody = RequestBody.create(MediaType.parse("file"), file);
+                ResponseData responseData = new HttpTask(Config.url_add_pic).execute(new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("image", file.getName(), fileBody)
+                        .build());
+                if (responseData.isSuccess()) {
+                    pics2.add(responseData.data);
+                }
+            }else {
+                pics2.add(uri);
+            }
+        }
+        newUris.clear();
+        newUris.addAll(pics2);
     }
 }

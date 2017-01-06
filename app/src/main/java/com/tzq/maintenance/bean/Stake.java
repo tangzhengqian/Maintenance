@@ -4,7 +4,6 @@ import com.tzq.common.utils.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,13 +35,15 @@ public class Stake implements Serializable {
         if (!Util.isEmpty(beforePicUris)) {
             return beforePicUris;
         }
-        if (!Util.isEmpty(before_pic)) {
-            String[] urls = before_pic.split(",");
-            beforePicUris = Arrays.asList(urls);
-        }
 
         if (beforePicUris == null) {
             beforePicUris = new ArrayList<>();
+        }
+        if (!Util.isEmpty(before_pic)) {
+            String[] urls = before_pic.split(",");
+            for (String s : urls) {
+                beforePicUris.add(s);
+            }
         }
         return beforePicUris;
     }
@@ -61,13 +62,15 @@ public class Stake implements Serializable {
         if (!Util.isEmpty(constructionPics)) {
             return constructionPics;
         }
-        if (!Util.isEmpty(construction_pic)) {
-            String[] urls = construction_pic.split(",");
-            constructionPics = Arrays.asList(urls);
-        }
 
         if (constructionPics == null) {
             constructionPics = new ArrayList<>();
+        }
+        if (!Util.isEmpty(construction_pic)) {
+            String[] urls = construction_pic.split(",");
+            for (String s : urls) {
+                constructionPics.add(s);
+            }
         }
         return constructionPics;
     }
@@ -86,14 +89,17 @@ public class Stake implements Serializable {
         if (!Util.isEmpty(afterPics)) {
             return afterPics;
         }
-        if (!Util.isEmpty(after_pic)) {
-            String[] urls = after_pic.split(",");
-            afterPics = Arrays.asList(urls);
-        }
 
         if (afterPics == null) {
             afterPics = new ArrayList<>();
         }
+        if (!Util.isEmpty(after_pic)) {
+            String[] urls = after_pic.split(",");
+            for (String s : urls) {
+                afterPics.add(s);
+            }
+        }
+
         return afterPics;
     }
 
