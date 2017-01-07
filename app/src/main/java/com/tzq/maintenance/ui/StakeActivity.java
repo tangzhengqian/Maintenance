@@ -65,6 +65,8 @@ public class StakeActivity extends BaseActivity {
         MyUtil.setUpSp(mAct, mStakeSp, Config.STAKES);
         mStakeSp.setSelection(MyUtil.getNoticeStakeIndex(mBean.stake_ud));
 
+        mStakeNum1Et.setText(mBean.stake_num1);
+        mStakeNum2Et.setText(mBean.stake_num2);
         MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
         MyUtil.showImage(mBean.getConstructionNewPics(), mConsIv1, mConsIv2);
         MyUtil.showImage(mBean.getAfterNewPics(), mAfterIv1, mAfterIv2);

@@ -152,8 +152,7 @@ public class CheckActivity extends BaseActivity {
                 new Thread() {
                     @Override
                     public void run() {
-                        MyUtil.updatePic(mBean.getTuzhiPicUris(), mBean.getTuzhiNewPicUris());
-                        MyUtil.updatePic(mBean.getAttachPicUris(), mBean.getAttachNewPicUris());
+
 
                         prepareCheck();
                         final boolean result = httpSave();
@@ -304,6 +303,30 @@ public class CheckActivity extends BaseActivity {
             findViewById(R.id.add_detail_new_iv).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.add_detail_new_iv).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void saveSubStakes() {
+        for (Stake stake : mBean.sub_stakes) {
+            MyUtil.updatePic(stake.getBeforePics(), stake.getBeforeNewPics());
+            MyUtil.updatePic(stake.getConstructionPics(), stake.getConstructionNewPics());
+            MyUtil.updatePic(stake.getAfterPics(), stake.getAfterNewPics());
+        }
+
+
+        for (Stake stake : mBean.sub_stakes) {
+            FormBody.Builder builder = new FormBody.Builder();
+            builder.add("before_pic", getFormPic(stake.getBeforeNewPics()))
+                    .add("construction_pic", getFormPic(stake.getConstructionNewPics()))
+                    .add("after_pic", getFormPic(stake.getAfterNewPics()))
+                    .add("stake_ud", stake.stake_ud)
+                    .add("stake_num1", stake.stake_num1)
+                    .add("stake_num2", stake.stake_num2)
+                    .add("check_id", mBean.id + "");
+            if (stake.id > 0) {
+                builder.add("id", stake.id + "");
+            }
+            new HttpTask(Config.url_save_subStake).execute(builder.build());
         }
     }
 
@@ -482,6 +505,14 @@ public class CheckActivity extends BaseActivity {
             Detail childDetail = (Detail) child.getTag();
             mBean.detail_new_edit.add(childDetail);
         }
+
+        int subStakeCount = mSubStakeListLay.getChildCount();
+        mBean.sub_stakes = new ArrayList<>();
+        for (int i = 0; i < subStakeCount; i++) {
+            View child = mSubStakeListLay.getChildAt(i);
+            Stake childDetail = (Stake) child.getTag();
+            mBean.sub_stakes.add(childDetail);
+        }
     }
 
     private boolean httpSave() {
@@ -506,6 +537,10 @@ public class CheckActivity extends BaseActivity {
                 return false;
             }
         }
+
+        MyUtil.updatePic(mBean.getTuzhiPicUris(), mBean.getTuzhiNewPicUris());
+        MyUtil.updatePic(mBean.getAttachPicUris(), mBean.getAttachNewPicUris());
+        saveSubStakes();
 
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("cate", mBean.cate)
@@ -533,7 +568,6 @@ public class CheckActivity extends BaseActivity {
         }
 
         int j = 0;
-        int detailNewCount = mDetailNewListLay.getChildCount();
         for (Detail detail : mBean.detail_new_edit) {
             builder.add("detail_new_edit[" + j + "][detail_name_cate]", "" + detail.cate_id);
             builder.add("detail_new_edit[" + j + "][detail_id]", "" + detail.id);

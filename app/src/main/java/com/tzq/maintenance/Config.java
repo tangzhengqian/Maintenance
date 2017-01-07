@@ -36,6 +36,7 @@ public class Config {
     public static final String url_get_new_time = url_host + "/Home/Api/getNewTime";
     public static final String url_contract_list = url_host + "/Home/Api/getContractList";
     public static final String url_contract_save = url_host + "/Home/Api/saveContract";
+    public static final String url_save_subStake = url_host + "/Home/Api/saveSonStake";
 
 
     public static final String url_export1 = url_host + "/Home/ApiDown/exportPaymentCheck";
