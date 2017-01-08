@@ -55,6 +55,7 @@ public class Stake implements Serializable {
 
         newBeforePicUris = new ArrayList<>();
         newBeforePicUris.addAll(getBeforePics());
+
         return newBeforePicUris;
     }
 

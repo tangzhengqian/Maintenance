@@ -622,7 +622,9 @@ public class CheckActivity extends BaseActivity {
                 startActivity(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mBeforePics).putExtra("editable", false));
                 break;
             case R.id.add_substake_iv:
-                startActivityForResult(new Intent(mAct, StakeActivity.class).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_STAKE);
+                Stake stake = new Stake();
+                stake.before_pic = mBean.before_pic;
+                startActivityForResult(new Intent(mAct, StakeActivity.class).putExtra("stake", stake).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_STAKE);
                 break;
             case R.id.tuzhi_pic_lay:
                 startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mBean.getTuzhiNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_TUZHI);
