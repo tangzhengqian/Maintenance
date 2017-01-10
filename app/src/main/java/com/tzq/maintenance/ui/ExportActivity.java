@@ -74,50 +74,57 @@ public class ExportActivity extends BaseActivity {
 
     @Override
     public void onViewClick(View view) {
-        String startDate = mStartDateTv.getText().toString();
-        String endDate = mEndDateTv.getText().toString();
-        if (Util.isEmpty(startDate) || Util.isEmpty(endDate)) {
-            MyUtil.toast("请选择时间段");
-            return;
-        }
-        if(endDate.compareTo(startDate)<=0){
-            MyUtil.toast("截止时间应大于开始时间");
-            return;
-        }
+        boolean isClickDate = false;
         switch (view.getId()) {
             case R.id.start_date_tv:
+                isClickDate = true;
                 MyUtil.showDateTimeDialog(mAct, mStartDateTv);
                 break;
             case R.id.end_date_tv:
+                isClickDate = true;
                 MyUtil.showDateTimeDialog(mAct, mEndDateTv);
                 break;
-            case R.id.export1_bt:
-                download(Config.url_export1, String.format("计量支付审核表_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export2_bt:
-                download(Config.url_export2, String.format("计量支付报表封面_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export3_bt:
-                download(Config.url_export3, String.format("编制说明_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export4_bt:
-                download(Config.url_export4, String.format("财务支付报表_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export5_bt:
-                download(Config.url_export5, String.format("支付报表_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export6_bt:
-                download(Config.url_export6, String.format("支付汇总表_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export7_bt:
-                download(Config.url_export7, String.format("道路保洁、巡查费用计算表_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export8_bt:
-                download(Config.url_export8, String.format("违约金_%s_%s.xls", startDate, endDate));
-                break;
-            case R.id.export9_bt:
-                download(Config.url_export9, String.format("巡查日志_%s_%s.xls", startDate, endDate));
-                break;
+        }
+        if (!isClickDate) {
+            String startDate = mStartDateTv.getText().toString();
+            String endDate = mEndDateTv.getText().toString();
+            if (Util.isEmpty(startDate) || Util.isEmpty(endDate)) {
+                MyUtil.toast("请选择时间段");
+                return;
+            }
+            if (endDate.compareTo(startDate) <= 0) {
+                MyUtil.toast("截止时间应大于开始时间");
+                return;
+            }
+            switch (view.getId()) {
+                case R.id.export1_bt:
+                    download(Config.url_export1, String.format("计量支付审核表_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export2_bt:
+                    download(Config.url_export2, String.format("计量支付报表封面_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export3_bt:
+                    download(Config.url_export3, String.format("编制说明_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export4_bt:
+                    download(Config.url_export4, String.format("财务支付报表_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export5_bt:
+                    download(Config.url_export5, String.format("支付报表_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export6_bt:
+                    download(Config.url_export6, String.format("支付汇总表_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export7_bt:
+                    download(Config.url_export7, String.format("道路保洁、巡查费用计算表_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export8_bt:
+                    download(Config.url_export8, String.format("违约金_%s_%s.xls", startDate, endDate));
+                    break;
+                case R.id.export9_bt:
+                    download(Config.url_export9, String.format("巡查日志_%s_%s.xls", startDate, endDate));
+                    break;
+            }
         }
     }
 }

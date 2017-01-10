@@ -17,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
@@ -45,7 +47,7 @@ import static com.tzq.maintenance.ui.NoticeListActivity.REQUEST_UPDATE_NOTICE;
  * Created by Administrator on 2016/10/20.
  */
 
-public class CheckListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class CheckListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener, CompoundButton.OnCheckedChangeListener {
     public static final int REQUEST_UPDATE_CHECK = 22;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView mListView;
@@ -56,7 +58,10 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     private List<Check> mListData = new ArrayList<>();
     private int mSelectPosition;
     private boolean isMutiSelectMode = false;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton01, radioButton02, radioButton03;
     private List<Integer> selectPositions = new ArrayList<>();
+    private int type = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,6 +70,10 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         setTitle("验收单列表");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        radioButton01 = (RadioButton) findViewById(R.id.radioBtn01);
+        radioButton02 = (RadioButton) findViewById(R.id.radioBtn02);
+        radioButton03 = (RadioButton) findViewById(R.id.radioBtn03);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         mListView = (ListView) findViewById(R.id.list_view);
         footerView = (TextView) getLayoutInflater().inflate(R.layout.list_footer_view, null);
@@ -84,7 +93,20 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                 startActivityForResult(new Intent(mAct, CheckActivity.class).putExtra("check", item), REQUEST_UPDATE_CHECK);
             }
         });
-        httpGetList(1);
+
+        updateCount(0, 0, 0, 0);
+        radioButton01.setOnCheckedChangeListener(this);
+        radioButton02.setOnCheckedChangeListener(this);
+        radioButton03.setOnCheckedChangeListener(this);
+        radioButton01.setChecked(true);
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            type = getType(buttonView.getId());
+            httpGetList(1);
+        }
     }
 
     @Override
@@ -260,6 +282,23 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         httpGetList(1);
     }
 
+    private int getType(int checkedId) {
+        if (checkedId == radioButton01.getId()) {
+            return 1;
+        } else if (checkedId == radioButton02.getId()) {
+            return 2;
+        } else if (checkedId == radioButton03.getId()) {
+            return 3;
+        }
+        return 0;
+    }
+
+    private void updateCount(int all, int deal, int complete, int fail) {
+        radioButton01.setText("正处理\n" + deal);
+        radioButton02.setText("已验收\n" + complete);
+        radioButton03.setText("未通过\n" + fail);
+    }
+
     private void httpGetList(final int p) {
         if (p == 1) {
             setRefresh(true);
@@ -279,6 +318,11 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
+                                    int all = o.optInt("all");
+                                    int dealing = o.optInt("dealing");
+                                    int complete = o.optInt("complete");
+                                    int fail = o.optInt("fail");
+                                    updateCount(all, dealing, complete, fail);
                                     List<Check> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Check>>() {
                                     }.getType());
                                     mPage = p;
@@ -309,6 +353,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
+                .add("type", type + "")
                 .build());
     }
 

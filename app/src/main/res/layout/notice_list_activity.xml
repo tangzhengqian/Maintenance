@@ -6,17 +6,70 @@
     android:layout_height="match_parent"
     tools:context="com.tzq.maintenance.ui.NoticeListActivity">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <ListView
-            android:id="@+id/tongzd_list"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:listSelector="@color/transparent"
-            android:divider="@null"
-            android:cacheColorHint="@color/transparent"></ListView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioBtn01"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/radio_bg"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="正处理\n20"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/radioBtn02"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/radio_bg"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="已完成"
+                android:textSize="12sp" />
+
+            <RadioButton
+                android:id="@+id/radioBtn03"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/radio_bg"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="4dp"
+                android:text="未通过"
+                android:textSize="12sp" />
+
+        </RadioGroup>
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/tongzd_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:cacheColorHint="@color/transparent"
+                android:divider="@null"
+                android:listSelector="@color/transparent"></ListView>
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
+
 </RelativeLayout>

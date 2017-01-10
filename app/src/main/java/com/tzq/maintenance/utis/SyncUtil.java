@@ -250,7 +250,11 @@ public class SyncUtil {
                 .build());
         if (responseData.isSuccess()) {
             ActiveAndroid.beginTransaction();
-            new Delete().from(Drawing.class).execute();
+            try {
+                new Delete().from(Drawing.class).execute();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             List<Drawing> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Drawing>>() {
             }.getType());
             for (Drawing item : list) {

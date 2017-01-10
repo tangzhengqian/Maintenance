@@ -8,4 +8,7 @@
     <color name="button_normal_n">#CDAD00</color>
     <color name="button_normal_h">#8B814C</color>
     <color name="button_normal_d">#DBDBDB</color>
+
+    <color name="radio_normal">#DBDBDB</color>
+    <color name="radio_checked">#6495ED</color>
 </resources>

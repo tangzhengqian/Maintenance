@@ -17,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
@@ -43,7 +45,7 @@ import okhttp3.FormBody;
  * Created by Administrator on 2016/10/20.
  */
 
-public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener {
+public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener, CompoundButton.OnCheckedChangeListener {
     public static final int REQUEST_UPDATE_NOTICE = 22;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ListView mListView;
@@ -54,7 +56,10 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     private List<Notice> mListData = new ArrayList<>();
     private int mSelectPosition;
     private boolean isMutiSelectMode = false;
+    private RadioGroup radioGroup;
+    private RadioButton radioButton01, radioButton02, radioButton03;
     private List<Integer> selectPositions = new ArrayList<>();
+    private int type = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,6 +68,10 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         setTitle("通知单列表");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+        radioButton01 = (RadioButton) findViewById(R.id.radioBtn01);
+        radioButton02 = (RadioButton) findViewById(R.id.radioBtn02);
+        radioButton03 = (RadioButton) findViewById(R.id.radioBtn03);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_layout);
         mListView = (ListView) findViewById(R.id.tongzd_list);
         footerView = (TextView) getLayoutInflater().inflate(R.layout.list_footer_view, null);
@@ -82,9 +91,22 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                 startActivityForResult(new Intent(mAct, NoticeActivity.class).putExtra("notice", item), REQUEST_UPDATE_NOTICE);
             }
         });
-        httpGetList(1);
+
+        updateCount(0, 0, 0, 0);
+        radioButton01.setOnCheckedChangeListener(this);
+        radioButton02.setOnCheckedChangeListener(this);
+        radioButton03.setOnCheckedChangeListener(this);
+//        radioButton01.setChecked(true);
+        radioGroup.check(R.id.radioBtn01);
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            type = getType(buttonView.getId());
+            httpGetList(1);
+        }
+    }
 
     @Override
     public void onViewClick(View view) {
@@ -101,8 +123,6 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             }
         }, 500);
     }
-
-    boolean isFisrtCreate = true;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -278,6 +298,23 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         httpGetList(1);
     }
 
+    private int getType(int checkedId) {
+        if (checkedId == radioButton01.getId()) {
+            return 1;
+        } else if (checkedId == radioButton02.getId()) {
+            return 2;
+        } else if (checkedId == radioButton03.getId()) {
+            return 3;
+        }
+        return 0;
+    }
+
+    private void updateCount(int all, int deal, int complete, int fail) {
+        radioButton01.setText("正处理\n" + deal);
+        radioButton02.setText("已验收\n" + complete);
+        radioButton03.setText("未通过\n" + fail);
+    }
+
     private void httpGetList(final int p) {
         if (p == 1) {
             setRefresh(true);
@@ -297,6 +334,11 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
                                 } else {
                                     JSONObject o = new JSONObject(responseData.data);
                                     count = o.optInt("count");
+                                    int all = o.optInt("all");
+                                    int dealing = o.optInt("dealing");
+                                    int complete = o.optInt("complete");
+                                    int fail = o.optInt("fail");
+                                    updateCount(all, dealing, complete, fail);
                                     List<Notice> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
                                     }.getType());
                                     mPage = p;
@@ -327,6 +369,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
+                .add("type", type + "")
                 .build());
     }
 
