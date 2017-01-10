@@ -232,6 +232,7 @@ public class SyncUtil {
             }
             ActiveAndroid.setTransactionSuccessful();
             ActiveAndroid.endTransaction();
+//            notifyComplete();
             sRetryCount = 0;
             getSysDrawList();
         } else {

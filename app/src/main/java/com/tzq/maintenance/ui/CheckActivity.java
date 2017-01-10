@@ -362,7 +362,7 @@ public class CheckActivity extends BaseActivity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_DETAIL);
+                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", false), REQUEST_DETAIL);
             }
         });
     }
