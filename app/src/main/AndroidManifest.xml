@@ -43,6 +43,8 @@
         <activity android:name=".ui.ExportActivity" />
         <activity android:name=".ui.ExportListActivity" />
         <activity android:name=".ui.StakeActivity" />
+        <activity android:name=".ui.AutoTimeActivity" />
+        <activity android:name=".ui.AutoTimeListActivity" />
 
         <receiver android:name=".core.HeartbeatReceiver"/>
         <service android:name=".core.CoreService"/>

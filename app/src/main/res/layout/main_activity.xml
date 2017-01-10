@@ -52,6 +52,11 @@
                 style="@style/button"
                 android:layout_marginTop="16dp"
                 android:text="报表导出"/>
+            <Button
+                android:id="@+id/autotime_bt"
+                style="@style/button"
+                android:layout_marginTop="16dp"
+                android:text="自动签发管理"/>
         </LinearLayout>
     </ScrollView>
 

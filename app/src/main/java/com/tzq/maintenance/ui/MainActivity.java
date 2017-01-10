@@ -74,6 +74,9 @@ public class MainActivity extends BaseActivity {
             case R.id.export_bt:
                 startActivity(new Intent(mAct, ExportActivity.class));
                 break;
+            case R.id.autotime_bt:
+                startActivity(new Intent(mAct, AutoTimeListActivity.class));
+                break;
         }
     }
 
