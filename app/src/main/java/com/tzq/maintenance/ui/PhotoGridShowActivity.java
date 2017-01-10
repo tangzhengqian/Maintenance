@@ -44,6 +44,7 @@ public class PhotoGridShowActivity extends BaseActivity {
     ArrayList<String> mUris = new ArrayList<>();
     List<Integer> mSelectPostion = new ArrayList<>();
     boolean mEditable = true;
+    boolean mTuzhiSys = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class PhotoGridShowActivity extends BaseActivity {
 
         mUris = getIntent().getStringArrayListExtra("uris");
         mEditable = getIntent().getBooleanExtra("editable", true);
+        mTuzhiSys = getIntent().getBooleanExtra("tuzhiSys", false);
         mAdapter.setDataList(mUris);
     }
 
@@ -74,6 +76,8 @@ public class PhotoGridShowActivity extends BaseActivity {
         }
 
         getMenuInflater().inflate(R.menu.photo_grid_show_activity, menu);
+        MenuItem takePhoto = menu.findItem(R.id.action_take_photo);
+        takePhoto.setVisible(!mTuzhiSys);
         MenuItem delete = menu.findItem(R.id.action_delete);
         if (mSelectPostion.size() > 0) {
             delete.setEnabled(true);
@@ -105,7 +109,7 @@ public class PhotoGridShowActivity extends BaseActivity {
                 }
             }).setNegativeButton("取消", null).show();
         } else if (item.getItemId() == R.id.action_add_pic) {
-            startActivityForResult(new Intent(mAct, PhotoSelectLocalActivity.class), REQUEST_ADD_PIC);
+            startActivityForResult(new Intent(mAct, PhotoSelectLocalActivity.class).putExtra("tuzhiSys", mTuzhiSys), REQUEST_ADD_PIC);
         } else if (item.getItemId() == R.id.action_take_photo) {
             openTakePhoto();
         } else if (item.getItemId() == R.id.action_complete) {
@@ -122,7 +126,10 @@ public class PhotoGridShowActivity extends BaseActivity {
             if (resultCode == RESULT_OK) {
                 String path = data.getStringExtra("path");
                 LogUtil.i("---path=" + path);
-                mUris.add("file://" + path);
+                if (path.startsWith("/")) {
+                    path = "file://" + path;
+                }
+                mUris.add(path);
                 mAdapter.setDataList(mUris);
             }
         } else if (requestCode == REQUEST_TAKE_PHOTO) {
@@ -148,7 +155,10 @@ public class PhotoGridShowActivity extends BaseActivity {
                     String path = dir.getAbsolutePath() + File.separator + System.currentTimeMillis() + ".jpg";
                     ImageUtil.saveBitmapToLocal(photo, path, Bitmap.CompressFormat.JPEG);
                     LogUtil.i("---path=" + path);
-                    mUris.add("file://" + path);
+                    if (path.startsWith("/")) {
+                        path = "file://" + path;
+                    }
+                    mUris.add(path);
                     mAdapter.setDataList(mUris);
                 }
 

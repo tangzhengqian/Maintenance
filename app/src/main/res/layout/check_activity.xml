@@ -283,7 +283,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="图纸：" />
+                android:text="本地图纸：" />
 
             <LinearLayout
                 android:id="@+id/tuzhi_pic_lay"
@@ -306,6 +306,44 @@
 
                 <ImageView
                     android:id="@+id/tuzhi_more_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@mipmap/arrow_right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/item_lay"
+            android:layout_height="82dp"
+            android:clickable="true"
+            android:onClick="onClick">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="系统图纸：" />
+
+            <LinearLayout
+                android:id="@+id/tuzhi2_pic_lay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:gravity="right|center_vertical"
+                android:onClick="onClick">
+
+                <ImageView
+                    android:id="@+id/tuzhi2_iv1"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="8dp" />
+
+                <ImageView
+                    android:id="@+id/tuzhi2_iv2"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent" />
+
+                <ImageView
+                    android:id="@+id/tuzhi2_more_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@mipmap/arrow_right" />

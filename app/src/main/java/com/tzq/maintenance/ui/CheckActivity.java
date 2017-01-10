@@ -48,12 +48,14 @@ public class CheckActivity extends BaseActivity {
     final int REQUEST_STAKE = 106;
     final int REQUEST_TUZHI = 107;
     final int REQUEST_ATTACH = 108;
+    final int REQUEST_TUZHI_SYS = 109;
     Check mBean;
     Spinner mTypeSp, mStakeSp, structureSp;
     EditText mStakeNum1Et, mStakeNum2Et, mProjectNameEt, mDaysEt, mCostEt;
     TextView mDateEt;
     ImageView mBeforeIv1, mBeforeIv2;
     ImageView mTuzhiIv1, mTuzhiIv2;
+    ImageView mTuzhi2Iv1, mTuzhi2Iv2;
     ImageView mAttachIv1, mAttachIv2;
     LinearLayout mDetailListLay, mDetailNewListLay, mSubStakeListLay;
     DealBean mNoticeDealBean;
@@ -80,6 +82,8 @@ public class CheckActivity extends BaseActivity {
         mBeforeIv2 = (ImageView) findViewById(R.id.before_iv2);
         mTuzhiIv1 = (ImageView) findViewById(R.id.tuzhi_iv1);
         mTuzhiIv2 = (ImageView) findViewById(R.id.tuzhi_iv2);
+        mTuzhi2Iv1 = (ImageView) findViewById(R.id.tuzhi2_iv1);
+        mTuzhi2Iv2 = (ImageView) findViewById(R.id.tuzhi2_iv2);
         mAttachIv1 = (ImageView) findViewById(R.id.attach_iv1);
         mAttachIv2 = (ImageView) findViewById(R.id.attach_iv2);
         mDetailListLay = (LinearLayout) findViewById(R.id.detail_list_lay);
@@ -285,6 +289,7 @@ public class CheckActivity extends BaseActivity {
         MyUtil.showImage(mBeforePics, mBeforeIv1, mBeforeIv2);
 
         MyUtil.showImage(mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
+        MyUtil.showImage(mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
         MyUtil.showImage(mBean.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
     }
 
@@ -539,6 +544,7 @@ public class CheckActivity extends BaseActivity {
         }
 
         MyUtil.updatePic(mBean.getTuzhiPicUris(), mBean.getTuzhiNewPicUris());
+        MyUtil.updatePic(mBean.getTuzhiSysPicUris(), mBean.getTuzhiSysNewPicUris());
         MyUtil.updatePic(mBean.getAttachPicUris(), mBean.getAttachNewPicUris());
         saveSubStakes();
 
@@ -584,6 +590,7 @@ public class CheckActivity extends BaseActivity {
 
         builder.add("before_pic", getFormPic(mBeforePics));
         builder.add("tuzhi", getFormPic(mBean.getTuzhiNewPicUris()));
+        builder.add("tuzhi_sys", getFormPic(mBean.getTuzhiSysNewPicUris()));
         builder.add("attach", getFormPic(mBean.getAttachNewPicUris()));
 
         ResponseData responseData = new HttpTask(Config.url_check_save).execute(builder.build());
@@ -623,11 +630,14 @@ public class CheckActivity extends BaseActivity {
                 break;
             case R.id.add_substake_iv:
                 Stake stake = new Stake();
-                stake.before_pic = mBean.before_pic;
+                stake.check_before_pic = mBeforePics;
                 startActivityForResult(new Intent(mAct, StakeActivity.class).putExtra("stake", stake).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_STAKE);
                 break;
             case R.id.tuzhi_pic_lay:
                 startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mBean.getTuzhiNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_TUZHI);
+                break;
+            case R.id.tuzhi2_pic_lay:
+                startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putExtra("tuzhiSys", true).putStringArrayListExtra("uris", mBean.getTuzhiSysNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_TUZHI_SYS);
                 break;
             case R.id.attach_lay:
                 startActivityForResult(new Intent(mAct, PhotoGridShowActivity.class).putStringArrayListExtra("uris", mBean.getAttachNewPicUris()).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_ATTACH);
@@ -696,7 +706,14 @@ public class CheckActivity extends BaseActivity {
                 mBean.getTuzhiNewPicUris().addAll(uris);
                 MyUtil.showImage(mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
             }
-        } else if (requestCode == REQUEST_ATTACH) {
+        } else if (requestCode == REQUEST_TUZHI_SYS) {
+            if (resultCode == RESULT_OK) {
+                mBean.getTuzhiSysNewPicUris().clear();
+                ArrayList<String> uris = data.getStringArrayListExtra("uris");
+                mBean.getTuzhiSysNewPicUris().addAll(uris);
+                MyUtil.showImage(mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
+            }
+        }else if (requestCode == REQUEST_ATTACH) {
             if (resultCode == RESULT_OK) {
                 mBean.getAttachNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");

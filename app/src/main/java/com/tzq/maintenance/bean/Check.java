@@ -43,9 +43,12 @@ public class Check implements Serializable {
 
     public List<Stake> sub_stakes;
     public String tuzhi;
+    public String tuzhi_sys;
     public String attach;
     private List<String> tuzhiPicUris;//just for cache
     private ArrayList<String> newTuzhiPicUris;//just offline save
+    private List<String> tuzhiSysPicUris;//just for cache
+    private ArrayList<String> newTuzhiSysPicUris;//just offline save
     private List<String> attachPicUris;//just for cache
     private ArrayList<String> newAttachPicUris;//just offline save
 
@@ -77,6 +80,33 @@ public class Check implements Serializable {
         newTuzhiPicUris = new ArrayList<>();
         newTuzhiPicUris.addAll(getTuzhiPicUris());
         return newTuzhiPicUris;
+    }
+
+    public List<String> getTuzhiSysPicUris() {
+        if (!Util.isEmpty(tuzhiSysPicUris)) {
+            return tuzhiSysPicUris;
+        }
+
+        if (tuzhiSysPicUris == null) {
+            tuzhiSysPicUris = new ArrayList<>();
+        }
+        if (!Util.isEmpty(tuzhi_sys)) {
+            String[] urls = tuzhi_sys.split(",");
+            for (String s : urls) {
+                tuzhiSysPicUris.add(s);
+            }
+        }
+
+        return tuzhiSysPicUris;
+    }
+
+    public ArrayList<String> getTuzhiSysNewPicUris() {
+        if (newTuzhiSysPicUris != null) {
+            return newTuzhiSysPicUris;
+        }
+        newTuzhiSysPicUris = new ArrayList<>();
+        newTuzhiSysPicUris.addAll(getTuzhiSysPicUris());
+        return newTuzhiSysPicUris;
     }
 
     public List<String> getAttachPicUris() {

@@ -9,6 +9,7 @@ public class User {
     public String user_name;
     public int company_id;
     public int maintenance_id;
+    public int management_id;
     public int role_id;
     public String token;
 }

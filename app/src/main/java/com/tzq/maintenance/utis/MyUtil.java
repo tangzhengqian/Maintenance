@@ -605,7 +605,7 @@ public class MyUtil {
         for (String uri : uris) {
             if (!newUris.contains(uri)) {
                 new HttpTask(Config.url_del_pic).execute(new FormBody.Builder().add("picUrl", uri).build());
-            }else {
+            } else {
                 pics.add(uri);
             }
         }
@@ -625,7 +625,7 @@ public class MyUtil {
                 if (responseData.isSuccess()) {
                     pics2.add(responseData.data);
                 }
-            }else {
+            } else {
                 pics2.add(uri);
             }
         }

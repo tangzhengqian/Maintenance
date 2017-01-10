@@ -19,6 +19,7 @@ public class Config {
     public static final String url_maintenance_list = url_host + "/Home/Api/getMaintenanceList";
     public static final String url_role_list = url_host + "/Home/Api/getRoleList";
     public static final String url_company_list = url_host + "/Home/Api/getCompanyList";
+    public static final String url_sys_drawing = url_host + "/Home/Api/getSysDrawing";
     public static final String url_notice_list = url_host + "/Home/Api/getNoticeList";
     public static final String url_notice_detail = url_host + "/Home/Api/getNoticeDetail";
     public static final String url_notice_save = url_host + "/Home/Api/saveNotice";

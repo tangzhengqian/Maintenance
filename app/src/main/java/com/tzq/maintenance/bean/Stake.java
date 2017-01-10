@@ -20,6 +20,7 @@ public class Stake implements Serializable {
     public String before_pic;
     public String construction_pic;
     public String after_pic;
+    public ArrayList<String> check_before_pic;
 
     private List<String> beforePicUris;//just for cache
     private ArrayList<String> newBeforePicUris;//just offline save
@@ -52,10 +53,14 @@ public class Stake implements Serializable {
         if (newBeforePicUris != null) {
             return newBeforePicUris;
         }
-
         newBeforePicUris = new ArrayList<>();
-        newBeforePicUris.addAll(getBeforePics());
-
+        if (Util.isEmpty(getBeforePics())) {
+            if (!Util.isEmpty(check_before_pic)) {
+                newBeforePicUris.addAll(check_before_pic);
+            }
+        } else {
+            newBeforePicUris.addAll(getBeforePics());
+        }
         return newBeforePicUris;
     }
 

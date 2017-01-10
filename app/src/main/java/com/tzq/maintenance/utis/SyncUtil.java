@@ -9,6 +9,7 @@ import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.Company;
 import com.tzq.maintenance.bean.Detail;
 import com.tzq.maintenance.bean.DetailType;
+import com.tzq.maintenance.bean.Drawing;
 import com.tzq.maintenance.bean.Maintenance;
 import com.tzq.maintenance.bean.Management;
 import com.tzq.maintenance.bean.ResponseData;
@@ -158,8 +159,6 @@ public class SyncUtil {
             ActiveAndroid.endTransaction();
             sRetryCount = 0;
             getStructureList();
-//            notifyComplete();
-//            getDetailTypeList();
         } else {
             sRetryCount++;
             if (sRetryCount <= MAX_RETRY_COUNT) {
@@ -229,6 +228,31 @@ public class SyncUtil {
             List<Detail> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Detail>>() {
             }.getType());
             for (Detail item : list) {
+                item.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+            ActiveAndroid.endTransaction();
+            sRetryCount = 0;
+            getSysDrawList();
+        } else {
+            sRetryCount++;
+            if (sRetryCount <= MAX_RETRY_COUNT) {
+                getDetailList();
+            } else {
+                notifyFail();
+            }
+        }
+    }
+
+    private static void getSysDrawList() {
+        ResponseData responseData = new HttpTask(Config.url_sys_drawing).setShowMessage(false).execute(new FormBody.Builder()
+                .build());
+        if (responseData.isSuccess()) {
+            ActiveAndroid.beginTransaction();
+            new Delete().from(Drawing.class).execute();
+            List<Drawing> list = Config.gson.fromJson(responseData.data, new TypeToken<List<Drawing>>() {
+            }.getType());
+            for (Drawing item : list) {
                 item.save();
             }
             ActiveAndroid.setTransactionSuccessful();

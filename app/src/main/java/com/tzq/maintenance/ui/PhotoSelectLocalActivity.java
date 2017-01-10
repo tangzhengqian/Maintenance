@@ -10,11 +10,14 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.activeandroid.query.Select;
 import com.tzq.common.bean.PhotoAibum;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.ImageUtil;
 import com.tzq.common.utils.Util;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.R;
+import com.tzq.maintenance.bean.Drawing;
 import com.tzq.maintenance.utis.MyUtil;
 
 import java.util.ArrayList;
@@ -28,6 +31,7 @@ public class PhotoSelectLocalActivity extends BaseActivity {
     private GridView mGridView;
     PhotoAdapter mAdapter;
     ArrayList<String> mPaths = new ArrayList<>();
+    boolean mTuzhiSys = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,20 +40,32 @@ public class PhotoSelectLocalActivity extends BaseActivity {
         setContentView(R.layout.photo_grid_show_activity);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mTuzhiSys = getIntent().getBooleanExtra("tuzhiSys", false);
+
         mGridView = (GridView) findViewById(R.id.photo_gv);
         mAdapter = new PhotoAdapter(mAct);
 
         mGridView.setAdapter(mAdapter);
 
-        List<PhotoAibum> l = ImageUtil.getPhotoAlbum(mAct);
-        for (PhotoAibum pa : l) {
-            if (Util.isEmpty(pa.bitList)) {
-                continue;
+        if (mTuzhiSys) {
+            List<Drawing> drawList = new Select().from(Drawing.class).where("management_id = " + App.getInstance().getUser().management_id).execute();
+            if (!Util.isEmpty(drawList)) {
+                for (Drawing drawing : drawList) {
+                    mPaths.add(drawing.image_url);
+                }
             }
-            for (PhotoAibum.PhotoItem it : pa.bitList) {
-                mPaths.add(it.path);
+        } else {
+            List<PhotoAibum> l = ImageUtil.getPhotoAlbum(mAct);
+            for (PhotoAibum pa : l) {
+                if (Util.isEmpty(pa.bitList)) {
+                    continue;
+                }
+                for (PhotoAibum.PhotoItem it : pa.bitList) {
+                    mPaths.add(it.path);
+                }
             }
         }
+
         mAdapter.setDataList(mPaths);
     }
 
@@ -82,7 +98,12 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             vh.photoCb.setVisibility(View.INVISIBLE);
             vh.photoCover.setVisibility(View.INVISIBLE);
             final String path = getItem(position);
-            MyUtil.displayPic(vh.photoIv, "file://" + path);
+            if (mTuzhiSys) {
+                MyUtil.displayPic(vh.photoIv, path);
+            } else {
+                MyUtil.displayPic(vh.photoIv, "file://" + path);
+            }
+
             vh.photoIv.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
