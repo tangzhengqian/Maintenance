@@ -105,6 +105,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             type = getType(buttonView.getId());
+            mListData.clear();
             httpGetList(1);
         }
     }

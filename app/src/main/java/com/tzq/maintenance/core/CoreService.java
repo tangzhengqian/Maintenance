@@ -25,7 +25,7 @@ public class CoreService extends Service {
     private final static int what_sync_data = 0x11;
     private final static int what_check_time = 0x12;
     private final static int delay_sync_data = 20 * 60 * 1000;
-    private final static int delay_check_time = 10000 * 1000;
+    private final static int delay_check_time = 10 * 1000;
 
     private Handler mHandler = new Handler() {
         @Override

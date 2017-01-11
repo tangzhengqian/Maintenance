@@ -16,16 +16,11 @@ import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
-import com.tzq.common.utils.LogUtil;
-import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.AutoTime;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +37,6 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
     private Adapter mListAdapter;
     private TextView footerView;
     private int mPage = 1;
-    private final int page_size = 10;
     private List<AutoTime> mListData = new ArrayList<>();
 
     @Override
@@ -68,7 +62,7 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 AutoTime item = mListAdapter.getItem(position);
-                startActivity(new Intent(mAct, AutoTimeActivity.class).putExtra("autoTime", item));
+                startActivityForResult(new Intent(mAct, AutoTimeActivity.class).putExtra("autoTime", item), 33);
             }
         });
         httpGetList(1);
@@ -102,7 +96,7 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_add) {
-            startActivity(new Intent(mAct, AutoTimeActivity.class));
+            startActivityForResult(new Intent(mAct, AutoTimeActivity.class), 22);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -115,52 +109,37 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode==RESULT_OK){
+        if (resultCode == RESULT_OK) {
             httpGetList(1);
         }
     }
 
     private void httpGetList(final int p) {
         footerView.setText("正在加载更多数据...");
-        new HttpTask(Config.url_contract_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+        new HttpTask(Config.url_autotime_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(final ResponseData responseData) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int count = 0;
-                        if (responseData.isSuccess()) {
-                            try {
-                                if (Util.isEmpty(responseData.data)) {
-                                    mListData.clear();
-                                } else {
-                                    JSONObject o = new JSONObject(responseData.data);
-                                    count = o.optInt("count");
-                                    List<AutoTime> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<AutoTime>>() {
-                                    }.getType());
-                                    mPage = p;
-                                    if (p == 1) {
-                                        mListData.clear();
-                                    }
-                                    mListData.addAll(list);
-                                }
-                            } catch (JSONException e) {
-                                LogUtil.e(e.getMessage(), e);
-                            }
-                            mListAdapter.setDataList(mListData);
-                        }
-                        if (mListData.size() >= count) {
-                            footerView.setText("没有更多的数据了");
-                            footerView.setEnabled(false);
-                        } else {
-                            footerView.setText("点击这里加载更多");
-                            footerView.setEnabled(true);
-                        }
-
-                        setRefresh(false);
+                int count = 0;
+                if (responseData.isSuccess()) {
+                    List<AutoTime> list = Config.gson.fromJson(responseData.data,
+                            new TypeToken<List<AutoTime>>() {
+                            }.getType());
+                    mPage = p;
+                    if (p == 1) {
+                        mListData.clear();
                     }
-                });
+                    mListData.addAll(list);
+                    mListAdapter.setDataList(mListData);
+                }
+                if (mListData.size() >= count) {
+                    footerView.setText("没有更多的数据了");
+                    footerView.setEnabled(false);
+                } else {
+                    footerView.setText("点击这里加载更多");
+                    footerView.setEnabled(true);
+                }
 
+                setRefresh(false);
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")
@@ -187,8 +166,8 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
             }
 
             AutoTime item = getItem(position);
-//            vh.nameTv.setText("" + item.clause);
-//            vh.timeTv.setText("管理处:" + item.management_name);
+            vh.nameTv.setText("" + item.mark);
+            vh.timeTv.setText("" + item.start_time + " 至 " + item.end_time);
             return convertView;
         }
 

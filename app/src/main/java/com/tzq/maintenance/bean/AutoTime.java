@@ -7,4 +7,9 @@ import java.io.Serializable;
  */
 
 public class AutoTime implements Serializable {
+    public int id;
+    public String mark;
+    public String start_time;
+    public String end_time;
+
 }

@@ -38,6 +38,8 @@ public class Config {
     public static final String url_contract_list = url_host + "/Home/Api/getContractList";
     public static final String url_contract_save = url_host + "/Home/Api/saveContract";
     public static final String url_save_subStake = url_host + "/Home/Api/saveSonStake";
+    public static final String url_autotime_list = url_host + "/Home/Api/getTimeList";
+    public static final String url_autotime_save = url_host + "/Home/Api/saveTime";
 
 
     public static final String url_export1 = url_host + "/Home/ApiDown/exportPaymentCheck";
@@ -49,7 +51,6 @@ public class Config {
     public static final String url_export7 = url_host + "/Home/ApiDown/exportCleanLook";
     public static final String url_export8 = url_host + "/Home/ApiDown/exportAllContract";
     public static final String url_export9 = url_host + "/Home/ApiDown/exportPatrolLog";
-
     public static final String url_export_notice = url_host + "/Home/ApiDown/exportNotice";
     public static final String url_export_check = url_host + "/Home/ApiDown/exportCheck";
 

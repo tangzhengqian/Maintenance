@@ -352,6 +352,9 @@ public class MyUtil {
         sp.setAdapter(adapter);
     }
 
+    private static boolean isDateDialogComplete = false;
+    private static boolean isTimeDialogComplete = false;
+
     public static void showDateTimeDialog(final Activity act, final View v) {
         String value = "";
         if (v instanceof TextView) {
@@ -363,16 +366,25 @@ public class MyUtil {
         }
         final String dfVaule = value;
         final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+        isDateDialogComplete = false;
         showDateDialog(act, dfVaule, df, new CompleteListener() {
             @Override
             public void onComplete(final Object date) {
+                if (isDateDialogComplete) {
+                    return;
+                }
+                isDateDialogComplete = true;
+                isTimeDialogComplete = false;
                 showTimeDialog(act, dfVaule, df, new CompleteListener() {
 
                     @Override
                     public void onComplete(Object time) {
+                        if (isTimeDialogComplete) {
+                            return;
+                        }
+                        isTimeDialogComplete = true;
                         String dateTime = date.toString() + " " + time.toString() + ":00";
-                        LogUtil.i("--dateTime=" + dateTime);
+//                        LogUtil.i("--dateTime=" + dateTime);
                         if (v instanceof TextView) {
                             TextView t = (TextView) v;
                             t.setText(dateTime);

@@ -104,6 +104,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (isChecked) {
             type = getType(buttonView.getId());
+            mListData.clear();
             httpGetList(1);
         }
     }

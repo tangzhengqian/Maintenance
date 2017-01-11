@@ -8,6 +8,7 @@ import com.tzq.common.utils.IOUtil;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
 import com.tzq.maintenance.App;
+import com.tzq.maintenance.Config;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.utis.MyUtil;
 import com.tzq.maintenance.utis.ProgressDialogUtil;
@@ -134,7 +135,9 @@ public class HttpTask {
         ResponseData responseData = new ResponseData();
         try {
             String body = response.body().string();
-            LogUtil.i("onResponse  " + body);
+            if (!Config.url_get_new_time.equals(mUrl)) {
+                LogUtil.i("onResponse  " + body);
+            }
             JSONObject o = new JSONObject(body);
             responseData.code = o.optInt("code");
             responseData.msg = o.optString("msg");

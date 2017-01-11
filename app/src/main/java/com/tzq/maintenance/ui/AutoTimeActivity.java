@@ -4,23 +4,27 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.AutoTime;
+import com.tzq.maintenance.bean.ResponseData;
+import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
+
+import okhttp3.FormBody;
 
 /**
  * Created by Administrator on 2016/10/31.
  */
 
 public class AutoTimeActivity extends BaseActivity {
-    final int REQUEST_DETAIL = 101;
-    final int REQUEST_PHOTO = 102;
     AutoTime mBean;
     TextView startTimeTv, endTimeTv;
     EditText noteEt;
@@ -42,6 +46,9 @@ public class AutoTimeActivity extends BaseActivity {
         if (mBean == null) {
             mBean = new AutoTime();
         } else {
+            startTimeTv.setText(mBean.start_time);
+            endTimeTv.setText(mBean.end_time);
+            noteEt.setText(mBean.mark);
         }
     }
 
@@ -67,35 +74,43 @@ public class AutoTimeActivity extends BaseActivity {
                 }).show();
                 break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
 
     private void save() {
-//        mBean.clause = mClauseEt.getText().toString();
-//        mBean.content = mContentEt.getText().toString();
-//        mBean.withholding = mWithholdEt.getText().toString();
-//        mBean.notes = mNoteEt.getText().toString();
-//        mBean.date = mDateTv.getText().toString();
+        mBean.mark = noteEt.getText().toString();
+        mBean.start_time = startTimeTv.getText().toString();
+        mBean.end_time = endTimeTv.getText().toString();
+        if (TextUtils.isEmpty(mBean.mark)) {
+            MyUtil.toast("请输入备注");
+            return;
+        }
+        if (TextUtils.isEmpty(mBean.start_time) || TextUtils.isEmpty(mBean.end_time)) {
+            MyUtil.toast("请输入时间段");
+            return;
+        }
+        if (mBean.end_time.compareTo(mBean.start_time) <= 0) {
+            MyUtil.toast("结束时间应该大于开始时间");
+            return;
+        }
 
-//        FormBody.Builder builder = new FormBody.Builder();
-//        builder.add("id", mBean.id + "")
-//                .add("clause", mBean.clause)
-//                .add("content", mBean.content + "")
-//                .add("withholding", mBean.withholding + "")
-//                .add("date", mBean.date + "")
-//                .add("notes", mBean.notes + "");
-//
-//        new HttpTask(Config.url_contract_save).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
-//            @Override
-//            public void onComplete(ResponseData responseData) {
-//                if (responseData.isSuccess()) {
-//                    MyUtil.toast("保存成功");
-//        setResult(RESULT_OK);
-//                    finish();
-//                }
-//            }
-//        }).enqueue(builder.build());
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add("id", mBean.id + "")
+                .add("mark", mBean.mark)
+                .add("start_time", mBean.start_time + "")
+                .add("end_time", mBean.end_time + "");
+
+        new HttpTask(Config.url_autotime_save).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+            @Override
+            public void onComplete(ResponseData responseData) {
+                if (responseData.isSuccess()) {
+                    MyUtil.toast("保存成功");
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }
+        }).enqueue(builder.build());
     }
 
     @Override
