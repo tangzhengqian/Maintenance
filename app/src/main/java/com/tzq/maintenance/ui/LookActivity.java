@@ -51,7 +51,12 @@ public class LookActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.auto_time_activity, menu);
-
+        MenuItem item = menu.findItem(R.id.action_delete);
+        if (mBean.id > 0) {
+            item.setVisible(true);
+        } else {
+            item.setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -65,7 +70,23 @@ public class LookActivity extends BaseActivity {
                 new AlertDialog.Builder(mAct).setMessage("要删除？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        setResult(RESULT_OK);
+                        if (mBean.id > 0) {
+                            new HttpTask(Config.url_look_delete + "?id=" + mBean.id).setActivity(mAct).addCompleteCallBack(new HttpTask.CompleteCallBack() {
+                                @Override
+                                public void onComplete(ResponseData responseData) {
+                                    if (responseData.isSuccess()) {
+                                        MyUtil.toast("删除成功");
+                                        setResult(RESULT_OK);
+                                        finish();
+                                    }
+                                }
+                            }).enqueue();
+                        } else {
+                            MyUtil.toast("删除成功");
+                            setResult(RESULT_OK);
+                            finish();
+                        }
+
                     }
                 }).show();
                 break;

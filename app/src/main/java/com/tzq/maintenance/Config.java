@@ -40,8 +40,10 @@ public class Config {
     public static final String url_save_subStake = url_host + "/Home/Api/saveSonStake";
     public static final String url_autotime_list = url_host + "/Home/Api/getTimeList";
     public static final String url_autotime_save = url_host + "/Home/Api/saveTime";
+    public static final String url_autotime_delete = url_host + "/Home/Api/delTime";
     public static final String url_look_list = url_host + "/Home/Api/getLookList";
     public static final String url_look_save = url_host + "/Home/Api/saveLook";
+    public static final String url_look_delete = url_host + "/Home/Api/delLook";
 
 
     public static final String url_export1 = url_host + "/Home/ApiDown/exportPaymentCheck";
