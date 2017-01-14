@@ -5,6 +5,7 @@ import com.tzq.common.utils.Util;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Administrator on 2017/1/5.
@@ -28,6 +29,8 @@ public class Stake implements Serializable {
     private ArrayList<String> newConstructionPics;//just offline save
     private List<String> afterPics;//just for cache
     private ArrayList<String> newAfterPics;//just offline save
+
+    public String uuid = UUID.randomUUID().toString();
 
     public Stake() {
     }

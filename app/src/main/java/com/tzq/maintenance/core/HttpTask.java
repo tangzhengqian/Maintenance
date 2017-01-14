@@ -100,7 +100,9 @@ public class HttpTask {
     }
 
     public void enqueue(RequestBody body) {
-        LogUtil.i("enqueue " + mUrl);
+        if (!Config.url_get_new_time.equals(mUrl)) {
+            LogUtil.i("enqueue " + mUrl);
+        }
 
         showProgressDialog();
         getCall(body).enqueue(new Callback() {
@@ -121,7 +123,10 @@ public class HttpTask {
     }
 
     public ResponseData execute(RequestBody body) {
-        LogUtil.i("execute " + mUrl);
+        if (!Config.url_get_new_time.equals(mUrl)) {
+            LogUtil.i("execute " + mUrl);
+        }
+
         try {
             Response response = getCall(body).execute();
             return getResponseData(response);

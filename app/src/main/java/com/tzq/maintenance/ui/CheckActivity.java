@@ -362,7 +362,7 @@ public class CheckActivity extends BaseActivity {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", false), REQUEST_DETAIL);
+                startActivityForResult(new Intent(mAct, DetailActivity.class).putExtra("detail", detail).putExtra("editable", MyUtil.isCheckEditable(mBean)), REQUEST_DETAIL);
             }
         });
     }
@@ -440,9 +440,18 @@ public class CheckActivity extends BaseActivity {
         for (int i = 0; i < count; i++) {
             View child = mSubStakeListLay.getChildAt(i);
             Stake childTag = (Stake) child.getTag();
-            if (childTag.id == stake.id) {
-                view = child;
+            if (stake.id > 0) {
+                if (childTag.id == stake.id) {
+                    view = child;
+                    break;
+                }
+            } else {
+                if (childTag.uuid.equals(stake.id)) {
+                    view = child;
+                    break;
+                }
             }
+
         }
         if (view == null) {
             view = View.inflate(mAct, R.layout.notice_sub_stake_lay, null);
@@ -713,7 +722,7 @@ public class CheckActivity extends BaseActivity {
                 mBean.getTuzhiSysNewPicUris().addAll(uris);
                 MyUtil.showImage(mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
             }
-        }else if (requestCode == REQUEST_ATTACH) {
+        } else if (requestCode == REQUEST_ATTACH) {
             if (resultCode == RESULT_OK) {
                 mBean.getAttachNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");

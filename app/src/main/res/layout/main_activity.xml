@@ -57,6 +57,11 @@
                 style="@style/button"
                 android:layout_marginTop="16dp"
                 android:text="自动签发管理"/>
+            <Button
+                android:id="@+id/lookBt"
+                style="@style/button"
+                android:layout_marginTop="16dp"
+                android:text="巡查管理"/>
         </LinearLayout>
     </ScrollView>
 

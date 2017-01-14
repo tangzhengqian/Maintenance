@@ -77,6 +77,9 @@ public class MainActivity extends BaseActivity {
             case R.id.autotime_bt:
                 startActivity(new Intent(mAct, AutoTimeListActivity.class));
                 break;
+            case R.id.lookBt:
+                startActivity(new Intent(mAct, LookListActivity.class));
+                break;
         }
     }
 

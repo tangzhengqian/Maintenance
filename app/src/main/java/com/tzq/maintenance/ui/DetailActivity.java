@@ -22,8 +22,6 @@ import com.tzq.maintenance.utis.MyUtil;
 
 import java.util.List;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by Administrator on 2016/11/1.
  */
@@ -34,7 +32,7 @@ public class DetailActivity extends BaseActivity {
 
     List<DetailType> mDetailTypeList = new Select().from(DetailType.class).execute();
     List<Detail> mDetailList;
-    Detail mDetail = new Detail();
+    Detail mBean = new Detail();
     boolean mEditable = true;
 
     @Override
@@ -54,25 +52,25 @@ public class DetailActivity extends BaseActivity {
         mCostEt = (EditText) findViewById(R.id.detail_cost_et);
 
         reset();
-        mDetail = (Detail) getIntent().getSerializableExtra("detail");
+        mBean = (Detail) getIntent().getSerializableExtra("detail");
         mEditable = getIntent().getBooleanExtra("editable", true);
         MyUtil.setUpSp(mAct, mTypeSp, mDetailTypeList);
         mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(0).id).execute();
         MyUtil.setUpSp(mAct, mNameSp, mDetailList);
-        if (mDetail != null) {
-            mTypeSp.setSelection(MyUtil.getDetailTypeIndex(mDetailTypeList, mDetail.cate_id));
+        if (mBean != null) {
+            mTypeSp.setSelection(MyUtil.getDetailTypeIndex(mDetailTypeList, mBean.cate_id));
             mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(mTypeSp.getSelectedItemPosition()).id).execute();
             MyUtil.setUpSp(mAct, mNameSp, mDetailList);
-            mNameSp.setSelection(MyUtil.getDetailIndex(mDetailList, mDetail.id));
-            mPriceEt.setText(mDetail.detail_price);
-            mUnitEt.setText(mDetail.detail_unit);
-            mQuantity1Et.setText(mDetail.detail_quantities1);
-            mQuantity2Et.setText(mDetail.detail_quantities2);
-            mQuantity3Et.setText(mDetail.detail_quantities3);
-            mCostEt.setText(mDetail.detail_all_price);
+            mNameSp.setSelection(MyUtil.getDetailIndex(mDetailList, mBean.id));
+            mPriceEt.setText(mBean.detail_price);
+            mUnitEt.setText(mBean.detail_unit);
+            mQuantity1Et.setText(mBean.detail_quantities1);
+            mQuantity2Et.setText(mBean.detail_quantities2);
+            mQuantity3Et.setText(mBean.detail_quantities3);
+            mCostEt.setText(mBean.detail_all_price);
         } else {
-            mDetail = new Detail();
-            mDetail.id = -1;
+            mBean = new Detail();
+            mBean.id = -1;
             mTypeSp.setSelection(0);
             mDetailList = new Select().from(Detail.class).where("cate_id = " + mDetailTypeList.get(mTypeSp.getSelectedItemPosition()).id).execute();
             MyUtil.setUpSp(mAct, mNameSp, mDetailList);
@@ -108,10 +106,10 @@ public class DetailActivity extends BaseActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (mDetailList != null && mDetailList.size() > position) {
-                    mDetail = mDetailList.get(position);
-                    if (mDetail != null) {
-                        mUnitEt.setText(mDetail.detail_unit);
-                        mPriceEt.setText(mDetail.detail_already_price);
+                    mBean = mDetailList.get(position);
+                    if (mBean != null) {
+                        mUnitEt.setText(mBean.detail_unit);
+                        mPriceEt.setText(mBean.detail_already_price);
                         cal();
                     }
                 }
@@ -134,41 +132,43 @@ public class DetailActivity extends BaseActivity {
         return true;
     }
 
-    private void cal(){
-        double p= NumberUtil.strToDouble(mPriceEt.getText().toString());
-        double n1=1;
-        if(!Util.isEmpty(mQuantity1Et.getText().toString())){
-            n1=NumberUtil.strToDouble(mQuantity1Et.getText().toString());
+    private void cal() {
+        double p = NumberUtil.strToDouble(mPriceEt.getText().toString());
+        double n1 = 1;
+        if (!Util.isEmpty(mQuantity1Et.getText().toString())) {
+            n1 = NumberUtil.strToDouble(mQuantity1Et.getText().toString());
         }
-        double n2=1;
-        if(!Util.isEmpty(mQuantity2Et.getText().toString())){
-            n2=NumberUtil.strToDouble(mQuantity2Et.getText().toString());
+        double n2 = 1;
+        if (!Util.isEmpty(mQuantity2Et.getText().toString())) {
+            n2 = NumberUtil.strToDouble(mQuantity2Et.getText().toString());
         }
-        double n3=1;
-        if(!Util.isEmpty(mQuantity3Et.getText().toString())){
-            n3=NumberUtil.strToDouble(mQuantity3Et.getText().toString());
+        double n3 = 1;
+        if (!Util.isEmpty(mQuantity3Et.getText().toString())) {
+            n3 = NumberUtil.strToDouble(mQuantity3Et.getText().toString());
         }
-        double cost=p*n1*n2*n3;
-        mCostEt.setText(""+NumberUtil.doubleToStr(cost,2));
+        double cost = p * n1 * n2 * n3;
+        mCostEt.setText("" + NumberUtil.doubleToStr(cost, 2));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_ok) {
-            mDetail.id = ((Detail) mNameSp.getSelectedItem()).id;
-            mDetail.cate_id = ((DetailType) mTypeSp.getSelectedItem()).id;
-            mDetail.detail_price = mPriceEt.getText().toString();
-            mDetail.detail_unit = mUnitEt.getText().toString();
-            mDetail.detail_quantities1 = mQuantity1Et.getText().toString();
-            mDetail.detail_quantities2 = mQuantity2Et.getText().toString();
-            mDetail.detail_quantities3 = mQuantity3Et.getText().toString();
-            mDetail.detail_all_price = mCostEt.getText().toString();
-            setResult(RESULT_OK, new Intent().putExtra("detail", mDetail));
+            Detail detail = (Detail) mNameSp.getSelectedItem();
+            mBean.id = detail.id;
+            mBean.cate_id = ((DetailType) mTypeSp.getSelectedItem()).id;
+            mBean.detail_price = mPriceEt.getText().toString();
+            mBean.detail_unit = mUnitEt.getText().toString();
+            mBean.detail_quantities1 = mQuantity1Et.getText().toString();
+            mBean.detail_quantities2 = mQuantity2Et.getText().toString();
+            mBean.detail_quantities3 = mQuantity3Et.getText().toString();
+            mBean.detail_all_price = mCostEt.getText().toString();
+            mBean.detail_num = detail.detail_num;
+            setResult(RESULT_OK, new Intent().putExtra("detail", mBean));
             finish();
             return true;
         } else if (id == R.id.action_delete) {
-            setResult(Config.RESULT_DELETE, new Intent().putExtra("detail", mDetail));
+            setResult(Config.RESULT_DELETE, new Intent().putExtra("detail", mBean));
             finish();
             return true;
         }
@@ -176,7 +176,7 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void reset() {
-        mDetail = null;
+        mBean = null;
         mPriceEt.setText("");
         mUnitEt.setText("");
         mQuantity1Et.setText("");
@@ -187,7 +187,7 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onViewClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.refreshBt:
                 cal();
                 break;

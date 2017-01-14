@@ -45,6 +45,8 @@
         <activity android:name=".ui.StakeActivity" />
         <activity android:name=".ui.AutoTimeActivity" />
         <activity android:name=".ui.AutoTimeListActivity" />
+        <activity android:name=".ui.LookListActivity" />
+        <activity android:name=".ui.LookActivity" />
 
         <receiver android:name=".core.HeartbeatReceiver"/>
         <service android:name=".core.CoreService"/>
