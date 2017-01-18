@@ -530,26 +530,12 @@ public class CheckActivity extends BaseActivity {
     }
 
     private boolean httpSave() {
-        if (Util.isEmpty(mBean.stake_num1)) {
-            MyUtil.toast("请输入桩号");
+        if (!MyUtil.checkStake(mBean.stake_num1)) {
             return false;
-        } else {
-            float n1 = Float.valueOf(mBean.stake_num1);
-            if (String.valueOf((int) n1).length() != 6) {
-                MyUtil.toast("桩号必须有6位整数");
-                return false;
-            }
         }
 
-        if (Util.isEmpty(mBean.stake_num2)) {
-            MyUtil.toast("请输入桩号");
+        if (!MyUtil.checkStake(mBean.stake_num2)) {
             return false;
-        } else {
-            float n2 = Float.valueOf(mBean.stake_num2);
-            if (String.valueOf((int) n2).length() != 6) {
-                MyUtil.toast("桩号必须有6位整数");
-                return false;
-            }
         }
 
         MyUtil.updatePic(mBean.getTuzhiPicUris(), mBean.getTuzhiNewPicUris());

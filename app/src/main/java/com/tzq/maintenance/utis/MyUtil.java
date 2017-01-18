@@ -644,4 +644,18 @@ public class MyUtil {
         newUris.clear();
         newUris.addAll(pics2);
     }
+
+    public static boolean checkStake(String stake) {
+        if (Util.isEmpty(stake)) {
+            MyUtil.toast("请输入桩号");
+            return false;
+        } else {
+            float n1 = Float.valueOf(stake);
+            if (String.valueOf((int) n1).length() != 7) {
+                MyUtil.toast("桩号必须是7位整数");
+                return false;
+            }
+        }
+        return true;
+    }
 }
