@@ -66,7 +66,6 @@ public class Config {
     public static final String prefs_key_offline_check_list = "offline_check_list";
 
 
-
     public static final long sync_delay = 1000 * 60 * 10;
 
     public static final int RESULT_DELETE = 33;
@@ -86,7 +85,13 @@ public class Config {
 
     public static final String exportDirPath = "/sdcard/tzqExport";
     public static final String photoDirPath = "/sdcard/tzqPhoto";
-    public static final String crash_info_file ="/sdcard/tzq_crash";
+    public static final String crash_info_file = "/sdcard/tzq_crash";
+
+    public static final int ROLE_KEZHANG = 2;
+    public static final int ROLE_MAINT_MANAGER = 3;
+    public static final int ROLE_MAINT_MEMBER = 4;
+    public static final int ROLE_WORK_MANAGER = 5;
+    public static final int ROLE_WORK_MEMBER = 6;
 
 
     public static Gson gson;

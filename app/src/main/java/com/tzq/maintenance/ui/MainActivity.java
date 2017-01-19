@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 import com.tzq.maintenance.App;
+import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Company;
 import com.tzq.maintenance.bean.Maintenance;
@@ -33,7 +34,6 @@ public class MainActivity extends BaseActivity {
         String name = App.getInstance().getUser().user_name;
         Company company = new Select().from(Company.class).where("id=" + App.getInstance().getUser().company_id).executeSingle();
         Maintenance maintenance = new Select().from(Maintenance.class).where("id=" + App.getInstance().getUser().maintenance_id).executeSingle();
-//        Management management=new Select().from(Management.class).where("id="+App.getInstance().getUser().maintenance_id).executeSingle();
         Role role = new Select().from(Role.class).where("id=" + App.getInstance().getUser().role_id).executeSingle();
         if (name == null) {
             name = "";
@@ -43,20 +43,35 @@ public class MainActivity extends BaseActivity {
                 "\n所属养护科：" + maintenance.name +
                 "\n职位：" + role.name);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-//
-//                            }
-//                        }).show();
-//            }
-//        });
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        findViewById(R.id.notices_bt).setVisibility(View.VISIBLE);
+        findViewById(R.id.checks_bt).setVisibility(View.VISIBLE);
+        findViewById(R.id.contract_bt).setVisibility(View.VISIBLE);
+        findViewById(R.id.export_bt).setVisibility(View.VISIBLE);
+        findViewById(R.id.autotime_bt).setVisibility(View.VISIBLE);
+        findViewById(R.id.lookBt).setVisibility(View.VISIBLE);
+        switch (App.getInstance().getUser().role_id) {
+            case Config.ROLE_KEZHANG:
+                break;
+            case Config.ROLE_MAINT_MANAGER:
+                break;
+            case Config.ROLE_MAINT_MEMBER:
+                findViewById(R.id.checks_bt).setVisibility(View.GONE);
+                findViewById(R.id.export_bt).setVisibility(View.GONE);
+                findViewById(R.id.autotime_bt).setVisibility(View.GONE);
+                break;
+            case Config.ROLE_WORK_MANAGER:
+                findViewById(R.id.contract_bt).setVisibility(View.GONE);
+                break;
+            case Config.ROLE_WORK_MEMBER:
+                findViewById(R.id.contract_bt).setVisibility(View.GONE);
+                break;
+        }
     }
 
     @Override

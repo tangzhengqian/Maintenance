@@ -142,28 +142,28 @@ public class MyUtil {
         DealBean bean = null;
         if (step == 0) {
             if (createUserRoleId == nowUseRoleId) {
-                if (createUserRoleId == 6) {//施工单位巡查人员
+                if (createUserRoleId == Config.ROLE_WORK_MEMBER) {//施工单位巡查人员
                     return new DealBean("提交到施工管理", "for_5", null, null);
-                } else if (createUserRoleId == 5) {//施工单位管理
+                } else if (createUserRoleId == Config.ROLE_WORK_MANAGER) {//施工单位管理
                     return new DealBean("提交到养护科管理", "for_3", "不通过", "return_6");
-                } else if (createUserRoleId == 4) {//养护科巡查人员
+                } else if (createUserRoleId == Config.ROLE_MAINT_MEMBER) {//养护科巡查人员
                     return new DealBean("提交到养护科管理", "for_3", null, null);
-                } else if (createUserRoleId == 3) {//养护科管理
+                } else if (createUserRoleId == Config.ROLE_MAINT_MANAGER) {//养护科管理
                     return new DealBean("提交到科长", "for_2", "不通过", "return_5");
-                } else if (createUserRoleId == 2) {//养护科管理
+                } else if (createUserRoleId == Config.ROLE_KEZHANG) {//科长
                     return new DealBean("通过", "for_end", "不通过", "return_3");
                 }
             }
         } else if (step == 10) {
-            if (nowUseRoleId == 5) {//施工单位管理
+            if (nowUseRoleId == Config.ROLE_WORK_MANAGER) {//施工单位管理
                 return new DealBean("提交到养护科管理", "for_3", "不通过", "return_6");
             }
         } else if (step == 20) {
-            if (nowUseRoleId == 3) {//养护科管理
+            if (nowUseRoleId == Config.ROLE_MAINT_MANAGER) {//养护科管理
                 return new DealBean("提交到科长", "for_2", "不通过", "return_5");
             }
         } else if (step == 30) {
-            if (nowUseRoleId == 2) {//科长
+            if (nowUseRoleId == Config.ROLE_KEZHANG) {//科长
                 return new DealBean("通过", "for_end", "不通过", "return_3");
             }
         }
@@ -234,15 +234,15 @@ public class MyUtil {
     public static DealBean getCheckDealStr(int step, int nowUseRoleId) {
         DealBean bean = null;
         if (step == 0) {
-            if (nowUseRoleId == 5) {//施工单位管理
+            if (nowUseRoleId == Config.ROLE_WORK_MANAGER) {//施工单位管理
                 return new DealBean("提交到养护科管理", "for_3", null, null);
             }
         } else if (step == 10) {
-            if (nowUseRoleId == 3) {//养护科管理
+            if (nowUseRoleId == Config.ROLE_MAINT_MANAGER) {//养护科管理
                 return new DealBean("提交到科长", "for_2", "不通过", "return_5");
             }
         } else if (step == 20) {
-            if (nowUseRoleId == 2) {//科长
+            if (nowUseRoleId == Config.ROLE_KEZHANG) {//科长
                 return new DealBean("通过", "for_end", "不通过", "return_3");
             }
         }
