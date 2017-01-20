@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-import com.tzq.common.utils.Util;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.NormalBean;
@@ -145,26 +144,12 @@ public class StakeActivity extends BaseActivity {
         mBean.stake_ud = ((NormalBean) mStakeSp.getSelectedItem()).name;
         mBean.stake_num1 = mStakeNum1Et.getText().toString();
         mBean.stake_num2 = mStakeNum2Et.getText().toString();
-        if (Util.isEmpty(mBean.stake_num1)) {
-            MyUtil.toast("请输入桩号");
+        if (!MyUtil.checkStake(mBean.stake_num1)) {
             return false;
-        } else {
-            float n1 = Float.valueOf(mBean.stake_num1);
-            if (String.valueOf((int) n1).length() != 6) {
-                MyUtil.toast("桩号必须有6位整数");
-                return false;
-            }
         }
 
-        if (Util.isEmpty(mBean.stake_num2)) {
-            MyUtil.toast("请输入桩号");
+        if (!MyUtil.checkStake(mBean.stake_num2)) {
             return false;
-        } else {
-            float n2 = Float.valueOf(mBean.stake_num2);
-            if (String.valueOf((int) n2).length() != 6) {
-                MyUtil.toast("桩号必须有6位整数");
-                return false;
-            }
         }
         return true;
     }

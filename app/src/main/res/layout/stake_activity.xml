@@ -33,8 +33,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="6dp"
-                android:inputType="numberDecimal"
-                android:maxLength="10"
+                android:inputType="number"
+                android:maxLength="7"
                 android:layout_weight="1" />
 
             <EditText
@@ -42,8 +42,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="6dp"
-                android:inputType="numberDecimal"
-                android:maxLength="10"
+                android:inputType="number"
+                android:maxLength="7"
                 android:layout_weight="1" />
         </LinearLayout>
         <LinearLayout
