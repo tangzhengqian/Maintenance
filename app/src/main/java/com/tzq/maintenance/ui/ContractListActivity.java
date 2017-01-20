@@ -79,7 +79,7 @@ public class ContractListActivity extends BaseActivity implements SwipeRefreshLa
     @Override
     public void onViewClick(View view) {
         if (view == footerView) {
-            httpGetList(mPage++);
+            httpGetList(++mPage);
         }
     }
 
@@ -118,42 +118,36 @@ public class ContractListActivity extends BaseActivity implements SwipeRefreshLa
         new HttpTask(Config.url_contract_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(final ResponseData responseData) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int count = 0;
-                        if (responseData.isSuccess()) {
-                            try {
-                                if (Util.isEmpty(responseData.data)) {
-                                    mListData.clear();
-                                } else {
-                                    JSONObject o = new JSONObject(responseData.data);
-                                    count = o.optInt("count");
-                                    List<Contract> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Contract>>() {
-                                    }.getType());
-                                    mPage = p;
-                                    if (p == 1) {
-                                        mListData.clear();
-                                    }
-                                    mListData.addAll(list);
-                                }
-                            } catch (JSONException e) {
-                                LogUtil.e(e.getMessage(), e);
-                            }
-                            mListAdapter.setDataList(mListData);
-                        }
-                        if (mListData.size() >= count) {
-                            footerView.setText("没有更多的数据了");
-                            footerView.setEnabled(false);
+                int count = 0;
+                if (responseData.isSuccess()) {
+                    try {
+                        if (Util.isEmpty(responseData.data)) {
+                            mListData.clear();
                         } else {
-                            footerView.setText("点击这里加载更多");
-                            footerView.setEnabled(true);
+                            JSONObject o = new JSONObject(responseData.data);
+                            count = o.optInt("count");
+                            List<Contract> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Contract>>() {
+                            }.getType());
+                            mPage = p;
+                            if (p == 1) {
+                                mListData.clear();
+                            }
+                            mListData.addAll(list);
                         }
-
-                        setRefresh(false);
+                    } catch (JSONException e) {
+                        LogUtil.e(e.getMessage(), e);
                     }
-                });
+                    mListAdapter.setDataList(mListData);
+                }
+                if (mListData.size() >= count) {
+                    footerView.setText("没有更多的数据了");
+                    footerView.setEnabled(false);
+                } else {
+                    footerView.setText("点击这里加载更多");
+                    footerView.setEnabled(true);
+                }
 
+                setRefresh(false);
             }
         }).enqueue(new FormBody.Builder()
                 .add("now_page", p + "")

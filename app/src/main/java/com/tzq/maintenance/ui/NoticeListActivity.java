@@ -112,7 +112,7 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
     @Override
     public void onViewClick(View view) {
         if (view == footerView) {
-            httpGetList(mPage++);
+            httpGetList(++mPage);
         }
     }
 
@@ -324,48 +324,43 @@ public class NoticeListActivity extends BaseActivity implements SwipeRefreshLayo
         new HttpTask(Config.url_notice_list).addCompleteCallBack(new HttpTask.CompleteCallBack() {
             @Override
             public void onComplete(final ResponseData responseData) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        int count = 0;
-                        if (responseData.isSuccess()) {
-                            try {
-                                if (Util.isEmpty(responseData.data)) {
-                                    mListData.clear();
-                                } else {
-                                    JSONObject o = new JSONObject(responseData.data);
-                                    count = o.optInt("count");
-                                    int all = o.optInt("all");
-                                    int dealing = o.optInt("dealing");
-                                    int complete = o.optInt("complete");
-                                    int fail = o.optInt("fail");
-                                    updateCount(all, dealing, complete, fail);
-                                    List<Notice> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
-                                    }.getType());
-                                    mPage = p;
-                                    if (p == 1) {
-                                        mListData.clear();
-                                    }
-                                    mListData.addAll(list);
-                                }
-                            } catch (JSONException e) {
-                                LogUtil.e(e.getMessage(), e);
-                            }
-                        }
-                        mergeOffline();
-                        mListAdapter.setDataList(mListData);
-                        if (mListData.size() >= count) {
-                            footerView.setText("没有更多的数据了");
-                            footerView.setEnabled(false);
+                int count = 0;
+                if (responseData.isSuccess()) {
+                    try {
+                        if (Util.isEmpty(responseData.data)) {
+                            mListData.clear();
                         } else {
-                            footerView.setText("点击这里加载更多");
-                            footerView.setEnabled(true);
+                            JSONObject o = new JSONObject(responseData.data);
+                            count = o.optInt("count");
+                            int all = o.optInt("all");
+                            int dealing = o.optInt("dealing");
+                            int complete = o.optInt("complete");
+                            int fail = o.optInt("fail");
+                            updateCount(all, dealing, complete, fail);
+                            List<Notice> list = Config.gson.fromJson(o.optString("list"), new TypeToken<List<Notice>>() {
+                            }.getType());
+                            mPage = p;
+                            if (p == 1) {
+                                mListData.clear();
+                            }
+                            mListData.addAll(list);
                         }
-
-                        setRefresh(false);
-                        refreshMutiSelect();
+                    } catch (JSONException e) {
+                        LogUtil.e(e.getMessage(), e);
                     }
-                });
+                }
+                mergeOffline();
+                mListAdapter.setDataList(mListData);
+                if (mListData.size() >= count) {
+                    footerView.setText("没有更多的数据了");
+                    footerView.setEnabled(false);
+                } else {
+                    footerView.setText("点击这里加载更多");
+                    footerView.setEnabled(true);
+                }
+
+                setRefresh(false);
+                refreshMutiSelect();
 
             }
         }).enqueue(new FormBody.Builder()
