@@ -73,7 +73,8 @@ public class LookListActivity extends BaseActivity implements SwipeRefreshLayout
     @Override
     public void onViewClick(View view) {
         if (view == footerView) {
-            httpGetList(++mPage);
+            int p = mPage + 1;
+            httpGetList(p);
         }
     }
 

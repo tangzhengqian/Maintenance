@@ -73,7 +73,8 @@ public class AutoTimeListActivity extends BaseActivity implements SwipeRefreshLa
     @Override
     public void onViewClick(View view) {
         if (view == footerView) {
-            httpGetList(++mPage);
+            int p = mPage + 1;
+            httpGetList(p);
         }
     }
 

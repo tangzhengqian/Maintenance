@@ -265,7 +265,8 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     @Override
     public void onViewClick(View view) {
         if (view == footerView) {
-            httpGetList(++mPage);
+            int p = mPage + 1;
+            httpGetList(p);
         }
     }
 

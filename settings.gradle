@@ -1,1 +1,1 @@
-include ':app', ':Android-Common:android-common'
+include ':app', ':Android-Common:android-common', ':jtest'
