@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -657,5 +658,21 @@ public class MyUtil {
             }
         }
         return true;
+    }
+
+    public static String getStakeStr(String stake1, String stake2) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("K");
+        sb.append(stake1.substring(0, 4));
+        sb.append("+");
+        sb.append(stake1.substring(4, stake1.length()));
+        if (!TextUtils.isEmpty(stake2)) {
+            sb.append("-");
+            sb.append("K");
+            sb.append(stake1.substring(0, 4));
+            sb.append("+");
+            sb.append(stake1.substring(4, stake1.length()));
+        }
+        return sb.toString();
     }
 }

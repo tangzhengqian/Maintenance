@@ -25,9 +25,11 @@ import com.google.gson.reflect.TypeToken;
 import com.tzq.common.ui.CBaseAdapter;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
+import com.tzq.maintenance.App;
 import com.tzq.maintenance.Config;
 import com.tzq.maintenance.R;
 import com.tzq.maintenance.bean.Check;
+import com.tzq.maintenance.bean.DealBean;
 import com.tzq.maintenance.bean.ResponseData;
 import com.tzq.maintenance.core.HttpTask;
 import com.tzq.maintenance.utis.MyUtil;
@@ -114,6 +116,12 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isMutiSelectMode) {
             getMenuInflater().inflate(R.menu.notice_list_muti_select, menu);
+            MenuItem commit = menu.findItem(R.id.action_commit);
+            if (type == 1) {
+                commit.setVisible(true);
+            } else {
+                commit.setVisible(false);
+            }
             String s = "";
             if (!selectPositions.isEmpty()) {
                 s = "(" + selectPositions.size() + ")";
@@ -142,6 +150,8 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
         }
         return true;
     }
+
+    int commitCount = 0;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -175,6 +185,39 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                     }
                 }).show();
 
+                break;
+            case R.id.action_commit:
+                new AlertDialog.Builder(mAct).setMessage("批量提交所选通知单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ProgressDialogUtil.show(mAct, "正在批量提交...");
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                commitCount = 0;
+                                for (int pos : selectPositions) {
+                                    Check check = mListAdapter.getItem(pos);
+                                    DealBean noticeDealBean = MyUtil.getCheckDealStr(check.step, App.getInstance().getUser().role_id);
+                                    if (noticeDealBean != null) {
+                                        commitCount++;
+                                        new HttpTask(Config.url_check_deal + "?id=" + check.id + "&act=" + noticeDealBean.nextAct).execute(null);
+                                    }
+                                }
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ProgressDialogUtil.hide(mAct);
+                                        MyUtil.toast("提交完成\n共有" + commitCount + "条验收单提交成功");
+                                        httpGetList(1);
+                                    }
+                                });
+                            }
+                        }.start();
+
+                        isMutiSelectMode = false;
+                        refreshMutiSelect();
+                    }
+                }).show();
                 break;
             case R.id.action_delete:
                 new AlertDialog.Builder(mAct).setMessage("删除所选验收单？").setNegativeButton("取消", null).setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -403,6 +446,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
                 vh.stepTv = (TextView) convertView.findViewById(R.id.notice_step_tv);
                 vh.checkBox = (CheckBox) convertView.findViewById(R.id.check);
                 vh.statusTv = (TextView) convertView.findViewById(R.id.statusTv);
+                vh.stakeTv = (TextView) convertView.findViewById(R.id.stakeTv);
             } else {
                 vh = (VH) convertView.getTag();
             }
@@ -414,6 +458,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             vh.costTv.setText("造价：" + item.project_cost);
             vh.stepTv.setText("状态：" + MyUtil.getStepStrForCheck(Integer.valueOf(item.step)));
             vh.dateTv.setText("" + item.created_at);
+            vh.stakeTv.setText("" + item.stake_ud + " " + MyUtil.getStakeStr(item.stake_num1, item.stake_num2));
             if (Util.isEmpty(item.offlineId)) {
                 vh.statusTv.setText("" + MyUtil.getStatusStrForCheck(Integer.valueOf(item.step)));
                 vh.statusTv.setTextColor(MyUtil.getStatusColorForCheck(Integer.valueOf(item.step)));
@@ -455,6 +500,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
             public TextView stepTv;
             public CheckBox checkBox;
             public TextView statusTv;
+            public TextView stakeTv;
         }
     }
 }

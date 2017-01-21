@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -352,8 +353,10 @@ public class NoticeActivity extends BaseActivity {
             return false;
         }
 
-        if (!MyUtil.checkStake(mBean.stake_num2)) {
-            return false;
+        if (!TextUtils.isEmpty(mBean.stake_num2)) {
+            if (!MyUtil.checkStake(mBean.stake_num2)) {
+                return false;
+            }
         }
 
 

@@ -15,8 +15,8 @@
         android:id="@+id/action_export"
         android:title="导出"
         app:showAsAction="ifRoom" />
-    <!--<item-->
-        <!--android:id="@+id/action_commit"-->
-        <!--android:title="提交"-->
-        <!--app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/action_commit"
+        android:title="提交上级"
+        app:showAsAction="ifRoom" />
 </menu>

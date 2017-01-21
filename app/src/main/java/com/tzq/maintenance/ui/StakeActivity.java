@@ -3,6 +3,7 @@ package com.tzq.maintenance.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -147,9 +148,10 @@ public class StakeActivity extends BaseActivity {
         if (!MyUtil.checkStake(mBean.stake_num1)) {
             return false;
         }
-
-        if (!MyUtil.checkStake(mBean.stake_num2)) {
-            return false;
+        if (!TextUtils.isEmpty(mBean.stake_num2)) {
+            if (!MyUtil.checkStake(mBean.stake_num2)) {
+                return false;
+            }
         }
         return true;
     }

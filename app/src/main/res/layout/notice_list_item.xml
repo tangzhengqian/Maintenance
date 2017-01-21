@@ -29,9 +29,15 @@
                 android:text="编号：" />
 
             <TextView
-                android:id="@+id/notice_name_tv"
+                android:id="@+id/stakeTv"
                 style="@style/notice_item_tv"
                 android:layout_below="@+id/notice_no_tv"
+                android:text="桩号：" />
+
+            <TextView
+                android:id="@+id/notice_name_tv"
+                style="@style/notice_item_tv"
+                android:layout_below="@+id/stakeTv"
                 android:text="工程名称：" />
 
             <TextView
@@ -58,7 +64,7 @@
                 android:id="@+id/notice_date_tv"
                 style="@style/notice_item_tv"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/notice_step_tv"
+                android:layout_below="@+id/notice_name_tv"
                 android:text="" />
         </RelativeLayout>
 
