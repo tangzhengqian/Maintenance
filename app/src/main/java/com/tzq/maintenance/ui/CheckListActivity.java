@@ -453,7 +453,7 @@ public class CheckListActivity extends BaseActivity implements SwipeRefreshLayou
 
             Check item = getItem(position);
             vh.nameTv.setText("名称：" + item.project_name);
-            vh.noTv.setText("编号：" + item.id);
+            vh.noTv.setText("编号：" + item.notice_id);
             vh.typeTv.setText("分类：" + MyUtil.getNoticeCateStr(item.cate));
             vh.costTv.setText("造价：" + item.project_cost);
             vh.stepTv.setText("状态：" + MyUtil.getStepStrForCheck(Integer.valueOf(item.step)));
