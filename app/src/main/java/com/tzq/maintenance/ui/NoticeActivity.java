@@ -96,14 +96,14 @@ public class NoticeActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.notice_act, menu);
         MenuItem dealNextMenu = menu.findItem(R.id.action_deal_next);
         MenuItem dealCancelMenu = menu.findItem(R.id.action_deal_cancel);
-        MenuItem deleteMenu = menu.findItem(R.id.action_delete);
+//        MenuItem deleteMenu = menu.findItem(R.id.action_delete);
         MenuItem saveMenu = menu.findItem(R.id.action_save);
 
-        if (mBean.created_user_id == App.getInstance().getUser().user_id || App.getInstance().getUser().role_id == 1) {
-            deleteMenu.setVisible(true);
-        } else {
-            deleteMenu.setVisible(false);
-        }
+//        if (mBean.created_user_id == App.getInstance().getUser().user_id || App.getInstance().getUser().role_id == 1) {
+//            deleteMenu.setVisible(true);
+//        } else {
+//            deleteMenu.setVisible(false);
+//        }
         if (mBean.id <= 0) {
             dealNextMenu.setVisible(false);
             dealCancelMenu.setVisible(false);
@@ -128,7 +128,7 @@ public class NoticeActivity extends BaseActivity {
             }
         }
         saveMenu.setVisible(isEditable());
-        deleteMenu.setVisible(isEditable());
+//        deleteMenu.setVisible(isEditable());
 
         return super.onCreateOptionsMenu(menu);
     }
