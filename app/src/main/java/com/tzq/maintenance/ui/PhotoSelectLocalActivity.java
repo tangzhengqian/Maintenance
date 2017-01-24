@@ -54,6 +54,7 @@ public class PhotoSelectLocalActivity extends BaseActivity {
         mGridView.setAdapter(mAdapter);
 
         if (mTuzhiSys) {
+            findViewById(R.id.aibum_lay).setVisibility(View.GONE);
             List<Drawing> drawList = new Select().from(Drawing.class).where("management_id = " + App.getInstance().getUser().management_id).execute();
             if (!Util.isEmpty(drawList)) {
                 for (Drawing drawing : drawList) {
@@ -62,6 +63,7 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             }
             mAdapter.setDataList(mPaths);
         } else {
+            findViewById(R.id.aibum_lay).setVisibility(View.VISIBLE);
             final List<String> aibumNames = new ArrayList<>();
             final List<PhotoAibum> l = ImageUtil.getPhotoAlbum(mAct);
             for (PhotoAibum pa : l) {
@@ -135,11 +137,6 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             if (mTuzhiSys) {
                 MyUtil.displayPic(mAct, vh.photoIv, path);
             } else {
-//                if(path.contains("Camera")||path.contains("camera")){
-//                    MyUtil.displayLargePic(vh.photoIv, "file://" + path);
-//                }else {
-//                    MyUtil.displayPic(vh.photoIv, "file://" + path);
-//                }
                 MyUtil.displayPic(mAct,vh.photoIv, "file://" + path);
             }
 

@@ -15,6 +15,7 @@
         android:verticalSpacing="8dp"
         android:paddingBottom="35dp"/>
     <LinearLayout
+        android:id="@+id/aibum_lay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
