@@ -20,8 +20,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.activeandroid.query.Select;
+import com.bumptech.glide.Glide;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.picasso.Picasso;
 import com.tzq.common.core.PrefsManager;
 import com.tzq.common.utils.LogUtil;
 import com.tzq.common.utils.Util;
@@ -316,19 +316,36 @@ public class MyUtil {
     }
 
     public static void displayPic(ImageView iv, String url) {
+        displayPic(null, iv, url);
+    }
+
+    public static void displayPic(Context context, ImageView iv, String url) {
 //        LogUtil.i("displayPic  " + url);
         if (!url.contains(":")) {
             url = Config.url_host + url;
         }
-        Picasso.with(App.getInstance()).load(url).resize(100, 100).centerCrop().into(iv);
+        if (context == null) {
+            context = App.getInstance();
+        }
+//        Picasso.with(context).load(url).resizeDimen(R.dimen.img_wh, R.dimen.img_wh).config(Bitmap.Config.RGB_565)
+//                .centerCrop().into(iv);
+        Glide.with(context).load(url).override(200,200).centerCrop().into(iv);
     }
 
     public static void displayLargePic(ImageView iv, String url) {
+        displayLargePic(null, iv, url);
+    }
+
+    public static void displayLargePic(Context context, ImageView iv, String url) {
 //        LogUtil.i("displayPic  " + url);
         if (!url.contains(":")) {
             url = Config.url_host + url;
         }
-        Picasso.with(App.getInstance()).load(url).into(iv);
+        if (context == null) {
+            context = App.getInstance();
+        }
+//        Picasso.with(context).load(url).memoryPolicy(NO_CACHE, NO_STORE).config(Bitmap.Config.RGB_565).into(iv);
+        Glide.with(context).load(url).into(iv);
     }
 
     public static DetailType getDetailType(int id) {

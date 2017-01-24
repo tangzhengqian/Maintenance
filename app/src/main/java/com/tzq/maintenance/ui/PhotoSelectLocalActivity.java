@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import com.activeandroid.query.Select;
 import com.tzq.common.bean.PhotoAibum;
@@ -29,6 +32,7 @@ import java.util.List;
 
 public class PhotoSelectLocalActivity extends BaseActivity {
     private GridView mGridView;
+    private Spinner spinner;
     PhotoAdapter mAdapter;
     ArrayList<String> mPaths = new ArrayList<>();
     boolean mTuzhiSys = false;
@@ -37,12 +41,14 @@ public class PhotoSelectLocalActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("选择图片");
-        setContentView(R.layout.photo_grid_show_activity);
+        setContentView(R.layout.photo_select_activity);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         mTuzhiSys = getIntent().getBooleanExtra("tuzhiSys", false);
 
         mGridView = (GridView) findViewById(R.id.photo_gv);
+        spinner = (Spinner) findViewById(R.id.spinner);
         mAdapter = new PhotoAdapter(mAct);
 
         mGridView.setAdapter(mAdapter);
@@ -54,19 +60,47 @@ public class PhotoSelectLocalActivity extends BaseActivity {
                     mPaths.add(drawing.image_url);
                 }
             }
+            mAdapter.setDataList(mPaths);
         } else {
-            List<PhotoAibum> l = ImageUtil.getPhotoAlbum(mAct);
+            final List<String> aibumNames = new ArrayList<>();
+            final List<PhotoAibum> l = ImageUtil.getPhotoAlbum(mAct);
             for (PhotoAibum pa : l) {
                 if (Util.isEmpty(pa.bitList)) {
                     continue;
                 }
-                for (PhotoAibum.PhotoItem it : pa.bitList) {
-                    mPaths.add(it.path);
+                if (pa.name.contains("Camera") || pa.name.contains("camera")) {
+                    aibumNames.add(0, pa.name);
+                } else {
+                    aibumNames.add(pa.name);
                 }
             }
-        }
+            MyUtil.setUpSp(this, spinner, aibumNames);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String name = aibumNames.get(position);
+                    mPaths.clear();
+                    for (PhotoAibum pa : l) {
+                        if (Util.isEmpty(pa.bitList)) {
+                            continue;
+                        }
+                        if (pa.name.equals(name)) {
+                            for (PhotoAibum.PhotoItem it : pa.bitList) {
+                                mPaths.add(it.path);
+                            }
+                            break;
+                        }
+                    }
+                    mAdapter.setDataList(mPaths);
 
-        mAdapter.setDataList(mPaths);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+        }
     }
 
     @Override
@@ -101,7 +135,12 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             if (mTuzhiSys) {
                 MyUtil.displayPic(vh.photoIv, path);
             } else {
-                MyUtil.displayPic(vh.photoIv, "file://" + path);
+//                if(path.contains("Camera")||path.contains("camera")){
+//                    MyUtil.displayLargePic(vh.photoIv, "file://" + path);
+//                }else {
+//                    MyUtil.displayPic(vh.photoIv, "file://" + path);
+//                }
+                MyUtil.displayPic(mAct,vh.photoIv, "file://" + path);
             }
 
             vh.photoIv.setOnClickListener(new View.OnClickListener() {
