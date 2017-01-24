@@ -197,7 +197,7 @@ public class PhotoGridShowActivity extends BaseActivity {
             }
 
             String uri = getItem(position);
-            MyUtil.displayPic(vh.photoIv, uri);
+            MyUtil.displayPic(mAct, vh.photoIv, uri);
             if (mSelectPostion.contains(position)) {
                 vh.photoCover.setVisibility(View.VISIBLE);
                 vh.photoCb.setChecked(true);

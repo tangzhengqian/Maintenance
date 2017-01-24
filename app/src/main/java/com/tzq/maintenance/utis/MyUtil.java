@@ -315,10 +315,6 @@ public class MyUtil {
         return 0;
     }
 
-    public static void displayPic(ImageView iv, String url) {
-        displayPic(null, iv, url);
-    }
-
     public static void displayPic(Context context, ImageView iv, String url) {
 //        LogUtil.i("displayPic  " + url);
         if (!url.contains(":")) {
@@ -327,14 +323,9 @@ public class MyUtil {
         if (context == null) {
             context = App.getInstance();
         }
-//        Picasso.with(context).load(url).resizeDimen(R.dimen.img_wh, R.dimen.img_wh).config(Bitmap.Config.RGB_565)
-//                .centerCrop().into(iv);
-        Glide.with(context).load(url).override(200,200).centerCrop().into(iv);
+        Glide.with(context).load(url).override(200, 200).centerCrop().into(iv);
     }
 
-    public static void displayLargePic(ImageView iv, String url) {
-        displayLargePic(null, iv, url);
-    }
 
     public static void displayLargePic(Context context, ImageView iv, String url) {
 //        LogUtil.i("displayPic  " + url);
@@ -344,7 +335,6 @@ public class MyUtil {
         if (context == null) {
             context = App.getInstance();
         }
-//        Picasso.with(context).load(url).memoryPolicy(NO_CACHE, NO_STORE).config(Bitmap.Config.RGB_565).into(iv);
         Glide.with(context).load(url).into(iv);
     }
 
@@ -612,18 +602,18 @@ public class MyUtil {
         return true;
     }
 
-    public static void showImage(List<String> pics, ImageView iv1, ImageView iv2) {
+    public static void showImage(Activity activity, List<String> pics, ImageView iv1, ImageView iv2) {
         if (iv1 != null) {
-            MyUtil.displayPic(iv1, "");
+            MyUtil.displayPic(activity, iv1, "");
             if (pics.size() >= 1) {
-                MyUtil.displayPic(iv1, pics.get(0));
+                MyUtil.displayPic(activity, iv1, pics.get(0));
             }
         }
 
         if (iv2 != null) {
-            MyUtil.displayPic(iv2, "");
+            MyUtil.displayPic(activity, iv2, "");
             if (pics.size() >= 2) {
-                MyUtil.displayPic(iv2, pics.get(1));
+                MyUtil.displayPic(activity, iv2, pics.get(1));
             }
         }
 

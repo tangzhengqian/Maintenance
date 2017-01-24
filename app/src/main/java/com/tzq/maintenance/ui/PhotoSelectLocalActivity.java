@@ -133,7 +133,7 @@ public class PhotoSelectLocalActivity extends BaseActivity {
             vh.photoCover.setVisibility(View.INVISIBLE);
             final String path = getItem(position);
             if (mTuzhiSys) {
-                MyUtil.displayPic(vh.photoIv, path);
+                MyUtil.displayPic(mAct, vh.photoIv, path);
             } else {
 //                if(path.contains("Camera")||path.contains("camera")){
 //                    MyUtil.displayLargePic(vh.photoIv, "file://" + path);

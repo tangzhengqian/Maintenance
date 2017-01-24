@@ -287,11 +287,11 @@ public class CheckActivity extends BaseActivity {
                 mBeforePics.add(s);
             }
         }
-        MyUtil.showImage(mBeforePics, mBeforeIv1, mBeforeIv2);
+        MyUtil.showImage(mAct, mBeforePics, mBeforeIv1, mBeforeIv2);
 
-        MyUtil.showImage(mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
-        MyUtil.showImage(mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
-        MyUtil.showImage(mBean.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
+        MyUtil.showImage(mAct, mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
+        MyUtil.showImage(mAct, mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
+        MyUtil.showImage(mAct, mBean.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
     }
 
 
@@ -468,9 +468,9 @@ public class CheckActivity extends BaseActivity {
         stakeTv.setText(stake.stake_ud);
         stakeN1Tv.setText(stake.stake_num1);
         stakeN2Tv.setText(stake.stake_num2);
-        MyUtil.showImage(stake.getBeforeNewPics(), beforeIv, null);
-        MyUtil.showImage(stake.getConstructionNewPics(), consIv, null);
-        MyUtil.showImage(stake.getAfterNewPics(), afterIv, null);
+        MyUtil.showImage(mAct, stake.getBeforeNewPics(), beforeIv, null);
+        MyUtil.showImage(mAct, stake.getConstructionNewPics(), consIv, null);
+        MyUtil.showImage(mAct, stake.getAfterNewPics(), afterIv, null);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -701,21 +701,21 @@ public class CheckActivity extends BaseActivity {
                 mBean.getTuzhiNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getTuzhiNewPicUris().addAll(uris);
-                MyUtil.showImage(mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
+                MyUtil.showImage(mAct, mBean.getTuzhiNewPicUris(), mTuzhiIv1, mTuzhiIv2);
             }
         } else if (requestCode == REQUEST_TUZHI_SYS) {
             if (resultCode == RESULT_OK) {
                 mBean.getTuzhiSysNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getTuzhiSysNewPicUris().addAll(uris);
-                MyUtil.showImage(mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
+                MyUtil.showImage(mAct, mBean.getTuzhiSysNewPicUris(), mTuzhi2Iv1, mTuzhi2Iv2);
             }
         } else if (requestCode == REQUEST_ATTACH) {
             if (resultCode == RESULT_OK) {
                 mBean.getAttachNewPicUris().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getAttachNewPicUris().addAll(uris);
-                MyUtil.showImage(mBean.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
+                MyUtil.showImage(mAct, mBean.getAttachNewPicUris(), mAttachIv1, mAttachIv2);
             }
         }
     }

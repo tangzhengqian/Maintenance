@@ -86,7 +86,7 @@ public class PhotoViewPagerActivity extends BaseActivity {
             photo.setOnViewTapListener(mPhotoTapListener);
             container.addView(photo);
 
-            MyUtil.displayLargePic(photo, mUrlList.get(position));
+            MyUtil.displayLargePic(mAct, photo, mUrlList.get(position));
             return photo;
         }
 

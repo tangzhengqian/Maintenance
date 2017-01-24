@@ -67,9 +67,9 @@ public class StakeActivity extends BaseActivity {
 
         mStakeNum1Et.setText(mBean.stake_num1);
         mStakeNum2Et.setText(mBean.stake_num2);
-        MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
-        MyUtil.showImage(mBean.getConstructionNewPics(), mConsIv1, mConsIv2);
-        MyUtil.showImage(mBean.getAfterNewPics(), mAfterIv1, mAfterIv2);
+        MyUtil.showImage(mAct, mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
+        MyUtil.showImage(mAct, mBean.getConstructionNewPics(), mConsIv1, mConsIv2);
+        MyUtil.showImage(mAct, mBean.getAfterNewPics(), mAfterIv1, mAfterIv2);
     }
 
     @Override
@@ -121,21 +121,21 @@ public class StakeActivity extends BaseActivity {
                 mBean.getBeforeNewPics().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getBeforeNewPics().addAll(uris);
-                MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
+                MyUtil.showImage(mAct, mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
             }
         } else if (requestCode == REQUEST_PHOTO_CONSTRUCTION) {
             if (resultCode == RESULT_OK) {
                 mBean.getConstructionNewPics().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getConstructionNewPics().addAll(uris);
-                MyUtil.showImage(mBean.getConstructionNewPics(), mConsIv1, mConsIv2);
+                MyUtil.showImage(mAct, mBean.getConstructionNewPics(), mConsIv1, mConsIv2);
             }
         } else if (requestCode == REQUEST_PHOTO_AFTER) {
             if (resultCode == RESULT_OK) {
                 mBean.getAfterNewPics().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getAfterNewPics().addAll(uris);
-                MyUtil.showImage(mBean.getAfterNewPics(), mAfterIv1, mAfterIv2);
+                MyUtil.showImage(mAct, mBean.getAfterNewPics(), mAfterIv1, mAfterIv2);
             }
         }
     }

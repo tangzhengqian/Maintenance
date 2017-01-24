@@ -278,7 +278,7 @@ public class NoticeActivity extends BaseActivity {
             }
         }
 
-        MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
+        MyUtil.showImage(mAct, mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
     }
 
 
@@ -450,7 +450,7 @@ public class NoticeActivity extends BaseActivity {
                 mBean.getBeforeNewPics().clear();
                 ArrayList<String> uris = data.getStringArrayListExtra("uris");
                 mBean.getBeforeNewPics().addAll(uris);
-                MyUtil.showImage(mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
+                MyUtil.showImage(mAct, mBean.getBeforeNewPics(), mBeforeIv1, mBeforeIv2);
             }
         }
     }
